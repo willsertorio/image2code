@@ -134,6 +134,7 @@ function renderOverview() {
     <div class="label refs-label">Reference images</div>
     <div class="refs">${SAMPLES.map(s => `<a href="#${s.id}"><img src="${esc(s.thumb)}" alt="Reference photo: ${esc(s.name)}" loading="lazy"><span class="label">${esc(s.name)}</span></a>`).join('')}</div>
     <h2>Results</h2>
+    <p class="note">Human: Claude Opus 5.5, acting as the human reviewer, scored each scene from six captures of the running scene and its code, before Carbon graded it. Carbon: given the reference photo, the same captures and the scene's HTML, with the rubric.</p>
     <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Sample</th><th>Criteria</th><th>Human</th><th>Carbon</th><th>Agree</th></tr></thead><tbody>${results}</tbody></table></div>
     <h2>By category</h2>
     <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Category</th><th>Criteria</th><th>Human</th><th>Carbon</th><th>Agree</th></tr></thead><tbody>${catRows}</tbody></table></div>`;

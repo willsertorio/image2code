@@ -6,6 +6,7 @@ Run from the repo root, with your key in the environment (never committed):
     export OPENROUTER_API_KEY=...
     python3 rubrics/carbon.py generate            # all five samples
     python3 rubrics/carbon.py generate toast      # just one
+    python3 rubrics/carbon.py followup toast      # second turn asking for the HTML, after a refusal
     python3 rubrics/carbon.py grade               # after the captures are in
 
 generate writes   rubrics/samples/<id>/model.html           the scene
@@ -118,6 +119,30 @@ def generate(sid, key):
     print(f"  wrote model.html ({len(html):,} bytes, served by {resp.get('model')})")
 
 
+FOLLOWUP = "Please build the scene as a single HTML file using three.js."
+
+
+def followup(sid, key):
+    """Second turn: replay the prompt and Carbon's latest reply, then ask for the HTML once."""
+    d = os.path.join(HERE, "samples", sid)
+    first = json.load(open(os.path.join(d, "model_response.json")))["choices"][0]["message"]["content"]
+    print(f"{sid}: follow-up turn with {MODEL} ...")
+    resp = post({"model": MODEL, "messages": [
+        {"role": "user", "content": [
+            {"type": "text", "text": PROMPT},
+            {"type": "image_url", "image_url": {"url": data_url(os.path.join(HERE, "img", f"{sid}.jpg"))}}]},
+        {"role": "assistant", "content": first},
+        {"role": "user", "content": FOLLOWUP}]}, key)
+    path = os.path.join(d, "followup_response.json")
+    html = extract_html(save_response(path, resp))
+    if not html:
+        print(f"  No HTML in the follow-up reply either (see {path}).")
+        return
+    with open(os.path.join(d, "model.html"), "w") as f:
+        f.write(html)
+    print(f"  wrote model.html ({len(html):,} bytes, served by {resp.get('model')})")
+
+
 def grade(sid, key):
     d = os.path.join(HERE, "samples", sid)
     caps = sorted(glob.glob(os.path.join(HERE, "captures", sid, "*.jpg")))
@@ -155,16 +180,16 @@ def grade(sid, key):
 
 
 def main():
-    if len(sys.argv) < 2 or sys.argv[1] not in ("generate", "grade"):
+    if len(sys.argv) < 2 or sys.argv[1] not in ("generate", "followup", "grade"):
         sys.exit(__doc__)
     key = os.environ.get("OPENROUTER_API_KEY") or sys.exit("Set OPENROUTER_API_KEY first.")
     ids = sys.argv[2:] or list(SAMPLES)
     for s in ids:
         if s not in SAMPLES:
             sys.exit(f"Unknown sample {s!r}; choose from {list(SAMPLES)}")
-    if sys.argv[1] == "generate":
+    if sys.argv[1] in ("generate", "followup"):
         for s in ids:
-            generate(s, key)
+            (generate if sys.argv[1] == "generate" else followup)(s, key)
         return
     path = os.path.join(HERE, "carbon.json")
     store = json.load(open(path)) if os.path.exists(path) else {}

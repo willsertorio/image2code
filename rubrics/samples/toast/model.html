@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photorealistic 3D Brioche French Toast — Three.js</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0e0d0c;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      user-select: none;
+    }
+    canvas { display: block; width: 100%; height: 100%; }
+
+    #loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #1b1917 0%, #0b0a09 100%);
+      color: #f3ead8;
+      z-index: 20;
+      transition: opacity 0.7s ease, visibility 0.7s ease;
+    }
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border: 3px solid rgba(243, 234, 216, 0.16);
+      border-top-color: #e59b38;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loader p {
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(243, 234, 216, 0.78);
+    }
+
+    #ui {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: rgba(18, 17, 16, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      color: rgba(255, 250, 240, 0.85);
+      font-size: 12px;
+      z-index: 10;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    }
+    .hint {
+      padding: 0 6px;
+      color: rgba(255, 250, 240, 0.62);
+      white-space: nowrap;
+    }
+    button {
+      background: rgba(255, 255, 255, 0.09);
+      color: #f7efe2;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 11.5px;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+    button:hover {
+      background: rgba(229, 155, 56, 0.28);
+      border-color: rgba(229, 155, 56, 0.55);
+    }
+    button.active {
+      background: rgba(229, 155, 56, 0.34);
+      border-color: rgba(229, 155, 56, 0.7);
+      color: #fff8eb;
+    }
+    @media (max-width: 600px) {
+      .hint { display: none; }
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="loader">
+    <div class="spinner"></div>
+    <p>Baking Procedural 3D Scene...</p>
+  </div>
+
+  <div id="ui">
+    <span class="hint">Drag to orbit · Scroll to zoom</span>
+    <button id="toggleDof" class="active">Macro DoF: ON</button>
+    <button id="resetCam">Hero Angle</button>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+    // -------------------------------------------------------------------------
+    // Deterministic PRNG & Fast 3D Value/Gradient Noise
+    // -------------------------------------------------------------------------
+    function mulberry32(seed) {
+      let a = seed >>> 0;
+      return function () {
+        a |= 0;
+        a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    const perm = new Uint8Array(512);
+    {
+      const rand = mulberry32(1337);
+      const p = new Uint8Array(256);
+      for (let i = 0; i < 256; i++) p[i] = i;
+      for (let i = 255; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        const tmp = p[i]; p[i] = p[j]; p[j] = tmp;
+      }
+      for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+    }
+
+    function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+    function lerp(a, b, t) { return a + t * (b - a); }
+    function smoothstep(e0, e1, x) {
+      const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
+      return t * t * (3 - 2 * t);
+    }
+
+    function grad3(hash, x, y, z) {
+      const h = hash & 15;
+      const u = h < 8 ? x : y;
+      const v = h < 4 ? y : (h === 12 || h === 14 ? x : z);
+      return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+    }
+
+    function noise3(x, y, z) {
+      const X = Math.floor(x) & 255;
+      const Y = Math.floor(y) & 255;
+      const Z = Math.floor(z) & 255;
+      x -= Math.floor(x);
+      y -= Math.floor(y);
+      z -= Math.floor(z);
+      const u = fade(x), v = fade(y), w = fade(z);
+      const A = perm[X] + Y, AA = perm[A] + Z, AB = perm[A + 1] + Z;
+      const B = perm[X + 1] + Y, BA = perm[B] + Z, BB = perm[B + 1] + Z;
+      return lerp(
+        lerp(
+          lerp(grad3(perm[AA], x, y, z), grad3(perm[BA], x - 1, y, z), u),
+          lerp(grad3(perm[AB], x, y - 1, z), grad3(perm[BB], x - 1, y - 1, z), u),
+          v
+        ),
+        lerp(
+          lerp(grad3(perm[AA + 1], x, y, z - 1), grad3(perm[BA + 1], x - 1, y, z - 1), u),
+          lerp(grad3(perm[AB + 1], x, y - 1, z - 1), grad3(perm[BB + 1], x - 1, y - 1, z - 1), u),
+          v
+        ),
+        w
+      );
+    }
+
+    function fbm3(x, y, z, octaves = 4) {
+      let sum = 0, amp = 0.5, freq = 1.0;
+      for (let i = 0; i < octaves; i++) {
+        sum += amp * noise3(x * freq, y * freq, z * freq);
+        freq *= 2.03;
+        amp *= 0.5;
+      }
+      return sum;
+    }
+
+    // -------------------------------------------------------------------------
+    // Procedural Textures
+    // -------------------------------------------------------------------------
+    function createLinenTextures() {
+      const size = 512;
+      const cDiff = document.createElement('canvas');
+      const cBump = document.createElement('canvas');
+      cDiff.width = cDiff.height = cBump.width = cBump.height = size;
+      const ctxD = cDiff.getContext('2d');
+      const ctxB = cBump.getContext('2d');
+      const imgD = ctxD.createImageData(size, size);
+      const imgB = ctxB.createImageData(size, size);
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const i = (y * size + x) * 4;
+          const warp = Math.sin(x * 0.65 + noise3(x * 0.05, y * 0.02, 1.2) * 1.5);
+          const weft = Math.sin(y * 0.65 + noise3(x * 0.02, y * 0.05, 4.7) * 1.5);
+          const slubX = noise3(x * 0.015, y * 0.25, 2.1) * 0.35;
+          const slubY = noise3(x * 0.25, y * 0.015, 6.3) * 0.35;
+          const weave = ((x + y) & 1) ? warp * 0.5 + 0.5 : weft * 0.5 + 0.5;
+          const mottle = fbm3(x * 0.015, y * 0.015, 0.5, 3) * 0.16;
+
+          const h = Math.max(0, Math.min(1, 0.45 + weave * 0.35 + slubX + slubY));
+          const lum = 0.78 + h * 0.22 + mottle;
+
+          // Warm grey-taupe natural linen matching reference tablecloth
+          imgD.data[i]     = Math.min(255, Math.max(0, 118 * lum));
+          imgD.data[i + 1] = Math.min(255, Math.max(0, 112 * lum));
+          imgD.data[i + 2] = Math.min(255, Math.max(0, 102 * lum));
+          imgD.data[i + 3] = 255;
+
+          const b = Math.floor(h * 255);
+          imgB.data[i] = imgB.data[i + 1] = imgB.data[i + 2] = b;
+          imgB.data[i + 3] = 255;
+        }
+      }
+      ctxD.putImageData(imgD, 0, 0);
+      ctxB.putImageData(imgB, 0, 0);
+
+      const map = new THREE.CanvasTexture(cDiff);
+      map.colorSpace = THREE.SRGBColorSpace;
+      map.wrapS = map.wrapT = THREE.RepeatWrapping;
+      map.repeat.set(9, 9);
+      map.anisotropy = 8;
+
+      const bumpMap = new THREE.CanvasTexture(cBump);
+      bumpMap.wrapS = bumpMap.wrapT = THREE.RepeatWrapping;
+      bumpMap.repeat.set(9, 9);
+      bumpMap.anisotropy = 8;
+
+      return { map, bumpMap };
+    }
+
+    function createPlateRoughnessMap() {
+      const size = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const img = ctx.createImageData(size, size);
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const i = (y * size + x) * 4;
+          const n1 = fbm3(x * 0.04, y * 0.04, 3.1, 4);
+          const speckle = noise3(x * 0.35, y * 0.35, 9.2);
+          // Matte stoneware ceramic (~0.38 to ~0.58 roughness)
+          let r = 0.46 + n1 * 0.14 + (speckle > 0.45 ? 0.12 : 0);
+          const v = Math.floor(Math.max(0, Math.min(1, r)) * 255);
+          img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+          img.data[i + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 3);
+      return tex;
+    }
+
+    function createBriocheMaps() {
+      const size = 512;
+      const cBump = document.createElement('canvas');
+      const cRough = document.createElement('canvas');
+      cBump.width = cBump.height = cRough.width = cRough.height = size;
+      const ctxB = cBump.getContext('2d');
+      const ctxR = cRough.getContext('2d');
+      const imgB = ctxB.createImageData(size, size);
+      const imgR = ctxR.createImageData(size, size);
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const i = (y * size + x) * 4;
+          // Spongy bread pores + baked crinkles
+          const cell1 = Math.abs(noise3(x * 0.11, y * 0.11, 1.4));
+          const cell2 = Math.abs(noise3(x * 0.24, y * 0.24, 5.8));
+          const pores = Math.pow(Math.min(1, cell1 * 1.4), 0.7) * 0.65 + cell2 * 0.35;
+          const macro = fbm3(x * 0.025, y * 0.025, 2.7, 3) * 0.35 + 0.5;
+
+          const bumpVal = Math.max(0, Math.min(1, pores * 0.72 + macro * 0.28));
+          // Glossy butter/syrup patches vs toasted crumb
+          const glazePatch = smoothstep(0.42, 0.68, fbm3(x * 0.018, y * 0.018, 8.1, 3) + 0.5);
+          const roughVal = lerp(0.58, 0.14, glazePatch) + (1.0 - pores) * 0.12;
+
+          const bByte = Math.floor(bumpVal * 255);
+          const rByte = Math.floor(Math.max(0.08, Math.min(0.88, roughVal)) * 255);
+
+          imgB.data[i] = imgB.data[i + 1] = imgB.data[i + 2] = bByte;
+          imgB.data[i + 3] = 255;
+
+          imgR.data[i] = imgR.data[i + 1] = imgR.data[i + 2] = rByte;
+          imgR.data[i + 3] = 255;
+        }
+      }
+      ctxB.putImageData(imgB, 0, 0);
+      ctxR.putImageData(imgR, 0, 0);
+
+      const bumpMap = new THREE.CanvasTexture(cBump);
+      bumpMap.wrapS = bumpMap.wrapT = THREE.RepeatWrapping;
+      bumpMap.anisotropy = 8;
+
+      const roughnessMap = new THREE.CanvasTexture(cRough);
+      roughnessMap.wrapS = roughnessMap.wrapT = THREE.RepeatWrapping;
+      roughnessMap.anisotropy = 8;
+
+      return { bumpMap, roughnessMap };
+    }
+
+    function createBananaTextures(syrupGlazed = false) {
+      const size = 512;
+      const cCol = document.createElement('canvas');
+      const cBump = document.createElement('canvas');
+      cCol.width = cCol.height = cBump.width = cBump.height = size;
+      const ctxC = cCol.getContext('2d');
+      const ctxB = cBump.getContext('2d');
+      const imgC = ctxC.createImageData(size, size);
+      const imgB = ctxB.createImageData(size, size);
+
+      const half = size * 0.5;
+
+      // Pre-generate tiny dark brown ovule/seed specks along the 3-carpel Y-arms
+      const rand = mulberry32(syrupGlazed ? 902 : 404);
+      const seeds = [];
+      for (let arm = 0; arm < 3; arm++) {
+        const baseAngle = arm * ((Math.PI * 2) / 3) + 0.35;
+        for (let s = 0; s < 5; s++) {
+          const dist = 0.08 + rand() * 0.22;
+          const ang = baseAngle + (rand() - 0.5) * 0.45;
+          seeds.push({
+            x: Math.cos(ang) * dist,
+            y: Math.sin(ang) * dist,
+            r: 0.012 + rand() * 0.012
+          });
+        }
+      }
+
+      for (let py = 0; py < size; py++) {
+        for (let px = 0; px < size; px++) {
+          const i = (py * size + px) * 4;
+          const nx = (px - half) / half;
+          const ny = (py - half) / half;
+          const r = Math.hypot(nx, ny);
+          const ang = Math.atan2(ny, nx);
+
+          // Creamy banana flesh base
+          let R = 243, G = 231, B = 192;
+          let bump = 0.55;
+
+          if (r <= 1.05) {
+            // Subtle radial vascular fibers
+            const radial = noise3(Math.cos(ang) * 9.0, Math.sin(ang) * 9.0, r * 3.5);
+            const fiber = radial * 0.5 + 0.5;
+            const ring = Math.exp(-Math.pow((r - 0.36) / 0.14, 2));
+
+            // 3-pointed carpel cleft in center
+            const cleftWave = Math.pow(Math.max(0, Math.cos(3 * (ang - 0.35) + noise3(nx * 4, ny * 4, 1.1) * 0.4)), 2.2);
+            const coreMask = Math.exp(-Math.pow(r / (0.14 + 0.16 * cleftWave), 2.2));
+
+            // Blend warm golden-tan inner ring & carpel core
+            const warmFactor = coreMask * 0.72 + ring * 0.28 * (0.6 + 0.4 * fiber);
+            R = lerp(R, 174, warmFactor);
+            G = lerp(G, 126, warmFactor);
+            B = lerp(B, 58, warmFactor);
+
+            // Faint radial fibrous streaks in mid-flesh
+            const streakMask = smoothstep(0.22, 0.45, r) * (1 - smoothstep(0.68, 0.88, r));
+            R -= streakMask * radial * 9;
+            G -= streakMask * radial * 11;
+            B -= streakMask * radial * 14;
+
+            // Slightly brighter creamy outer edge
+            const outerRim = smoothstep(0.80, 0.96, r);
+            R = lerp(R, 247, outerRim * 0.45);
+            G = lerp(G, 238, outerRim * 0.45);
+            B = lerp(B, 206, outerRim * 0.45);
+
+            bump = 0.56 - coreMask * 0.28 + radial * streakMask * 0.12 + outerRim * 0.08;
+
+            // Tiny dark seed specks
+            for (let s = 0; s < seeds.length; s++) {
+              const d = Math.hypot(nx - seeds[s].x, ny - seeds[s].y);
+              if (d < seeds[s].r * 1.8) {
+                const sm = 1.0 - smoothstep(seeds[s].r * 0.3, seeds[s].r * 1.8, d);
+                R = lerp(R, 76, sm * 0.85);
+                G = lerp(G, 43, sm * 0.85);
+                B = lerp(B, 16, sm * 0.85);
+                bump -= sm * 0.22;
+              }
+            }
+
+            // Optional golden maple syrup pooling across center/bottom of leaning foreground slices
+            if (syrupGlazed) {
+              const pool = smoothstep(-0.25, 0.55, ny + noise3(nx * 3, ny * 3, 7.2) * 0.22) * (1.0 - smoothstep(0.55, 0.92, r));
+              R = lerp(R, 198, pool * 0.58);
+              G = lerp(G, 108, pool * 0.58);
+              B = lerp(B, 22, pool * 0.58);
+            }
+          } else {
+            // Side peeled ridges region
+            const stripe = noise3(px * 0.18, py * 0.02, 3.3) * 8;
+            R = 238 + stripe;
+            G = 225 + stripe;
+            B = 182 + stripe;
+            bump = 0.5 + stripe * 0.015;
+          }
+
+          imgC.data[i]     = Math.min(255, Math.max(0, R));
+          imgC.data[i + 1] = Math.min(255, Math.max(0, G));
+          imgC.data[i + 2] = Math.min(255, Math.max(0, B));
+          imgC.data[i + 3] = 255;
+
+          const bVal = Math.floor(Math.max(0, Math.min(1, bump)) * 255);
+          imgB.data[i] = imgB.data[i + 1] = imgB.data[i + 2] = bVal;
+          imgB.data[i + 3] = 255;
+        }
+      }
+
+      ctxC.putImageData(imgC, 0, 0);
+      ctxB.putImageData(imgB, 0, 0);
+
+      const map = new THREE.CanvasTexture(cCol);
+      map.colorSpace = THREE.SRGBColorSpace;
+      map.anisotropy = 8;
+
+      const bumpMap = new THREE.CanvasTexture(cBump);
+      bumpMap.anisotropy = 8;
+
+      return { map, bumpMap };
+    }
+
+    function createBlueberryTextures() {
+      const size = 512;
+      const cCol = document.createElement('canvas');
+      const cRough = document.createElement('canvas');
+      cCol.width = cCol.height = cRough.width = cRough.height = size;
+      const ctxC = cCol.getContext('2d');
+      const ctxR = cRough.getContext('2d');
+      const imgC = ctxC.createImageData(size, size);
+      const imgR = ctxR.createImageData(size, size);
+
+      for (let py = 0; py < size; py++) {
+        const v = py / size; // v=0 is top pole (calyx crown)
+        const theta = v * Math.PI;
+        for (let px = 0; px < size; px++) {
+          const i = (py * size + px) * 4;
+          const u = px / size;
+          const phi = u * Math.PI * 2;
+
+          // 3D spherical coordinates so seam-free!
+          const sx = Math.sin(theta) * Math.cos(phi);
+          const sy = Math.cos(theta);
+          const sz = Math.sin(theta) * Math.sin(phi);
+
+          // Epicuticular powdery wax "bloom" mottle
+          const n1 = fbm3(sx * 2.8 + 4.1, sy * 2.8, sz * 2.8, 4);
+          const n2 = noise3(sx * 9.5, sy * 9.5, sz * 9.5);
+          let bloom = smoothstep(-0.12, 0.26, n1 + n2 * 0.16);
+
+          // Rubbed shiny dark spots
+          const rub = smoothstep(0.18, 0.42, noise3(sx * 2.1 - 3.0, sy * 2.1, sz * 2.1));
+          bloom *= (1.0 - rub * 0.85);
+
+          // Extra dusty bloom around crown rim, dark woody inside calyx basin
+          const crownBasin = 1.0 - smoothstep(0.06, 0.18, v);
+          const crownRim = Math.exp(-Math.pow((v - 0.19) / 0.07, 2));
+          bloom = Math.min(1.0, bloom + crownRim * 0.42) * (1.0 - crownBasin);
+
+          // Deep blue-black skin -> dusty slate-indigo wax bloom
+          let R = lerp(16, 76, bloom);
+          let G = lerp(21, 94, bloom);
+          let B = lerp(38, 132, bloom);
+
+          // Woody dark brown-charcoal center inside calyx
+          R = lerp(R, 24, crownBasin);
+          G = lerp(G, 19, crownBasin);
+          B = lerp(B, 20, crownBasin);
+
+          const rough = lerp(0.16, 0.56, bloom) + crownBasin * 0.35;
+
+          imgC.data[i]     = Math.floor(R);
+          imgC.data[i + 1] = Math.floor(G);
+          imgC.data[i + 2] = Math.floor(B);
+          imgC.data[i + 3] = 255;
+
+          const rByte = Math.floor(Math.max(0.1, Math.min(0.95, rough)) * 255);
+          imgR.data[i] = imgR.data[i + 1] = imgR.data[i + 2] = rByte;
+          imgR.data[i + 3] = 255;
+        }
+      }
+
+      ctxC.putImageData(imgC, 0, 0);
+      ctxR.putImageData(imgR, 0, 0);
+
+      const map = new THREE.CanvasTexture(cCol);
+      map.colorSpace = THREE.SRGBColorSpace;
+      map.anisotropy = 8;
+
+      const roughnessMap = new THREE.CanvasTexture(cRough);
+      roughnessMap.anisotropy = 8;
+
+      return { map, roughnessMap };
+    }
+
+    // -------------------------------------------------------------------------
+    // Scene, Camera, Renderer & Studio Window Environment
+    // -------------------------------------------------------------------------
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.06;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x161412);
+
+    const camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 0.1, 60);
+    const HERO_POS = new THREE.Vector3(0.12, 5.55, 8.15);
+    const HERO_TARGET = new THREE.Vector3(0.02, 1.38, 0.22);
+    camera.position.copy(HERO_POS);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.copy(HERO_TARGET);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.minDistance = 4.2;
+    controls.maxDistance = 15.5;
+    controls.maxPolarAngle = Math.PI * 0.465;
+    controls.update();
+
+    // Custom soft morning cafe window environment for crisp reflections on syrup & berries
+    function buildStudioEnvironment() {
+      const envScene = new THREE.Scene();
+      envScene.background = new THREE.Color(0x1c1a17);
+
+      const boxGeo = new THREE.PlaneGeometry(1, 1);
+
+      // Large soft morning window on left/front-top
+      const mainWindow = new THREE.Mesh(
+        boxGeo,
+        new THREE.MeshBasicMaterial({ color: new THREE.Color(5.5, 5.1, 4.5), side: THREE.DoubleSide })
+      );
+      mainWindow.scale.set(14, 10, 1);
+      mainWindow.position.set(-10, 9, 7);
+      mainWindow.lookAt(0, 1, 0);
+      envScene.add(mainWindow);
+
+      // Secondary overhead softbox strip for top berry & crust specular sheen
+      const topStrip = new THREE.Mesh(
+        boxGeo,
+        new THREE.MeshBasicMaterial({ color: new THREE.Color(3.2, 3.0, 2.7), side: THREE.DoubleSide })
+      );
+      topStrip.scale.set(10, 5, 1);
+      topStrip.position.set(1, 14, 3);
+      topStrip.lookAt(0, 1, 0);
+      envScene.add(topStrip);
+
+      // Warm amber bounce card on right-back
+      const warmBounce = new THREE.Mesh(
+        boxGeo,
+        new THREE.MeshBasicMaterial({ color: new THREE.Color(2.2, 1.65, 1.05), side: THREE.DoubleSide })
+      );
+      warmBounce.scale.set(12, 8, 1);
+      warmBounce.position.set(11, 5, -5);
+      warmBounce.lookAt(0, 1, 0);
+      envScene.add(warmBounce);
+
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const envRT = pmrem.fromScene(envScene, 0.045);
+      pmrem.dispose();
+      return envRT.texture;
+    }
+
+    scene.environment = buildStudioEnvironment();
+    scene.environmentIntensity = 0.85;
+
+    // Key window directional light
+    const keyLight = new THREE.DirectionalLight(0xfff5e6, 2.65);
+    keyLight.position.set(-5.2, 8.4, 5.4);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(2048, 2048);
+    keyLight.shadow.camera.near = 2.0;
+    keyLight.shadow.camera.far = 22.0;
+    const d = 5.5;
+    keyLight.shadow.camera.left = -d;
+    keyLight.shadow.camera.right = d;
+    keyLight.shadow.camera.top = d;
+    keyLight.shadow.camera.bottom = -d;
+    keyLight.shadow.bias = -0.0004;
+    keyLight.shadow.normalBias = 0.016;
+    scene.add(keyLight);
+
+    // Warm rim backlight for golden brioche edges & translucent syrup
+    const rimLight = new THREE.DirectionalLight(0xffdca8, 1.35);
+    rimLight.position.set(5.5, 5.8, -5.5);
+    rimLight.castShadow = true;
+    rimLight.shadow.mapSize.set(1024, 1024);
+    rimLight.shadow.bias = -0.0005;
+    rimLight.shadow.normalBias = 0.02;
+    scene.add(rimLight);
+
+    // Gentle front-fill bounce
+    const fillLight = new THREE.DirectionalLight(0xeef2ff, 0.45);
+    fillLight.position.set(2.5, 3.2, 6.8);
+    scene.add(fillLight);
+
+    // -------------------------------------------------------------------------
+    // 1. Woven Linen Tablecloth & Matte Black Ceramic Plate
+    // -------------------------------------------------------------------------
+    const linenTex = createLinenTextures();
+    const clothGeo = new THREE.PlaneGeometry(34, 34, 110, 110);
+    clothGeo.rotateX(-Math.PI / 2);
+    {
+      const pos = clothGeo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const z = pos.getZ(i);
+        const dist = Math.hypot(x, z);
+        // Flat under plate foot, gentle natural fabric folds outside plate
+        const outside = smoothstep(3.8, 7.2, dist);
+        const fold1 = Math.sin(x * 0.45 + z * 0.25 + noise3(x * 0.15, 0, z * 0.15) * 2.0) * 0.07;
+        const fold2 = fbm3(x * 0.18, 0.5, z * 0.18, 3) * 0.11;
+        pos.setY(i, outside * (fold1 + fold2));
+      }
+      clothGeo.computeVertexNormals();
+    }
+    const clothMat = new THREE.MeshPhysicalMaterial({
+      map: linenTex.map,
+      bumpMap: linenTex.bumpMap,
+      bumpScale: 0.025,
+      roughness: 0.92,
+      metalness: 0.0,
+      sheen: 0.45,
+      sheenRoughness: 0.85,
+      sheenColor: new THREE.Color(0xa69f93)
+    });
+    const tablecloth = new THREE.Mesh(clothGeo, clothMat);
+    tablecloth.receiveShadow = true;
+    scene.add(tablecloth);
+
+    // Helper for plate floor height at radius r
+    function getPlateFloorY(r) {
+      if (r <= 3.1) return 0.13 + (r / 3.1) * 0.012;
+      const t = Math.min(1, (r - 3.1) / (5.45 - 3.1));
+      return 0.142 + Math.pow(t, 1.85) * 0.40;
+    }
+
+    {
+      const profile = [];
+      // Top center outward to rim
+      for (let i = 0; i <= 42; i++) {
+        const r = (i / 42) * 5.45;
+        profile.push(new THREE.Vector2(r, getPlateFloorY(r)));
+      }
+      // Rounded lip
+      profile.push(new THREE.Vector2(5.52, 0.545));
+      profile.push(new THREE.Vector2(5.54, 0.50));
+      profile.push(new THREE.Vector2(5.47, 0.43));
+      // Underside curve down to foot ring resting on tablecloth y=0
+      profile.push(new THREE.Vector2(4.45, 0.16));
+      profile.push(new THREE.Vector2(3.45, 0.01));
+      profile.push(new THREE.Vector2(3.25, 0.0));
+      profile.push(new THREE.Vector2(3.12, 0.05));
+      profile.push(new THREE.Vector2(0.0, 0.05));
+
+      const plateGeo = new THREE.LatheGeometry(profile, 112);
+      // Planar UVs on top for isotropic ceramic micro-speckle
+      const pos = plateGeo.attributes.position;
+      const uvs = plateGeo.attributes.uv;
+      for (let i = 0; i < pos.count; i++) {
+        uvs.setXY(i, pos.getX(i) * 0.12 + 0.5, pos.getZ(i) * 0.12 + 0.5);
+      }
+      plateGeo.computeVertexNormals();
+
+      const plateRoughMap = createPlateRoughnessMap();
+      const plateMat = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(0x131314),
+        roughnessMap: plateRoughMap,
+        roughness: 0.92,
+        bumpMap: plateRoughMap,
+        bumpScale: 0.0035,
+        metalness: 0.04,
+        clearcoat: 0.18,
+        clearcoatRoughness: 0.45
+      });
+      const plate = new THREE.Mesh(plateGeo, plateMat);
+      plate.castShadow = true;
+      plate.receiveShadow = true;
+      scene.add(plate);
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. Procedural Brioche French Toast Builder
+    // -------------------------------------------------------------------------
+    const briocheMaps = createBriocheMaps();
+    const briocheMat = new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      vertexColors: true,
+      bumpMap: briocheMaps.bumpMap,
+      bumpScale: 0.022,
+      roughnessMap: briocheMaps.roughnessMap,
+      roughness: 0.78,
+      metalness: 0.0,
+      clearcoat: 0.58,
+      clearcoatRoughnessMap: briocheMaps.roughnessMap,
+      clearcoatRoughness: 0.36,
+      sheen: 0.22,
+      sheenRoughness: 0.65,
+      sheenColor: new THREE.Color(0xf4b958)
+    });
+
+    function createBriocheSlice({ width = 3.35, height = 0.74, depth = 3.05, seed = 1, syrupFront = 0.5 }) {
+      const segX = 72, segY = 24, segZ = 72;
+      const geo = new THREE.BoxGeometry(2, 2, 2, segX, segY, segZ);
+      const pos = geo.attributes.position;
+      const uvs = geo.attributes.uv;
+      const colors = new Float32Array(pos.count * 3);
+
+      const hx = width * 0.5;
+      const hy = height * 0.5;
+      const hz = depth * 0.5;
+      const bevel = 0.15;
+
+      const cCrumb = new THREE.Color(0xeab048);     // Golden egg-soaked brioche interior
+      const cSear  = new THREE.Color(0xb85614);     // Pan-browned golden-orange toast
+      const cDark  = new THREE.Color(0x6e2606);     // Deep caramelized sear spots
+      const cCrust = new THREE.Color(0x9a3d0c);     // Rich caramelized brioche crust
+      const cCrustHi = new THREE.Color(0xd66f1e);   // Warm amber crust highlights
+      const tmpCol = new THREE.Color();
+
+      for (let i = 0; i < pos.count; i++) {
+        const ux = pos.getX(i); // [-1, 1]
+        const uy = pos.getY(i);
+        const uz = pos.getZ(i);
+
+        // Assign non-stretched world-scale UVs before deforming
+        if (Math.abs(uy) > 0.999) {
+          uvs.setXY(i, ux * hx * 0.36 + 0.5, uz * hz * 0.36 + 0.5);
+        } else if (Math.abs(ux) > 0.999) {
+          uvs.setXY(i, uz * hz * 0.36 + 0.5, uy * hy * 0.36 + 0.5);
+        } else {
+          uvs.setXY(i, ux * hx * 0.36 + 0.5, uy * hy * 0.36 + 0.5);
+        }
+
+        // Exact rounded-box projection
+        const ix = hx - bevel, iy = hy - bevel, iz = hz - bevel;
+        const x0 = ux * hx, y0 = uy * hy, z0 = uz * hz;
+        const cx = Math.max(-ix, Math.min(ix, x0));
+        const cy = Math.max(-iy, Math.min(iy, y0));
+        const cz = Math.max(-iz, Math.min(iz, z0));
+        let dx = x0 - cx, dy = y0 - cy, dz = z0 - cz;
+        const dLen = Math.hypot(dx, dy, dz);
+        if (dLen > 1e-5) {
+          dx = (dx / dLen) * bevel;
+          dy = (dy / dLen) * bevel;
+          dz = (dz / dLen) * bevel;
+        }
+        let px = cx + dx;
+        let py = cy + dy;
+        let pz = cz + dz;
+
+        // Classic brioche loaf silhouette: rounded crown on -z, subtle waist pinch on sides
+        const crownFactor = smoothstep(-0.15, 0.95, -uz);
+        const waistPinch = Math.exp(-Math.pow((uz - 0.18) / 0.35, 2));
+        px *= 1.0 + 0.075 * crownFactor - 0.055 * waistPinch;
+        pz -= 0.16 * (1.0 - ux * ux) * smoothstep(0.1, 1.0, -uz);
+        // Gentle rounded bulge on front edge (+z) as well
+        pz += 0.09 * (1.0 - ux * ux) * smoothstep(0.1, 1.0, uz);
+
+        // Distance from outer perimeter for crust detection
+        const edgeDist = Math.min(1.0 - Math.abs(ux), 1.0 - Math.abs(uz));
+        const isSide = 1.0 - smoothstep(0.0, 0.24, edgeDist);
+
+        // Organic 3D bread displacement + vertical baked crust fluting
+        const angle = Math.atan2(pz, px);
+        const flute = Math.sin(angle * 26.0 + noise3(px * 1.6 + seed * 5, py * 1.2, pz * 1.6) * 2.8);
+        const nMacro = fbm3(px * 0.85 + seed * 11.3, py * 1.1, pz * 0.85 - seed * 7.1, 3);
+        const nPores = noise3(px * 4.5 + seed * 3.1, py * 4.5, pz * 4.5);
+
+        // Outward crust crinkles
+        const radialScale = 1.0 + isSide * (flute * 0.016 + nMacro * 0.045);
+        px *= radialScale;
+        pz *= radialScale;
+
+        // Top/bottom uneven custard puffing & edge pillowing
+        const centerDip = (1.0 - ux * ux) * (1.0 - uz * uz);
+        py += Math.sign(uy) * (nMacro * 0.045 + nPores * 0.014 - centerDip * 0.025 + isSide * 0.018);
+
+        pos.setXYZ(i, px, py, pz);
+
+        // Rich toasted French toast vertex colors
+        const searNoise = fbm3(px * 1.25 + seed * 17.0, py * 1.8, pz * 1.25 + seed * 4.2, 4);
+        const searAmt = smoothstep(-0.14, 0.28, searNoise);
+        const charAmt = smoothstep(0.22, 0.46, searNoise);
+
+        // Face crumb color
+        tmpCol.copy(cCrumb).lerp(cSear, searAmt * 0.78).lerp(cDark, charAmt * 0.55);
+
+        // Blend into caramelized outer crust
+        const crustBlend = smoothstep(0.22, 0.02, edgeDist);
+        const fluteShade = smoothstep(-0.7, 0.7, flute);
+        const crustCol = new THREE.Color().copy(cCrust).lerp(cCrustHi, fluteShade * 0.55).lerp(cDark, (1.0 - fluteShade) * 0.35 + charAmt * 0.35);
+        tmpCol.lerp(crustCol, crustBlend);
+
+        // Warm syrup saturation on front-facing crust
+        if (syrupFront > 0) {
+          const frontMask = smoothstep(-0.1, 0.85, uz) * crustBlend * syrupFront;
+          tmpCol.lerp(new THREE.Color(0x9e3a06), frontMask * 0.42);
+        }
+
+        colors[i * 3]     = tmpCol.r;
+        colors[i * 3 + 1] = tmpCol.g;
+        colors[i * 3 + 2] = tmpCol.b;
+      }
+
+      geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geo.computeVertexNormals();
+
+      const mesh = new THREE.Mesh(geo, briocheMat);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      return mesh;
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. Banana Slice & Blueberry Builders
+    // -------------------------------------------------------------------------
+    const bananaTexNormal = createBananaTextures(false);
+    const bananaTexSyrup  = createBananaTextures(true);
+
+    const bananaMatNormal = new THREE.MeshPhysicalMaterial({
+      map: bananaTexNormal.map,
+      bumpMap: bananaTexNormal.bumpMap,
+      bumpScale: 0.012,
+      roughness: 0.34,
+      metalness: 0.0,
+      clearcoat: 0.38,
+      clearcoatRoughness: 0.24,
+      sheen: 0.35,
+      sheenRoughness: 0.55,
+      sheenColor: new THREE.Color(0xfff5d6)
+    });
+
+    const bananaMatSyrup = new THREE.MeshPhysicalMaterial({
+      map: bananaTexSyrup.map,
+      bumpMap: bananaTexSyrup.bumpMap,
+      bumpScale: 0.01,
+      roughness: 0.18,
+      metalness: 0.0,
+      clearcoat: 0.92,
+      clearcoatRoughness: 0.07,
+      sheen: 0.3,
+      sheenColor: new THREE.Color(0xffd28a)
+    });
+
+    function createBananaSlice({ radius = 0.56, thickness = 0.23, seed = 1, syrup = false }) {
+      const radialSegs = 48, ringSegs = 12, sideSegs = 10;
+      const positions = [];
+      const uvs = [];
+      const indices = [];
+
+      // Parametric rounded cylinder so cut faces map cleanly inside UV circle [0..1]
+      const totalRings = ringSegs + sideSegs + ringSegs;
+      const bevelR = thickness * 0.24;
+      const innerR = radius - bevelR;
+      const halfH = thickness * 0.5;
+
+      for (let rIdx = 0; rIdx <= totalRings; rIdx++) {
+        let profR, profY, uvRadius;
+        if (rIdx <= ringSegs) {
+          // Top cut face (center -> outer bevel start)
+          const t = rIdx / ringSegs;
+          profR = t * innerR;
+          profY = halfH;
+          uvRadius = t * 0.46;
+        } else if (rIdx < ringSegs + sideSegs) {
+          // Rounded side wall (top bevel -> bottom bevel)
+          const t = (rIdx - ringSegs) / sideSegs;
+          const ang = t * Math.PI;
+          profR = innerR + Math.sin(ang) * bevelR;
+          profY = Math.cos(ang) * halfH;
+          uvRadius = 0.46 + Math.sin(ang) * 0.035;
+        } else {
+          // Bottom cut face (outer bevel -> center)
+          const t = 1.0 - (rIdx - ringSegs - sideSegs) / ringSegs;
+          profR = Math.max(0, t * innerR);
+          profY = -halfH;
+          uvRadius = t * 0.46;
+        }
+
+        for (let s = 0; s <= radialSegs; s++) {
+          const theta = (s / radialSegs) * Math.PI * 2;
+          const cs = Math.cos(theta), sn = Math.sin(theta);
+
+          // Natural slight oval & longitudinal banana ridges (5 subtle flat facets)
+          const pentagon = 1.0 + 0.022 * Math.cos(5 * theta + seed);
+          const wobble = 1.0 + 0.035 * noise3(cs * 1.8 + seed * 3.7, profY * 2.0, sn * 1.8);
+
+          const x = cs * profR * 1.05 * pentagon * wobble;
+          const z = sn * profR * 0.96 * pentagon * wobble;
+          // Gentle natural concavity in cut center
+          const cup = (1.0 - Math.pow(profR / radius, 2)) * 0.015;
+          const y = profY - Math.sign(profY) * cup + noise3(x * 3.2 + seed, z * 3.2, seed) * 0.008;
+
+          positions.push(x, y, z);
+          uvs.push(0.5 + cs * uvRadius, 0.5 + sn * uvRadius);
+        }
+      }
+
+      const stride = radialSegs + 1;
+      for (let rIdx = 0; rIdx < totalRings; rIdx++) {
+        for (let s = 0; s < radialSegs; s++) {
+          const a = rIdx * stride + s;
+          const b = a + stride;
+          const c = a + 1;
+          const d = b + 1;
+          indices.push(a, b, c, c, b, d);
+        }
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setIndex(indices);
+      geo.computeVertexNormals();
+
+      const mesh = new THREE.Mesh(geo, syrup ? bananaMatSyrup : bananaMatNormal);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      return mesh;
+    }
+
+    const berryTex = createBlueberryTextures();
+    const berryMat = new THREE.MeshPhysicalMaterial({
+      map: berryTex.map,
+      roughnessMap: berryTex.roughnessMap,
+      roughness: 0.85,
+      bumpMap: berryTex.roughnessMap,
+      bumpScale: 0.005,
+      metalness: 0.0,
+      clearcoat: 0.48,
+      clearcoatRoughnessMap: berryTex.roughnessMap,
+      clearcoatRoughness: 0.42,
+      sheen: 0.42,
+      sheenRoughness: 0.55,
+      sheenColor: new THREE.Color(0x7c97c9)
+    });
+
+    function createBlueberry({ radius = 0.28, seed = 1 }) {
+      const geo = new THREE.SphereGeometry(radius, 40, 32);
+      const pos = geo.attributes.position;
+
+      for (let i = 0; i < pos.count; i++) {
+        let x = pos.getX(i);
+        let y = pos.getY(i);
+        let z = pos.getZ(i);
+
+        const r = Math.hypot(x, y, z) || 1e-5;
+        const nx = x / r, ny = y / r, nz = z / r;
+        const theta = Math.acos(Math.max(-1, Math.min(1, ny))); // 0 at top pole
+        const phi = Math.atan2(nz, nx);
+
+        // Flatten poles like real plump blueberries
+        y *= 0.83;
+
+        // Characteristic 5-pointed star calyx crown at top pole
+        const starWave = Math.pow(0.5 + 0.5 * Math.cos(5 * phi + seed * 1.7 + Math.sin(2 * phi) * 0.25), 1.6);
+        const basin = Math.exp(-Math.pow(theta / 0.30, 2));
+        const crownRidge = Math.exp(-Math.pow((theta - (0.34 + 0.05 * starWave)) / 0.11, 2));
+
+        const crownDisp = -basin * 0.22 * radius + crownRidge * (0.045 + 0.075 * starWave) * radius;
+        // Bottom stem scar dimple
+        const stemDimple = Math.exp(-Math.pow((Math.PI - theta) / 0.28, 2)) * 0.08 * radius;
+        // Subtle organic lumpiness
+        const asym = fbm3(nx * 2.2 + seed * 5.3, ny * 2.2, nz * 2.2 - seed * 2.1, 3) * 0.09 * radius;
+
+        const scale = (r + crownDisp - stemDimple + asym) / r;
+        pos.setXYZ(i, x * scale, y * scale, z * scale);
+      }
+
+      geo.computeVertexNormals();
+      const mesh = new THREE.Mesh(geo, berryMat);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      return mesh;
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. Assemble the Stacked French Toast, Bananas & Blueberries
+    // -------------------------------------------------------------------------
+    const foodGroup = new THREE.Group();
+    scene.add(foodGroup);
+
+    // Slice 1: Bottom Brioche
+    const slice1 = createBriocheSlice({ width: 3.45, height: 0.72, depth: 3.12, seed: 11, syrupFront: 0.35 });
+    slice1.position.set(0.04, 0.50, -0.14);
+    slice1.rotation.set(0.02, -0.14, -0.02);
+    foodGroup.add(slice1);
+
+    // Slice 2: Middle Brioche (rotated diagonally with golden corner dipping forward-left, matching reference)
+    const slice2 = createBriocheSlice({ width: 3.32, height: 0.75, depth: 3.02, seed: 27, syrupFront: 0.85 });
+    slice2.position.set(0.02, 1.46, -0.06);
+    slice2.rotation.set(0.11, 0.58, -0.07);
+    foodGroup.add(slice2);
+
+    // Slice 3: Top Brioche (angled showing wide caramelized glossy crust across front-left & crown back-right)
+    const slice3 = createBriocheSlice({ width: 3.26, height: 0.76, depth: 2.98, seed: 43, syrupFront: 1.0 });
+    slice3.position.set(0.05, 2.34, -0.12);
+    slice3.rotation.set(0.14, 0.34, -0.09);
+    foodGroup.add(slice3);
+
+    // Helper to place banana slices
+    const bananaPlacements = [
+      // Layer 1 (between bottom & middle slice)
+      { pos: [-0.92, 0.96, 0.86], rot: [0.22, 0.3, -0.16], r: 0.56, t: 0.23, s: 1, syrup: true },
+      { pos: [-1.42, 1.12, 0.14], rot: [0.35, 0.1, 0.38],  r: 0.55, t: 0.22, s: 2, syrup: false },
+      { pos: [1.02,  0.96, 0.68], rot: [0.18, -0.2, -0.12],r: 0.57, t: 0.24, s: 3, syrup: true },
+      { pos: [0.85,  0.95, -0.85],rot: [-0.1, 0.4, 0.05],  r: 0.54, t: 0.22, s: 4, syrup: false },
+
+      // Layer 2 (between middle & top slice — signature white creamy slices peeking out)
+      { pos: [-0.94, 1.94, 0.68], rot: [0.28, 0.2, 0.24],  r: 0.55, t: 0.23, s: 5, syrup: false },
+      { pos: [0.22,  1.80, 0.84], rot: [0.16, 0.1, -0.08], r: 0.57, t: 0.24, s: 6, syrup: true },
+      { pos: [1.18,  1.92, 0.16], rot: [0.12, -0.3, -0.22],r: 0.54, t: 0.22, s: 7, syrup: false },
+      { pos: [-0.45, 1.88, -0.82],rot: [-0.15, 0.2, 0.1],  r: 0.54, t: 0.22, s: 8, syrup: false },
+
+      // Top Garnish (shingled on top brioche slice)
+      { pos: [-0.08, 2.74, 0.12], rot: [0.32, 0.25, -0.24],r: 0.55, t: 0.22, s: 9, syrup: true },
+      { pos: [0.12,  2.88, -0.68],rot: [0.24, -0.15,-0.18],r: 0.56, t: 0.23, s: 10, syrup: false },
+
+      // Foreground & Left Scatter on Matte Black Plate
+      // Far left flat banana slice
+      { pos: [-2.26, 0.30, 0.58], rot: [0.12, 0.4, -0.14], r: 0.58, t: 0.25, s: 11, syrup: false },
+      // Two signature upright leaning banana slices at front-center base!
+      { pos: [-0.10, 0.58, 1.56], rot: [1.08, -0.08, 0.12],r: 0.58, t: 0.24, s: 12, syrup: true },
+      { pos: [0.80,  0.58, 1.48], rot: [1.04, 0.28, -0.18],r: 0.57, t: 0.24, s: 13, syrup: true }
+    ];
+
+    bananaPlacements.forEach((b) => {
+      const mesh = createBananaSlice({ radius: b.r, thickness: b.t, seed: b.s, syrup: b.syrup });
+      mesh.position.set(...b.pos);
+      mesh.rotation.set(...b.rot);
+      foodGroup.add(mesh);
+    });
+
+    // Helper to place blueberries (with authentic orientations showing crowns & bloom)
+    const berryPlacements = [
+      // Top slice cluster
+      { pos: [-0.54, 2.84, 0.32], rot: [0.65, 0.4, -0.3],  r: 0.285, s: 1 },
+      { pos: [0.36,  2.70, 0.44], rot: [0.85, -0.2, 0.4],  r: 0.275, s: 2 },
+      { pos: [0.78,  2.69, 0.30], rot: [0.55, 0.6, -0.5],  r: 0.280, s: 3 },
+      { pos: [0.48,  2.78, -0.08],rot: [0.30, 1.1, 0.2],   r: 0.270, s: 4 },
+      { pos: [0.06,  2.80, -0.24],rot: [-0.4, 0.5, 0.7],   r: 0.255, s: 5 },
+      { pos: [-1.18, 2.38, -0.18],rot: [0.5, -0.8, 0.4],   r: 0.260, s: 6 },
+
+      // Center hero berry wedged between top & middle slice
+      { pos: [-0.36, 1.92, 0.90], rot: [1.15, 0.25, -0.2], r: 0.290, s: 7 },
+
+      // Left-middle hero berry sitting on banana slice of Layer 1
+      { pos: [-1.10, 1.24, 0.78], rot: [0.75, -0.35, 0.4], r: 0.285, s: 8 },
+      { pos: [-1.18, 1.44, 0.56], rot: [1.20, 0.2, 0.6],   r: 0.250, s: 9 },
+      // Tucked dark berry under middle slice corner
+      { pos: [0.28,  1.04, 1.02], rot: [0.9, 0.5, -0.3],   r: 0.265, s: 10 },
+      // Far left background berries
+      { pos: [-1.85, 0.42, -0.25],rot: [0.4, 0.8, 0.5],    r: 0.270, s: 11 },
+      { pos: [-1.58, 0.40, 0.22], rot: [0.8, -0.4, 0.2],   r: 0.255, s: 12 },
+
+      // Foreground cluster on matte black plate (left -> center -> right)
+      { pos: [-1.72, 0.41, 1.10], rot: [0.85, 0.6, 0.3],   r: 0.285, s: 13 },
+      { pos: [-1.22, 0.43, 1.38], rot: [0.52, -0.4, 0.25], r: 0.315, s: 14 },
+      { pos: [-0.66, 0.40, 1.38], rot: [0.95, 0.2, -0.5],  r: 0.275, s: 15 },
+      { pos: [-0.68, 0.41, 1.78], rot: [1.05, -0.35, 0.3], r: 0.290, s: 16 },
+      // Front-most hero blueberry right between the two leaning banana slices!
+      { pos: [0.32,  0.40, 1.88], rot: [1.28, 0.18, -0.35],r: 0.290, s: 17 },
+      // Tucked berry right behind the right leaning banana slice
+      { pos: [1.14,  0.40, 1.36], rot: [0.90, 0.7, -0.2],  r: 0.270, s: 18 }
+    ];
+
+    const berryMeshes = [];
+    berryPlacements.forEach((b) => {
+      const mesh = createBlueberry({ radius: b.r, seed: b.s });
+      mesh.position.set(...b.pos);
+      mesh.rotation.set(...b.rot);
+      foodGroup.add(mesh);
+      berryMeshes.push(mesh);
+    });
+
+    // -------------------------------------------------------------------------
+    // 5. Glossy Transmissive Maple Syrup (Rivulets, Drips & Plate Pools)
+    // -------------------------------------------------------------------------
+    const syrupMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(0xd96b14),
+      transmission: 0.84,
+      ior: 1.49,
+      roughness: 0.04,
+      metalness: 0.0,
+      thickness: 0.55,
+      attenuationColor: new THREE.Color(0x8c2a00),
+      attenuationDistance: 0.32,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.02,
+      specularIntensity: 1.2
+    });
+
+    // Conformal syrup rivulets hugging the exact deformed surface of a brioche slice
+    function addCrustSyrupRivulets(sliceMesh, dripSpecs) {
+      sliceMesh.updateMatrixWorld(true);
+      const posAttr = sliceMesh.geometry.attributes.position;
+
+      // Helper to find closest surface vertex on slice in slice local space
+      function closestSurfacePoint(targetLocal) {
+        let bestDist = Infinity;
+        const best = new THREE.Vector3();
+        const v = new THREE.Vector3();
+        for (let i = 0; i < posAttr.count; i++) {
+          v.fromBufferAttribute(posAttr, i);
+          const d = v.distanceToSquared(targetLocal);
+          if (d < bestDist) {
+            bestDist = d;
+            best.copy(v);
+          }
+        }
+        return best;
+      }
+
+      dripSpecs.forEach((spec) => {
+        const curvePts = [];
+        const steps = 9;
+        for (let s = 0; s <= steps; s++) {
+          const t = s / steps;
+          const approx = new THREE.Vector3(
+            lerp(spec.x0, spec.x1, t) + Math.sin(t * Math.PI * 2 + spec.seed) * 0.03,
+            lerp(spec.y0, spec.y1, t),
+            lerp(spec.z0, spec.z1, t)
+          );
+          if (t <= spec.hugUntil) {
+            const surf = closestSurfacePoint(approx);
+            // Offset slightly outward from slice center so rivulet sits cleanly on crust
+            const outDir = new THREE.Vector3(surf.x, surf.y * 0.25, surf.z).normalize();
+            surf.addScaledVector(outDir, 0.012);
+            curvePts.push(surf);
+          } else {
+            // Hanging teardrop bead below bottom crust edge
+            const prev = curvePts[curvePts.length - 1].clone();
+            prev.y -= (t - spec.hugUntil) * spec.hangLen;
+            curvePts.push(prev);
+          }
+        }
+
+        const curve = new THREE.CatmullRomCurve3(curvePts);
+        const tubeGeo = new THREE.TubeGeometry(curve, 24, spec.radius, 10, false);
+        // Taper top, swell into glossy teardrop at bottom
+        const tPos = tubeGeo.attributes.position;
+        for (let i = 0; i < tPos.count; i++) {
+          const ringIdx = Math.floor(i / 11);
+          const u = ringIdx / 24;
+          const center = curve.getPointAt(Math.min(1, u));
+          const vx = tPos.getX(i) - center.x;
+          const vy = tPos.getY(i) - center.y;
+          const vz = tPos.getZ(i) - center.z;
+          const profile = Math.sin(u * Math.PI) * 0.65 + Math.pow(u, 2.2) * 0.85;
+          // Flatten slightly against crust
+          tPos.setXYZ(i, center.x + vx * profile, center.y + vy * profile, center.z + vz * profile * 0.72);
+        }
+        tubeGeo.computeVertexNormals();
+
+        const dripMesh = new THREE.Mesh(tubeGeo, syrupMat);
+        sliceMesh.add(dripMesh);
+      });
+    }
+
+    // Glossy amber drips running down the top slice front crust (prominent in photo)
+    addCrustSyrupRivulets(slice3, [
+      { x0: -0.95, y0: 0.36, z0: 1.48, x1: -0.92, y1: -0.36, z1: 1.48, hugUntil: 0.86, hangLen: 0.24, radius: 0.055, seed: 1 },
+      { x0: -0.58, y0: 0.37, z0: 1.52, x1: -0.54, y1: -0.37, z1: 1.52, hugUntil: 0.88, hangLen: 0.28, radius: 0.068, seed: 2 },
+      { x0: -0.18, y0: 0.36, z0: 1.55, x1: -0.15, y1: -0.36, z1: 1.55, hugUntil: 0.90, hangLen: 0.20, radius: 0.062, seed: 3 },
+      { x0:  0.24, y0: 0.36, z0: 1.54, x1:  0.26, y1: -0.37, z1: 1.54, hugUntil: 0.85, hangLen: 0.30, radius: 0.072, seed: 4 },
+      { x0:  0.68, y0: 0.35, z0: 1.50, x1:  0.70, y1: -0.35, z1: 1.50, hugUntil: 0.92, hangLen: 0.16, radius: 0.058, seed: 5 },
+      { x0:  1.12, y0: 0.34, z0: 1.42, x1:  1.10, y1: -0.34, z1: 1.42, hugUntil: 0.90, hangLen: 0.18, radius: 0.052, seed: 6 }
+    ]);
+
+    // Glossy drips on the middle slice front corner & edges
+    addCrustSyrupRivulets(slice2, [
+      { x0: -0.85, y0: 0.35, z0: 1.48, x1: -0.82, y1: -0.36, z1: 1.48, hugUntil: 0.85, hangLen: 0.32, radius: 0.064, seed: 7 },
+      { x0: -0.35, y0: 0.36, z0: 1.52, x1: -0.34, y1: -0.37, z1: 1.52, hugUntil: 0.86, hangLen: 0.26, radius: 0.060, seed: 8 },
+      { x0:  0.12, y0: 0.35, z0: 1.52, x1:  0.14, y1: -0.36, z1: 1.52, hugUntil: 0.90, hangLen: 0.22, radius: 0.055, seed: 9 }
+    ]);
+
+    // Thin glossy syrup glaze patches on top brioche & puddle under front bananas on black plate
+    function createSyrupPuddle(cx, cz, rx, rz, thickness, yBase, seed) {
+      const geo = new THREE.CylinderGeometry(1, 1, thickness, 48, 1);
+      const pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        const z = pos.getZ(i);
+        const ang = Math.atan2(z, x);
+        const r = Math.hypot(x, z);
+        const organic = 1.0 + 0.22 * Math.sin(3 * ang + seed) + 0.14 * Math.cos(5 * ang - seed * 2);
+        const wx = cx + x * rx * organic;
+        const wz = cz + z * rz * organic;
+        const floorY = yBase !== null ? yBase : getPlateFloorY(Math.hypot(wx, wz));
+        // Meniscus rounded edge
+        const dome = y > 0 ? thickness * Math.sqrt(Math.max(0, 1.0 - r * r * 0.85)) : 0.002;
+        pos.setXYZ(i, wx, floorY + dome, wz);
+      }
+      geo.computeVertexNormals();
+      const mesh = new THREE.Mesh(geo, syrupMat);
+      scene.add(mesh);
+    }
+
+    // Subtle glossy maple syrup pools on plate around base of stack & front bananas
+    createSyrupPuddle(-0.08, 1.52, 0.52, 0.34, 0.032, null, 1.4);
+    createSyrupPuddle(0.75,  1.42, 0.48, 0.32, 0.030, null, 3.1);
+    createSyrupPuddle(1.65,  0.48, 0.55, 0.42, 0.026, null, 5.2);
+
+    // -------------------------------------------------------------------------
+    // 6. Powdered Sugar Dusting (3D Micro-Crystals + Soft Plate Dust)
+    // -------------------------------------------------------------------------
+    {
+      const rand = mulberry32(2026);
+      const sugarGeo = new THREE.IcosahedronGeometry(0.015, 0);
+      const sugarMat = new THREE.MeshStandardMaterial({
+        color: 0xfbfaf7,
+        roughness: 0.88,
+        metalness: 0.0
+      });
+
+      const matrices = [];
+      const dummy = new THREE.Object3D();
+
+      // 1) Sweeping powdered sugar arcs on the matte black ceramic plate (front, right, left)
+      for (let i = 0; i < 3400; i++) {
+        // Concentrate around r = 1.65 .. 4.15, mostly front-left through front-center to right
+        const angle = (rand() - 0.46) * Math.PI * 1.65 + Math.PI * 0.5;
+        const rSpread = Math.pow(rand(), 0.72);
+        const baseR = 1.65 + rSpread * 2.55;
+        const clumping = fbm3(Math.cos(angle) * 3.5, 0.2, Math.sin(angle) * 3.5, 3);
+        if (rand() > 0.58 + clumping * 0.95) continue;
+
+        const r = baseR + (rand() - 0.5) * 0.45;
+        if (r > 4.75) continue;
+
+        const x = Math.cos(angle) * r;
+        const z = Math.sin(angle) * r * 0.92 + 0.18;
+        const pr = Math.hypot(x, z);
+        if (pr > 4.85) continue;
+        // Keep immediate front lip of plate clean black ceramic like the photo
+        if (z > 2.85 && rand() > 0.14) continue;
+
+        const y = getPlateFloorY(pr) + 0.006;
+        const s = (0.35 + Math.pow(rand(), 2.4) * 1.45);
+
+        dummy.position.set(x, y, z);
+        dummy.rotation.set(rand() * 6.28, rand() * 6.28, rand() * 6.28);
+        dummy.scale.set(s * 1.2, s * 0.55, s);
+        dummy.updateMatrix();
+        matrices.push(dummy.matrix.clone());
+      }
+
+      // 2) Light sugar specks clinging to blueberries & brioche crusts
+      berryPlacements.forEach((b) => {
+        const count = 14 + Math.floor(rand() * 18);
+        for (let k = 0; k < count; k++) {
+          const theta = rand() * Math.PI * 0.68;
+          const phi = rand() * Math.PI * 2;
+          const br = b.r * 0.94;
+          const x = b.pos[0] + Math.sin(theta) * Math.cos(phi) * br;
+          const y = b.pos[1] + Math.cos(theta) * br * 0.86;
+          const z = b.pos[2] + Math.sin(theta) * Math.sin(phi) * br;
+          const s = 0.3 + rand() * 0.65;
+          dummy.position.set(x, y, z);
+          dummy.rotation.set(rand() * 6, rand() * 6, rand() * 6);
+          dummy.scale.set(s, s * 0.6, s);
+          dummy.updateMatrix();
+          matrices.push(dummy.matrix.clone());
+        }
+      });
+
+      // Dust specks on upper brioche edges
+      for (let i = 0; i < 280; i++) {
+        const ang = rand() * Math.PI * 2;
+        const rad = 0.6 + rand() * 1.05;
+        const x = Math.cos(ang) * rad;
+        const z = Math.sin(ang) * rad - 0.1;
+        const y = 2.66 + rand() * 0.12;
+        const s = 0.3 + rand() * 0.65;
+        dummy.position.set(x, y, z);
+        dummy.rotation.set(rand() * 6, rand() * 6, rand() * 6);
+        dummy.scale.set(s, s * 0.5, s);
+        dummy.updateMatrix();
+        matrices.push(dummy.matrix.clone());
+      }
+
+      const sugarInstanced = new THREE.InstancedMesh(sugarGeo, sugarMat, matrices.length);
+      for (let i = 0; i < matrices.length; i++) {
+        sugarInstanced.setMatrixAt(i, matrices[i]);
+      }
+      sugarInstanced.receiveShadow = true;
+      scene.add(sugarInstanced);
+
+      // Soft fine powdery veil on the black plate around sugar clusters
+      const dustPositions = [];
+      for (let i = 0; i < 4200; i++) {
+        const angle = (rand() - 0.46) * Math.PI * 1.7 + Math.PI * 0.5;
+        const r = 1.55 + Math.pow(rand(), 0.78) * 2.85;
+        const x = Math.cos(angle) * r + (rand() - 0.5) * 0.35;
+        const z = Math.sin(angle) * r * 0.92 + 0.18 + (rand() - 0.5) * 0.35;
+        const pr = Math.hypot(x, z);
+        if (pr > 4.85 || z > 2.95) continue;
+        const clumping = fbm3(x * 1.3, 0.5, z * 1.3, 3);
+        if (rand() > 0.52 + clumping * 0.9) continue;
+        dustPositions.push(x, getPlateFloorY(pr) + 0.004, z);
+      }
+
+      const dustCanvas = document.createElement('canvas');
+      dustCanvas.width = dustCanvas.height = 64;
+      const dCtx = dustCanvas.getContext('2d');
+      const grad = dCtx.createRadialGradient(32, 32, 2, 32, 32, 30);
+      grad.addColorStop(0, 'rgba(255,255,255,0.65)');
+      grad.addColorStop(0.5, 'rgba(255,255,255,0.22)');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      dCtx.fillStyle = grad;
+      dCtx.fillRect(0, 0, 64, 64);
+
+      const dustGeo = new THREE.BufferGeometry();
+      dustGeo.setAttribute('position', new THREE.Float32BufferAttribute(dustPositions, 3));
+      const dustMat = new THREE.PointsMaterial({
+        size: 0.065,
+        map: new THREE.CanvasTexture(dustCanvas),
+        transparent: true,
+        opacity: 0.42,
+        depthWrite: false
+      });
+      scene.add(new THREE.Points(dustGeo, dustMat));
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. Post-Processing (Subtle Specular Bloom + Shallow Macro Depth of Field)
+    // -------------------------------------------------------------------------
+    const renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+      type: THREE.HalfFloatType,
+      samples: 4
+    });
+
+    const composer = new EffectComposer(renderer, renderTarget);
+    const renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
+
+    // Crisp specular sparkle on wet maple syrup highlights
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      0.16,  // strength
+      0.35,  // radius
+      0.92   // threshold
+    );
+    composer.addPass(bloomPass);
+
+    // Macro photography shallow Depth of Field (blurs back plate rim & far linen)
+    const bokehPass = new BokehPass(scene, camera, {
+      focus: 8.6,
+      aperture: 0.00145,
+      maxblur: 0.0065
+    });
+    composer.addPass(bokehPass);
+
+    const outputPass = new OutputPass();
+    composer.addPass(outputPass);
+
+    // -------------------------------------------------------------------------
+    // UI Controls & Resize Handling
+    // -------------------------------------------------------------------------
+    const toggleDofBtn = document.getElementById('toggleDof');
+    const resetCamBtn = document.getElementById('resetCam');
+    let dofEnabled = true;
+
+    toggleDofBtn.addEventListener('click', () => {
+      dofEnabled = !dofEnabled;
+      bokehPass.enabled = dofEnabled;
+      toggleDofBtn.textContent = `Macro DoF: ${dofEnabled ? 'ON' : 'OFF'}`;
+      toggleDofBtn.classList.toggle('active', dofEnabled);
+    });
+
+    let resettingCamera = false;
+    resetCamBtn.addEventListener('click', () => {
+      resettingCamera = true;
+    });
+    controls.addEventListener('start', () => {
+      resettingCamera = false;
+    });
+
+    window.addEventListener('resize', () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      composer.setSize(w, h);
+      bloomPass.resolution.set(w, h);
+    });
+
+    // -------------------------------------------------------------------------
+    // Render Loop & Smooth Reveal
+    // -------------------------------------------------------------------------
+    // Focus lock point on the front glossy brioche crust & central blueberry
+    const FOCUS_ANCHOR = new THREE.Vector3(0.0, 1.45, 1.15);
+
+    let firstFrame = true;
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (resettingCamera) {
+        camera.position.lerp(HERO_POS, 0.08);
+        controls.target.lerp(HERO_TARGET, 0.08);
+        if (camera.position.distanceTo(HERO_POS) < 0.01) {
+          camera.position.copy(HERO_POS);
+          controls.target.copy(HERO_TARGET);
+          resettingCamera = false;
+        }
+      }
+
+      controls.update();
+
+      // Dynamically keep focus locked on the front face of the French toast stack while orbiting
+      if (dofEnabled) {
+        const focusDist = camera.position.distanceTo(FOCUS_ANCHOR);
+        bokehPass.uniforms['focus'].value = focusDist;
+      }
+
+      composer.render();
+
+      if (firstFrame) {
+        firstFrame = false;
+        requestAnimationFrame(() => {
+          document.getElementById('loader').classList.add('hidden');
+        });
+      }
+    }
+
+    animate();
+  </script>
+</body>
+</html>
