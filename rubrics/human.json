@@ -534,5 +534,135 @@
    "pass": false,
    "comment": "The cracker-like slabs and the black void above the table make the paused frame read as CG, not as the photo."
   }
+ },
+ "moraine": {
+  "G1": {
+   "pass": true,
+   "comment": "Opens and renders with no errors, using a built-in painted preview until a photo is loaded. Needs internet for three.js from unpkg."
+  },
+  "G2": {
+   "pass": false,
+   "comment": "Orbit is limited to about 15° either side, and the camera drifts on its own until dragged. Within that range the edges of the painted backdrop still show."
+  },
+  "G3": {
+   "pass": true,
+   "comment": "One relief mesh, a reflective water plane and 90 mist sprites. Likely above 30 fps on a laptop, not measured on one."
+  },
+  "1": {
+   "pass": false,
+   "comment": "A slider panel, four camera presets, a 'Load Your Photo' bar and a controls hint sit over the scene."
+  },
+  "2": {
+   "pass": true,
+   "comment": "The water ripples and the mist drifts from load, with no input."
+  },
+  "3": {
+   "pass": true,
+   "comment": "Eye level, left cliff, lake in the lower half and peaks across the top, as in the photo."
+  },
+  "4": {
+   "pass": false,
+   "comment": "The lake is a murky grey blue, not the photo's bright glacial turquoise."
+  },
+  "5": {
+   "pass": false,
+   "comment": "The skyline is a flat, painted band of angular shapes, not the photo's jagged peak profile."
+  },
+  "6": {
+   "pass": false,
+   "comment": "No clear snow on the peaks or in the couloir; the peaks are pink and brown stripes."
+  },
+  "7": {
+   "pass": true,
+   "comment": "A dark green forest mass lines the right shore, as in the photo, though it reads as one shape with a sawtooth edge."
+  },
+  "8": {
+   "pass": true,
+   "comment": "Pink sunrise sky with warm orange light on a peak tip."
+  },
+  "9": {
+   "pass": false,
+   "comment": "The mountains are a flat backdrop and flat panels with horizontal stripes, with no ridges or gullies."
+  },
+  "10": {
+   "pass": false,
+   "comment": "There are no individual trees, only a dark mass with a sawtooth top edge."
+  },
+  "11": {
+   "pass": false,
+   "comment": "The shoreline is a clean edge where the relief mesh meets the water, with no rocks or debris."
+  },
+  "12": {
+   "pass": false,
+   "comment": "The edges of the backdrop show at the sides and top, and the mist reads as glowing blobs floating over the far shore."
+  },
+  "13": {
+   "pass": false,
+   "comment": "Light is painted into the image. The peaks are evenly pink and brown, with no warm sunlit faces against a shaded valley."
+  },
+  "14": {
+   "pass": false,
+   "comment": "Distance haze is warm pink, so the far peaks get hazier but not bluer."
+  },
+  "15": {
+   "pass": true,
+   "comment": "No area is fully black, and only a few pixels of the mist glow clip to white."
+  },
+  "16": {
+   "pass": false,
+   "comment": "No shadows. Nothing in the scene casts a contact shadow."
+  },
+  "17": {
+   "pass": true,
+   "comment": "The water reflects the backdrop and sky."
+  },
+  "18": {
+   "pass": false,
+   "comment": "The water has one murky colour, with no lighter, clearer water near the shore."
+  },
+  "19": {
+   "pass": false,
+   "comment": "Rock is flat colour with horizontal stripes, with no rock texture at the default view."
+  },
+  "20": {
+   "pass": false,
+   "comment": "There is no snow that reads as snow."
+  },
+  "21": {
+   "pass": true,
+   "comment": "The horizon is level."
+  },
+  "22": {
+   "pass": true,
+   "comment": "Ripples move across the water and distort the reflection."
+  },
+  "23": {
+   "pass": true,
+   "comment": "Mist drifts slowly over the far end of the lake, though it reads as glowing blobs."
+  },
+  "24": {
+   "pass": false,
+   "comment": "There are no tree tops to sway."
+  },
+  "25": {
+   "pass": false,
+   "comment": "The mist swings back and forth on a sine instead of drifting one way, which reads as a loop."
+  },
+  "26": {
+   "pass": false,
+   "comment": "The same horizontal stripes repeat across the whole backdrop."
+  },
+  "27": {
+   "pass": true,
+   "comment": "There are no tree models to repeat; the forest is one painted mass."
+  },
+  "28": {
+   "pass": true,
+   "comment": "45° field of view, no fisheye, no post effects."
+  },
+  "29": {
+   "pass": false,
+   "comment": "A paused frame reads as a flat painted illustration, not as the photo."
+  }
  }
 }
