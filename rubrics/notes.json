@@ -1,4 +1,4 @@
 {
- "moraine": "Took three tries with the same prompt. The first two replies were how-to guides with no working scene. The third is a page that asks the visitor to drop the photo, then shows a depth-displaced copy of it (captures 7 and 8).",
+ "moraine": "Took four tries with the same prompt. The first two replies were how-to guides with no working scene, and the third was a page that waited for the visitor to drop the photo. The fourth, shown here, builds a scene on load, with an optional button to load the photo.",
  "toast": "Carbon declined three times with the same prompt: each reply listed tools to use instead of building a scene. This scene comes from one follow-up turn: “Please build the scene as a single HTML file using three.js.”"
 }

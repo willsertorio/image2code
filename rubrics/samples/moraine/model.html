@@ -2,321 +2,719 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Moraine Lake — Interactive 3D Scene</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photorealistic 3D Scene — Moraine Lake Projection</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #070b10; color: #eef2f7; font-family: system-ui, sans-serif; overflow: hidden; }
+    body {
+      overflow: hidden;
+      background: #061318;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #eef6f8;
+      user-select: none;
+    }
     canvas { display: block; width: 100vw; height: 100vh; }
-    #dropzone {
-      position: fixed; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 14px;
-      background: radial-gradient(circle at center, #13202cee, #070b10fa);
-      z-index: 10; cursor: pointer; transition: opacity 0.4s ease;
+
+    /* Top Drop / Upload Banner */
+    #upload-bar {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      background: rgba(8, 24, 32, 0.82);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(110, 210, 225, 0.35);
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      transition: opacity 0.3s ease, border-color 0.2s ease;
     }
-    #dropzone.hidden { opacity: 0; pointer-events: none; }
-    .card {
-      border: 2px dashed #4ea8de88; border-radius: 16px; padding: 40px 56px;
-      text-align: center; background: #0d1824aa; backdrop-filter: blur(8px);
+    #upload-bar.dragover {
+      border-color: #ff9d5c;
+      background: rgba(25, 45, 55, 0.95);
     }
-    .card h1 { font-size: 1.35rem; margin-bottom: 8px; font-weight: 600; }
-    .card p { color: #9db4c8; font-size: 0.95rem; }
-    #hud {
-      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-      background: #0b131dcc; border: 1px solid #ffffff1f; padding: 8px 18px;
-      border-radius: 999px; font-size: 0.82rem; color: #cbd8e6;
-      pointer-events: none; opacity: 0; transition: opacity 0.5s;
+    .btn-primary {
+      background: linear-gradient(135deg, #0ea5b7, #0b6e8c);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
     }
-    #hud.visible { opacity: 1; }
+    .btn-primary:hover { filter: brightness(1.12); transform: scale(1.02); }
+    #status-text { font-size: 13px; color: #b8dce4; }
+
+    /* Control Panel */
+    #controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 20;
+      width: 280px;
+      padding: 16px;
+      background: rgba(8, 22, 30, 0.78);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      font-size: 12px;
+    }
+    #controls h3 {
+      font-size: 13px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: #7ddae8;
+      margin-bottom: 12px;
+    }
+    .control-row {
+      display: flex;
+       flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      color: #cfe6ec;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #16b1c5;
+      cursor: pointer;
+    }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .btn-preset {
+      background: rgba(255, 255, 255, 0.08);
+      color: #dceef2;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 6px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-preset:hover, .btn-preset.active {
+      background: rgba(22, 177, 197, 0.32);
+      border-color: rgba(125, 218, 232, 0.55);
+    }
+    #hint {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 15;
+      padding: 8px 12px;
+      background: rgba(8, 22, 30, 0.65);
+      border-radius: 8px;
+      font-size: 11px;
+      color: #9ec2cb;
+      pointer-events: none;
+    }
+    #drop-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(6, 22, 30, 0.78);
+      border: 3px dashed #5ce1f5;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 600;
+      color: #e6fbff;
+      pointer-events: none;
+    }
   </style>
-</head>
-<body>
-  <div id="dropzone">
-    <div class="card">
-      <h1>Drop Your Moraine Lake Photo Here</h1>
-      <p>or click anywhere to select the image file</p>
-      <input type="file" id="fileInput" accept="image/*" hidden />
-    </div>
-  </div>
-  <div id="hud">Move mouse for 3D parallax • Scroll to dolly in/out • Click & drag to orbit</div>
 
   <script type="importmap">
     {
       "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
       }
     }
   </script>
+</head>
+<body>
+  <div id="drop-overlay">Drop Photo to Project into 3D Space</div>
+
+  <div id="upload-bar">
+    <button class="btn-primary" id="upload-btn">📂 Load Your Photo</button>
+    <input type="file" id="file-input" accept="image/*" hidden />
+    <span id="status-text">Drag & drop the Moraine Lake photo anywhere for exact photorealistic 3D</span>
+  </div>
+
+  <div id="controls">
+    <h3>3D Scene Controls</h3>
+    <div class="control-row">
+      <div class="control-label"><span>Water Ripples</span><span id="val-ripples">0.65</span></div>
+      <input type="range" id="slider-ripples" min="0" max="2.5" step="0.05" value="0.65" />
+    </div>
+    <div class="control-row">
+      <div class="control-label"><span>3D Relief Scale</span><span id="val-relief">1.00</span></div>
+      <input type="range" id="slider-relief" min="0.2" max="1.8" step="0.05" value="1.00" />
+    </div>
+    <div class="control-row">
+      <div class="control-label"><span>Drone Motion</span><span id="val-motion">0.55</span></div>
+      <input type="range" id="slider-motion" min="0" max="1.5" step="0.05" value="0.55" />
+    </div>
+
+    <div class="preset-grid">
+      <button class="btn-preset active" data-preset="cinematic">Drone Drift</button>
+      <button class="btn-preset" data-preset="home">Exact Photo View</button>
+      <button class="btn-preset" data-preset="skim">Low Water Skim</button>
+      <button class="btn-preset" data-preset="dolly">Valley Push-In</button>
+    </div>
+  </div>
+
+  <div id="hint">Left-Drag: Orbit • Right-Drag: Pan • Scroll: Zoom</div>
 
   <script type="module">
     import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { Water } from 'three/addons/objects/Water.js';
 
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('fileInput');
-    const hud = document.getElementById('hud');
+    // --- Projection & Scene Constants ---
+    const CAM_HEIGHT = 8.0;
+    const PROJ_FOV = 45;
+    let projAspect = 1.5;
 
-    dropzone.addEventListener('click', () => fileInput.click());
-    window.addEventListener('dragover', (e) => e.preventDefault());
-    window.addEventListener('drop', (e) => {
-      e.preventDefault();
-      if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
-    });
-    fileInput.addEventListener('change', (e) => {
-      if (e.target.files[0]) loadImage(e.target.files[0]);
-    });
-
-    // Scene & Camera setup
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.04;
     document.body.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    const FOV = 42;
-    const camera = new THREE.PerspectiveCamera(FOV, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, -0.35);
+    scene.background = new THREE.Color(0x09242c);
+    scene.fog = new THREE.FogExp2(0xd8a89e, 0.00075);
 
-    // Build custom continuous depth map tailored to Moraine Lake topology
-    function buildDepthTexture(img) {
-      const w = 384, h = 256;
+    const camera = new THREE.PerspectiveCamera(PROJ_FOV, window.innerWidth / window.innerHeight, 0.5, 1200);
+    camera.position.set(0, CAM_HEIGHT, 0);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, CAM_HEIGHT - 2.0, -110);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI * 0.515; // Keep above lake surface
+    controls.minPolarAngle = Math.PI * 0.34;
+    controls.minAzimuthAngle = -0.26;
+    controls.maxAzimuthAngle = 0.26;
+    controls.minDistance = 45;
+    controls.maxDistance = 145;
+
+    // --- Procedural Tileable Water Normal Map (Zero external dependencies) ---
+    function createWaterNormalsTexture() {
+      const size = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const img = ctx.createImageData(size, size);
+      const heights = new Float32Array(size * size);
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const u = (x / size) * Math.PI * 2;
+          const v = (y / size) * Math.PI * 2;
+          let h = 0;
+          h += Math.sin(u * 3 + v * 2) * 0.35;
+          h += Math.cos(u * 7 - v * 5 + 1.3) * 0.22;
+          h += Math.sin(u * 13 + v * 11 + 2.4) * 0.14;
+          h += Math.cos(u * 23 - v * 19 + 0.7) * 0.08;
+          h += Math.sin(u * 37 + v * 41) * 0.04;
+          heights[y * size + x] = h;
+        }
+      }
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const xr = (x + 1) % size, xl = (x - 1 + size) % size;
+          const yd = (y + 1) % size, yu = (y - 1 + size) % size;
+          const dx = (heights[y * size + xr] - heights[y * size + xl]) * 2.2;
+          const dy = (heights[yd * size + x] - heights[yu * size + x]) * 2.2;
+          const nz = 1.0;
+          const len = Math.hypot(dx, dy, nz);
+          const idx = (y * size + x) * 4;
+          img.data[idx]     = ((-dx / len) * 0.5 + 0.5) * 255;
+          img.data[idx + 1] = ((-dy / len) * 0.5 + 0.5) * 255;
+          img.data[idx + 2] = ((nz / len) * 0.5 + 0.5) * 255;
+          img.data[idx + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      return tex;
+    }
+
+    // --- Glacial Turquoise Lakebed & Real-Time 3D Planar Water ---
+    const lakeBedGeo = new THREE.PlaneGeometry(900, 900);
+    lakeBedGeo.rotateX(-Math.PI / 2);
+    const lakeBedMat = new THREE.MeshBasicMaterial({ color: 0x054654 });
+    const lakeBed = new THREE.Mesh(lakeBedGeo, lakeBedMat);
+    lakeBed.position.set(0, -1.8, -160);
+    scene.add(lakeBed);
+
+    const waterGeo = new THREE.PlaneGeometry(900, 900);
+    const water = new Water(waterGeo, {
+      textureWidth: 1024,
+      textureHeight: 1024,
+      waterNormals: createWaterNormalsTexture(),
+      sunDirection: new THREE.Vector3(-0.55, 0.32, -0.77).normalize(),
+      sunColor: 0xffa870,
+      waterColor: 0x075c6d,
+      distortionScale: 0.65,
+      fog: true
+    });
+    water.rotation.x = -Math.PI / 2;
+    water.position.set(0, 0, -160);
+    scene.add(water);
+
+    // Subtle glacial rock-flour scatter glow in near foreground water
+    const scatterGeo = new THREE.PlaneGeometry(420, 260);
+    scatterGeo.rotateX(-Math.PI / 2);
+    const scatterMat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      uniforms: {
+        uColorNear: { value: new THREE.Color(0x0b798c) },
+        uColorMid: { value: new THREE.Color(0x085566) }
+      },
+      vertexShader: `
+        varying vec3 vWorld;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorld = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uColorNear;
+        uniform vec3 uColorMid;
+        varying vec3 vWorld;
+        void main() {
+          float distFactor = smoothstep(-165.0, -18.0, vWorld.z);
+          vec3 col = mix(uColorMid, uColorNear, distFactor);
+          gl_FragColor = vec4(col, distFactor * 0.34);
+        }
+      `
+    });
+    const glacialScatter = new THREE.Mesh(scatterGeo, scatterMat);
+    glacialScatter.position.set(0, 0.02, -95);
+    scene.add(glacialScatter);
+
+    // --- Atmospheric Glacial Mist Particles ---
+    const mistCount = 90;
+    const mistPos = new Float32Array(mistCount * 3);
+    for (let i = 0; i < mistCount; i++) {
+      mistPos[i * 3]     = (Math.random() - 0.5) * 190;
+      mistPos[i * 3 + 1] = 1.2 + Math.random() * 8.0;
+      mistPos[i * 3 + 2] = -70 - Math.random() * 115;
+    }
+    const mistGeo = new THREE.BufferGeometry();
+    mistGeo.setAttribute('position', new THREE.BufferAttribute(mistPos, 3));
+
+    const mistCanvas = document.createElement('canvas');
+    mistCanvas.width = mistCanvas.height = 64;
+    const mCtx = mistCanvas.getContext('2d');
+    const grad = mCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255, 225, 215, 0.16)');
+    grad.addColorStop(1, 'rgba(255, 225, 215, 0.0)');
+    mCtx.fillStyle = grad;
+    mCtx.fillRect(0, 0, 64, 64);
+
+    const mistMat = new THREE.PointsMaterial({
+      size: 28,
+      map: new THREE.CanvasTexture(mistCanvas),
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const mistParticles = new THREE.Points(mistGeo, mistMat);
+    scene.add(mistParticles);
+
+    // --- Shoreline Curve & Depth Model Tuned for Moraine Lake Composition ---
+    function shorelineT(s) {
+      // Normalized distance from top of image (0=top, 1=bottom) where water meets land
+      const leftDip  = 0.078 * Math.pow(Math.max(0, 1 - s / 0.42), 1.65);
+      const rightDip = 0.092 * Math.pow(Math.max(0, (s - 0.54) / 0.46), 1.35);
+      return 0.556 + leftDip + rightDip;
+    }
+
+    let projectedMesh = null;
+    let currentImageCanvas = null;
+    let reliefMultiplier = 1.0;
+
+    function buildProjected3DTerrain(imgCanvas) {
+      currentImageCanvas = imgCanvas;
+      projAspect = imgCanvas.width / imgCanvas.height;
+
+      const sampleW = 512;
+      const sampleH = 256;
+      const tmp = document.createElement('canvas');
+      tmp.width = sampleW;
+      tmp.height = sampleH;
+      const ctx = tmp.getContext('2d');
+      ctx.drawImage(imgCanvas, 0, 0, sampleW, sampleH);
+      const pixels = ctx.getImageData(0, 0, sampleW, sampleH).data;
+
+      const segX = 360;
+      const segY = 200;
+      const geo = new THREE.BufferGeometry();
+      const vertCount = (segX + 1) * (segY + 1);
+      const positions = new Float32Array(vertCount * 3);
+      const uvs = new Float32Array(vertCount * 2);
+      const indices = [];
+
+      const tanHalfFov = Math.tan(THREE.MathUtils.degToRad(PROJ_FOV * 0.5));
+
+      for (let iy = 0; iy <= segY; iy++) {
+        const vGrid = iy / segY; // 0 = top of image, 1 = shoreline (+ small underwater skirt)
+        for (let ix = 0; ix <= segX; ix++) {
+          const s = ix / segX; // 0 = left, 1 = right
+          const tShore = shorelineT(s);
+
+          // Extend slightly past shoreline (1.03) so mesh tucks seamlessly under Y=0 water ripples
+          const tImg = Math.min(0.98, vGrid * (tShore + 0.014));
+
+          const ndcX = 2.0 * s - 1.0;
+          const ndcY = 1.0 - 2.0 * tImg;
+          const dirX = ndcX * projAspect * tanHalfFov;
+          const dirY = ndcY * tanHalfFov;
+
+          // Exact shoreline distance where ray intersects Y = 0 water plane
+          const ndcYShore = 1.0 - 2.0 * tShore;
+          const dirYShore = Math.min(ndcYShore * tanHalfFov, -0.038);
+          const dShore = -CAM_HEIGHT / dirYShore;
+
+          // Sample pixel color for local rock/snow/sky relief classification
+          const px = Math.min(sampleW - 1, Math.floor(s * sampleW));
+          const py = Math.min(sampleH - 1, Math.floor(tImg * sampleH));
+          const pIdx = (py * sampleW + px) * 4;
+          const r = pixels[pIdx] / 255;
+          const g = pixels[pIdx + 1] / 255;
+          const b = pixels[pIdx + 2] / 255;
+          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+          //Normalized height above shoreline (0 at water, 1 at top edge)
+          const hNorm = Math.max(0, (tShore - tImg) / tShore);
+
+          // 1. Left foreground cliff & scree slope
+          const leftMask = 1.0 - smoothstep(0.16, 0.39, s);
+          const dLeft = dShore + hNorm * 42.0;
+
+          // 2. Right foreground pine forest wedge
+          const forestRidgeT = 0.56 - 0.16 * Math.pow(Math.max(0, (s - 0.52) / 0.48), 0.85);
+          const inForest = smoothstep(0.53, 0.62, s) * smoothstep(forestRidgeT - 0.035, forestRidgeT + 0.02, tImg);
+          const dForest = dShore + (1.0 - smoothstep(forestRidgeT, tShore, tImg)) * 18.0;
+
+          // 3. Valley of the Ten Peaks curved amphitheater
+          const valleyArch = 176.0 + 28.0 * (1.0 - Math.pow((s - 0.52) * 1.5, 2.0));
+          const dPeaks = valleyArch + hNorm * 24.0 - (lum - 0.4) * 9.5 * reliefMultiplier;
+
+          // 4. Smooth sky detection (high altitude + soft bright sunset clouds)
+          const ridgeEnvelope = 0.14 + 0.15 * Math.sin(s * 3.14) + (s < 0.22 ? -0.14 * (1 - s / 0.22) : 0);
+          const skyLikelihood = smoothstep(ridgeEnvelope + 0.08, ridgeEnvelope - 0.05, tImg) * smoothstep(0.38, 0.62, lum);
+          const dSky = 255.0 + hNorm * 35.0;
+
+          // Blend layers smoothly from shoreline upward
+          let depth = dPeaks;
+          depth = THREE.MathUtils.lerp(depth, dSky, skyLikelihood);
+          depth = THREE.MathUtils.lerp(depth, dLeft, leftMask * (1.0 - skyLikelihood * 0.85));
+          depth = THREE.MathUtils.lerp(depth, dForest, inForest);
+
+          // Anchor smoothly to exact water-plane intersection near the shoreline
+          const shorePin = smoothstep(0.16, 0.0, hNorm);
+          depth = THREE.MathUtils.lerp(depth, dShore, shorePin);
+
+          // Apply user relief multiplier around a reference depth of 145m
+          depth = 145.0 + (depth - 145.0) * (0.35 + 0.65 * reliefMultiplier);
+          // Re-pin exact shoreline contact so terrain never detaches from Y=0 water
+          depth = THREE.MathUtils.lerp(depth, dShore, Math.pow(shorePin, 1.5));
+
+          const worldX = depth * dirX;
+          let worldY = CAM_HEIGHT + depth * dirY;
+          const worldZ = -depth;
+
+          if (vGrid > 0.985) worldY = Math.min(worldY, -1.2); // Underwater skirt prevents reflection gaps
+
+          const vIdx = iy * (segX + 1) + ix;
+          positions[vIdx * 3]     = worldX;
+          positions[vIdx * 3 + 1] = worldY;
+          positions[vIdx * 3 + 2] = worldZ;
+
+          uvs[vIdx * 2]     = s;
+          uvs[vIdx * 2 + 1] = 1.0 - tImg;
+        }
+      }
+
+      for (let iy = 0; iy < segY; iy++) {
+        for (let ix = 0; ix < segX; ix++) {
+          const a = iy * (segX + 1) + ix;
+          const b = a + 1;
+          const c = a + (segX + 1);
+          const d = c + 1;
+          indices.push(a, c, b, b, c, d);
+        }
+      }
+
+      geo.setIndex(indices);
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+      geo.computeVertexNormals();
+
+      const tex = new THREE.CanvasTexture(imgCanvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+      const mat = new THREE.MeshBasicMaterial({
+        map: tex,
+        side: THREE.DoubleSide
+      });
+
+      if (projectedMesh) {
+        scene.remove(projectedMesh);
+        projectedMesh.geometry.dispose();
+        projectedMesh.material.map.dispose();
+        projectedMesh.material.dispose();
+      }
+
+      projectedMesh = new THREE.Mesh(geo, mat);
+      scene.add(projectedMesh);
+    }
+
+    function smoothstep(edge0, edge1, x) {
+      const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+      return t * t * (3 - 2 * t);
+    }
+
+    // --- Built-in Procedural Preview Image (Shown until user loads their photo) ---
+    function createProceduralPreviewCanvas() {
+      const w = 1500, h = 1000;
       const c = document.createElement('canvas');
       c.width = w; c.height = h;
       const ctx = c.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      const imgData = ctx.getImageData(0, 0, w, h).data;
 
-      const rawDepth = new Float32Array(w * h);
+      // Sunset Sky Gradient
+      const sky = ctx.createLinearGradient(0, 0, w, h * 0.56);
+      sky.addColorStop(0.0, '#9fb7c4');
+      sky.addColorStop(0.45, '#e8b3a2');
+      sky.addColorStop(0.78, '#ff9c73');
+      sky.addColorStop(1.0, '#d9958f');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, w, h);
 
-      for (let y = 0; y < h; y++) {
-        const v = y / (h - 1); // 0 = top, 1 = bottom
-        for (let x = 0; x < w; x++) {
-          const u = x / (w - 1); // 0 = left, 1 = right
-          const idx = (y * w + x) * 4;
-          const r = imgData[idx] / 255, g = imgData[idx + 1] / 255, b = imgData[idx + 2] / 255;
+      // Valley of the Ten Peaks Silhouette + Alpenglow
+      const peaks = [
+        [0.18, 0.20], [0.25, 0.17], [0.34, 0.13], [0.40, 0.23],
+        [0.45, 0.20], [0.51, 0.28], [0.56, 0.25], [0.63, 0.26],
+        [0.72, 0.23], [0.79, 0.20], [0.85, 0.27], [0.92, 0.21], [1.0, 0.25]
+      ];
+      ctx.beginPath();
+      ctx.moveTo(w * 0.15, h * 0.60);
+      peaks.forEach(([px, py]) => ctx.lineTo(w * px, h * py));
+      ctx.lineTo(w, h * 0.62);
+      ctx.closePath();
+      const rockGrad = ctx.createLinearGradient(0, h * 0.15, 0, h * 0.56);
+      rockGrad.addColorStop(0.0, '#eb8a44');
+      rockGrad.addColorStop(0.25, '#8c6968');
+      rockGrad.addColorStop(0.75, '#59474b');
+      rockGrad.addColorStop(1.0, '#bfa499');
+      ctx.fillStyle = rockGrad;
+      ctx.fill();
 
-          // Shoreline contour across Moraine Lake
-          let vShore = 0.57;
-          if (u < 0.36) vShore = 0.63 - (u / 0.36) * 0.06;
-          else if (u > 0.59) vShore = 0.57 + ((u - 0.59) / 0.41) * 0.08;
-
-          let dist = 20.0; // Default distant mountains
-
-          if (v > vShore) {
-            // Horizontal 3D water plane receding from near camera (D=3.2) to shoreline (D=15)
-            const t = (v - vShore) / (1.0 - vShore);
-            dist = 1.0 / ((1.0 - t) * (1.0 / 15.0) + t * (1.0 / 3.2));
-          } else {
-            // Left foreground cliff & scree slope
-            const uLeftRidge = 0.085 + v * 0.51;
-            // Right pine forest peninsula
-            const vRightTrees = 0.57 - Math.max(0, (u - 0.58) / 0.42) * 0.17;
-
-            if (u < uLeftRidge) {
-              const cliffT = u / uLeftRidge;
-              dist = 4.2 + cliffT * 9.5;
-            } else if (u > 0.58 && v > vRightTrees) {
-              const forestT = (u - 0.58) / 0.42;
-              dist = 14.5 - forestT * 7.5;
-            } else {
-              // Sky vs Ten Peaks silhouette detection
-              const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-              const isSky = v < 0.31 && lum > 0.48 && (r > 0.58 || b > 0.52);
-              dist = isSky ? 28.0 : 16.5 + (1.0 - v) * 4.5;
-            }
-          }
-          rawDepth[y * w + x] = dist;
-        }
+      // Horizontal sedimentary striations & snow couloirs
+      ctx.strokeStyle = 'rgba(255, 245, 240, 0.35)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 45; i++) {
+        const y = h * (0.19 + i * 0.006);
+        ctx.beginPath();
+        ctx.moveTo(w * 0.22 + Math.sin(i) * 40, y);
+        ctx.lineTo(w * 0.98, y + Math.cos(i) * 8);
+        ctx.stroke();
       }
 
-      // Smooth depth field (separable box blur passes) so mesh transitions seamlessly
-      const temp = new Float32Array(w * h);
-      const radius = 6;
-      for (let pass = 0; pass < 3; pass++) {
-        for (let y = 0; y < h; y++) {
-          for (let x = 0; x < w; x++) {
-            let sum = 0, cnt = 0;
-            for (let k = -radius; k <= radius; k++) {
-              const xx = Math.min(w - 1, Math.max(0, x + k));
-              sum += rawDepth[y * w + xx]; cnt++;
-            }
-            temp[y * w + x] = sum / cnt;
-          }
-        }
-        for (let y = 0; y < h; y++) {
-          for (let x = 0; x < w; x++) {
-            let sum = 0, cnt = 0;
-            for (let k = -radius; k <= radius; k++) {
-              const yy = Math.min(h - 1, Math.max(0, y + k));
-              sum += temp[yy * w + x]; cnt++;
-            }
-            rawDepth[y * w + x] = sum / cnt;
-          }
-        }
-      }
+      // Left Foreground Cliff & Scree Slope
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(w * 0.14, h * 0.09);
+      ctx.lineTo(w * 0.35, h * 0.54);
+      ctx.lineTo(w * 0.38, h * 0.57);
+      ctx.lineTo(0, h * 0.65);
+      ctx.closePath();
+      const cliffGrad = ctx.createLinearGradient(0, 0, w * 0.35, h * 0.6);
+      cliffGrad.addColorStop(0, '#2c221e');
+      cliffGrad.addColorStop(0.65, '#47362c');
+      cliffGrad.addColorStop(1, '#8d7560');
+      ctx.fillStyle = cliffGrad;
+      ctx.fill();
 
-      return { data: rawDepth, width: w, height: h };
+      // Tan Scree Apron
+      ctx.beginPath();
+      ctx.moveTo(w * 0.14, h * 0.38);
+      ctx.lineTo(w * 0.35, h * 0.575);
+      ctx.lineTo(w * 0.16, h * 0.59);
+      ctx.lineTo(w * 0.08, h * 0.50);
+      ctx.closePath();
+      ctx.fillStyle = '#99806a';
+      ctx.fill();
+
+      // Right Pine Forest Shoreline
+      ctx.beginPath();
+      ctx.moveTo(w * 0.58, h * 0.58);
+      for (let x = 0.58; x <= 1.005; x += 0.004) {
+        const ridgeY = 0.56 - 0.16 * Math.pow((x - 0.58) / 0.42, 0.82);
+        const treeTip = ridgeY - Math.abs(Math.sin(x * 380)) * 0.022;
+        ctx.lineTo(w * x, h * treeTip);
+      }
+      ctx.lineTo(w, h * 0.66);
+      ctx.lineTo(w * 0.58, h * 0.585);
+      ctx.closePath();
+      ctx.fillStyle = '#182b19';
+      ctx.fill();
+
+      return c;
     }
 
-    let mesh = null;
-    let uniforms = null;
+    buildProjected3DTerrain(createProceduralPreviewCanvas());
 
-    function loadImage(file) {
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        const colorTex = new THREE.Texture(img);
-        colorTex.colorSpace = THREE.SRGBColorSpace;
-        colorTex.minFilter = THREE.LinearFilter;
-        colorTex.magFilter = THREE.LinearFilter;
-        colorTex.needsUpdate = true;
-
-        const depthInfo = buildDepthTexture(img);
-        const imgAspect = img.width / img.height;
-        const segX = depthInfo.width - 1;
-        const segY = depthInfo.height - 1;
-
-        const geom = new THREE.PlaneGeometry(1, 1, segX, segY);
-        const pos = geom.attributes.position;
-        const uv = geom.attributes.uv;
-        const halfH = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
-
-        // Unproject every vertex along its exact optical camera ray from (0,0,0)
-        for (let i = 0; i < pos.count; i++) {
-          const u = uv.getX(i);
-          const v = uv.getY(i); // 1 at top, 0 at bottom
-          const gx = Math.round(u * segX);
-          const gy = Math.round((1.0 - v) * segY);
-          const D = depthInfo.data[gy * depthInfo.width + gx];
-
-          const X = (u - 0.5) * 2.0 * halfH * imgAspect * D;
-          const Y = (v - 0.5) * 2.0 * halfH * D;
-          const Z = -D;
-          pos.setXYZ(i, X, Y, Z);
-        }
-        geom.computeVertexNormals();
-
-        uniforms = {
-          uMap: { value: colorTex },
-          uTime: { value: 0 }
+    // --- File Loading & Drag-and-Drop Handling ---
+    function loadUserImage(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 2048;
+          const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.width * scale);
+          c.height = Math.round(img.height * scale);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          buildProjected3DTerrain(c);
+          document.getElementById('status-text').textContent = `✓ Projected "${file.name}" into live 3D space`;
         };
-
-        const mat = new THREE.ShaderMaterial({
-          uniforms,
-          vertexShader: `
-            varying vec2 vUv;
-            varying float vDist;
-            void main() {
-              vUv = uv;
-              vDist = -position.z;
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-          fragmentShader: `
-            uniform sampler2D uMap;
-            uniform float uTime;
-            varying vec2 vUv;
-            varying float vDist;
-
-            void main() {
-              vec2 uv = vUv;
-              float imgV = 1.0 - uv.y;
-
-              // Shoreline mask for animated 3D lake ripples
-              float vShore = 0.57;
-              if (uv.x < 0.36) vShore = 0.63 - (uv.x / 0.36) * 0.06;
-              else if (uv.x > 0.59) vShore = 0.57 + ((uv.x - 0.59) / 0.41) * 0.08;
-
-              float waterMask = smoothstep(vShore - 0.005, vShore + 0.02, imgV);
-              if (waterMask > 0.001) {
-                float persp = max(0.025, imgV - vShore);
-                float wx = (uv.x - 0.5) / persp;
-                float wz = 1.0 / persp;
-
-                float wave1 = sin(wx * 9.0 + uTime * 1.3) * cos(wz * 7.5 - uTime * 1.0);
-                float wave2 = sin(wx * 19.0 - uTime * 0.8 + wz * 14.0) * 0.5;
-                float ripple = (wave1 + wave2) * waterMask * persp * 0.0065;
-
-                uv.x += ripple;
-                uv.y += ripple * 0.55;
-              }
-
-              vec4 texColor = texture2D(uMap, clamp(uv, 0.001, 0.999));
-
-              // Subtle golden-hour atmospheric aerial perspective
-              float haze = smoothstep(14.0, 30.0, vDist) * 0.045;
-              vec3 warmGlow = vec3(1.0, 0.72, 0.58);
-              texColor.rgb = mix(texColor.rgb, warmGlow, haze);
-
-              gl_FragColor = texColor;
-              #include <colorspace_fragment>
-            }
-          `
-        });
-
-        if (mesh) scene.remove(mesh);
-        mesh = new THREE.Mesh(geom, mat);
-        scene.add(mesh);
-
-        fitViewport(imgAspect);
-        dropzone.classList.add('hidden');
-        hud.classList.add('visible');
+        img.src = e.target.result;
       };
-      img.src = url;
+      reader.readAsDataURL(file);
     }
 
-    let baseZ = -0.45;
-    function fitViewport(imgAspect = 1.5) {
-      const winAspect = window.innerWidth / window.innerHeight;
-      camera.aspect = winAspect;
-      // Ensure image fills viewport cleanly with headroom for parallax sway
-      if (winAspect > imgAspect) {
-        const ratio = imgAspect / winAspect;
-        camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(FOV / 2)) * ratio)) * 0.92;
-      } else {
-        camera.fov = FOV * 0.92;
-      }
-      camera.updateProjectionMatrix();
-    }
+    const fileInput = document.getElementById('file-input');
+    document.getElementById('upload-btn').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => loadUserImage(e.target.files[0]));
 
-    // Smooth interactive parallax & dolly controls
-    const target = { x: 0, y: 0, z: baseZ };
-    let isDragging = false, prevX = 0, prevY = 0;
-
-    window.addEventListener('pointermove', (e) => {
-      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
-      const ny = -(e.clientY / window.innerHeight - 0.5) * 2;
-      if (isDragging) {
-        target.x = THREE.MathUtils.clamp(target.x - (e.clientX - prevX) * 0.003, -0.65, 0.65);
-        target.y = THREE.MathUtils.clamp(target.y + (e.clientY - prevY) * 0.003, -0.4, 0.4);
-        prevX = e.clientX; prevY = e.clientY;
-      } else {
-        target.x = nx * 0.38;
-        target.y = ny * 0.24;
-      }
+    const dropOverlay = document.getElementById('drop-overlay');
+    window.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropOverlay.style.display = 'flex';
     });
-    window.addEventListener('pointerdown', (e) => { isDragging = true; prevX = e.clientX; prevY = e.clientY; });
-    window.addEventListener('pointerup', () => { isDragging = false; });
-    window.addEventListener('wheel', (e) => {
-      target.z = THREE.MathUtils.clamp(target.z - e.deltaY * 0.0018, -2.4, 0.15);
-    }, { passive: true });
-    window.addEventListener('resize', () => {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      fitViewport();
+    window.addEventListener('dragleave', (e) => {
+      if (e.relatedTarget === null) dropOverlay.style.display = 'none';
+    });
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropOverlay.style.display = 'none';
+      if (e.dataTransfer.files.length) loadUserImage(e.dataTransfer.files[0]);
     });
 
+    // --- UI Controls & Camera Presets ---
+    let activePreset = 'cinematic';
+    let motionSpeed = 0.55;
+    let userDragging = false;
+
+    controls.addEventListener('start', () => { userDragging = true; });
+    controls.addEventListener('end', () => { userDragging = false; });
+
+    document.getElementById('slider-ripples').addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      water.material.uniforms['distortionScale'].value = val;
+      document.getElementById('val-ripples').textContent = val.toFixed(2);
+    });
+
+    document.getElementById('slider-relief').addEventListener('input', (e) => {
+      reliefMultiplier = parseFloat(e.target.value);
+      document.getElementById('val-relief').textContent = reliefMultiplier.toFixed(2);
+      if (currentImageCanvas) buildProjected3DTerrain(currentImageCanvas);
+    });
+
+    document.getElementById('slider-motion').addEventListener('input', (e) => {
+      motionSpeed = parseFloat(e.target.value);
+      document.getElementById('val-motion').textContent = motionSpeed.toFixed(2);
+    });
+
+    document.querySelectorAll('.btn-preset').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-preset').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        activePreset = btn.dataset.preset;
+
+        if (activePreset === 'home') {
+          camera.position.set(0, CAM_HEIGHT, 0);
+          controls.target.set(0, CAM_HEIGHT, -110);
+        } else if (activePreset === 'skim') {
+          camera.position.set(-4.5, 2.4, -14);
+          controls.target.set(2.0, 9.5, -125);
+        } else if (activePreset === 'dolly') {
+          camera.position.set(0, 6.2, -26);
+          controls.target.set(0, 10.0, -135);
+        }
+      });
+    });
+
+    // --- Render Loop ---
     const clock = new THREE.Clock();
+
     function animate() {
       requestAnimationFrame(animate);
+      const dt = clock.getDelta();
       const t = clock.getElapsedTime();
-      if (uniforms) uniforms.uTime.value = t;
 
-      camera.position.x += (target.x - camera.position.x) * 0.06;
-      camera.position.y += (target.y - camera.position.y) * 0.06;
-      camera.position.z += (target.z - camera.position.z) * 0.06;
-      camera.lookAt(camera.position.x * 0.25, camera.position.y * 0.25, -12.0);
+      // Animate 3D water ripples
+      water.material.uniforms['time'].value += dt * 0.42;
 
+      // Subtle mist drift
+      mistParticles.position.x = Math.sin(t * 0.08) * 6.0;
+
+      // Gentle cinematic drone movement when not manually dragging
+      if (!userDragging && motionSpeed > 0.01) {
+        if (activePreset === 'cinematic') {
+          const swayX = Math.sin(t * 0.35 * motionSpeed) * 7.5;
+          const swayY = CAM_HEIGHT - 1.2 + Math.cos(t * 0.25 * motionSpeed) * 2.2;
+          const swayZ = -8.0 + Math.sin(t * 0.2 * motionSpeed) * 8.0;
+          camera.position.lerp(new THREE.Vector3(swayX, swayY, swayZ), 0.025);
+          controls.target.lerp(new THREE.Vector3(-swayX * 0.3, CAM_HEIGHT + 1.5, -120), 0.025);
+        } else if (activePreset === 'dolly') {
+          const pushZ = -18.0 - (Math.sin(t * 0.28 * motionSpeed) * 0.5 + 0.5) * 20.0;
+          camera.position.lerp(new THREE.Vector3(Math.sin(t * 0.2) * 3.0, 5.8, pushZ), 0.025);
+        } else if (activePreset === 'skim') {
+          camera.position.lerp(new THREE.Vector3(Math.sin(t * 0.3 * motionSpeed) * 8.5, 2.3, -15), 0.025);
+        }
+      }
+
+      controls.update();
       renderer.render(scene, camera);
     }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
     animate();
   </script>
 </body>
