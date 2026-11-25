@@ -7,6 +7,7 @@ The data is embedded in the page at build time, so the page makes no runtime fet
 import glob
 import json
 import os
+import statistics
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -33,7 +34,7 @@ def fleiss_kappa(items, n):
     return None if pe == 1 else (sum(P) / N - pe) / (1 - pe)
 
 
-samples, all_votes, nruns_all = [], [], set()
+samples, all_votes, nruns_all, pair_counts = [], [], set(), []
 for s in R["samples"]:
     sid = s["id"]
     h = HUMAN.get(sid, {})
@@ -44,9 +45,10 @@ for s in R["samples"]:
         hv = h.get(c["n"], {})
         verdicts = [r["results"][c["n"]] for r in runs]
         v = sum(x["pass"] for x in verdicts)
-        maj = (v > k / 2) if k else None
-        side = [x["evidence"] for x in verdicts if x["pass"] == maj]
-        other = [x["evidence"] for x in verdicts if x["pass"] != maj]
+        maj = None if not k or 2 * v == k else v > k / 2   # an even split has no majority
+        lead = maj if maj is not None else True
+        side = [x["evidence"] for x in verdicts if x["pass"] == lead]
+        other = [x["evidence"] for x in verdicts if x["pass"] != lead]
         rows.append({"n": c["n"], "d": c["d"], "c": c["c"], "h": hv.get("pass"), "hc": hv.get("comment", ""),
                      "j": maj, "v": v, "k": k, "jc": side[0] if side else "", "jo": other[0] if other else ""})
         if k:
@@ -56,16 +58,23 @@ for s in R["samples"]:
     model = f"samples/{sid}/model.html"
     caps = sorted(os.path.relpath(p, HERE) for p in glob.glob(os.path.join(HERE, "captures", sid, "*.jpg")))
     totals = [sum(r["results"][c["n"]]["pass"] for c in s["criteria"]) for r in runs]
+    if k > 1:
+        same = sum(r["v"] * (r["v"] - 1) + (k - r["v"]) * (k - r["v"] - 1) for r in rows)
+        pair = same / (len(rows) * k * (k - 1))   # share of run pairs that agree, over all criteria
+        pair_counts.append((same, len(rows) * k * (k - 1)))
+    else:
+        pair = None
     samples.append({"id": sid, "name": s["name"], "ref": f"img/{sid}.jpg", "thumb": f"img/{sid}_thumb.jpg",
                     "model": model if os.path.exists(os.path.join(HERE, model)) else None,
-                    "caps": caps, "rows": rows, "note": NOTES.get(sid, ""), "runs": totals,
+                    "caps": caps, "rows": rows, "note": NOTES.get(sid, ""), "runs": totals, "pair": pair,
+                    "mean": statistics.mean(totals) if totals else None, "sd": statistics.pstdev(totals) if totals else None,
                     "kappa": fleiss_kappa([r["v"] for r in rows], k) if k else None})
 
 cats = []
 for d, *_ in all_votes:
     if d not in cats:
         cats.append(d)
-STATS = {"runs": sorted(nruns_all), "kappa": fleiss_kappa([v for _, v, k, *_ in all_votes], max(nruns_all)) if len(nruns_all) == 1 else None,
+STATS = {"pair": sum(a for a, _ in pair_counts) / sum(b for _, b in pair_counts) if pair_counts else None, "runs": sorted(nruns_all), "kappa": fleiss_kappa([v for _, v, k, *_ in all_votes], max(nruns_all)) if len(nruns_all) == 1 else None,
          "cats": [{"d": d, "n": len(x), "unan": sum(v in (0, k) for _, v, k, *_ in x),
                    "agree": sum(h == m for *_, h, m in x if h is not None), "scored": sum(h is not None for *_, h, m in x)}
                   for d in cats for x in [[t for t in all_votes if t[0] == d]]]}
@@ -156,15 +165,16 @@ const capName = p => p.split('/').pop().replace(/^\\d+_/, '').replace('.jpg', ''
 document.getElementById('menu').innerHTML = SAMPLES.map(s => `<a href="#${s.id}" data-id="${s.id}">${ICON_BOX}<span>${esc(s.name)}</span></a>`).join('');
 
 const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '&ndash;';
+const pct1 = x => x === null || x === undefined ? '&ndash;' : (100 * x).toFixed(1) + '%';
 const kfmt = k => k === null || k === undefined ? '&ndash;' : k.toFixed(2);
 
 function renderOverview() {
   const results = SAMPLES.map(s => {
     const k = s.runs.length, unan = s.rows.filter(r => r.k && (r.v === 0 || r.v === r.k)).length;
-    const lo = Math.min(...s.runs), hi = Math.max(...s.runs), mean = k ? s.runs.reduce((a, b) => a + b, 0) / k : 0;
+    const lo = Math.min(...s.runs), hi = Math.max(...s.runs);
     return `<tr><td><a href="#${s.id}" style="text-decoration:none">${esc(s.name)}</a></td><td class="mono">${passes(s.rows, 'h')}</td>`
-      + `<td class="mono">${k ? s.runs.join(' &middot; ') : '&ndash;'}</td><td class="mono">${k ? (lo === hi ? lo : `${lo}&ndash;${hi}`) + ` (${mean.toFixed(1)})` : '&ndash;'}</td>`
-      + `<td class="mono">${k ? `${unan} / ${s.rows.length}` : '&ndash;'}</td><td class="mono">${kfmt(s.kappa)}</td><td class="mono">${agreeText(s.rows)}</td></tr>`;
+      + `<td class="mono">${k ? `${s.mean.toFixed(1)} (${s.sd.toFixed(1)})` : '&ndash;'}</td><td class="mono">${k ? (lo === hi ? lo : `${lo}&ndash;${hi}`) : '&ndash;'}</td>`
+      + `<td class="mono">${k > 1 ? pct1(s.pair) : '&ndash;'}</td><td class="mono">${k ? `${unan} / ${s.rows.length}` : '&ndash;'}</td><td class="mono">${kfmt(s.kappa)}</td><td class="mono">${agreeText(s.rows)}</td></tr>`;
   }).join('');
   const cats = STATS.cats.map(c => `<tr><td>${esc(c.d)}</td><td class="mono">${c.n}</td><td class="mono">${pct(c.unan, c.n)}</td><td class="mono">${pct(c.agree, c.scored)}</td></tr>`).join('');
   const all = SAMPLES.flatMap(s => s.rows).filter(r => r.k);
@@ -177,10 +187,10 @@ function renderOverview() {
     <div class="label refs-label">Reference images</div>
     <div class="refs">${SAMPLES.map(s => `<a href="#${s.id}"><img src="${esc(s.thumb)}" alt="Reference photo: ${esc(s.name)}" loading="lazy"><span class="label">${esc(s.name)}</span></a>`).join('')}</div>
     <h2>How it was scored</h2>
-    <p class="note">Human: Claude Opus 5.5, acting as the human reviewer, scored each scene from captures of the running scene and its code, before Carbon graded it. Carbon: given the reference photo, five screenshots (default view, orbit left, orbit right, from above, zoomed out) and the scene's HTML, with the rubric. Each Carbon run is a separate request with no shared history, at temperature 0, on one provider (Google AI Studio). Carbon's verdict is the majority of its runs.</p>
+    <p class="note">Human: Claude Opus 5.5, acting as the human reviewer, scored each scene from captures of the running scene and its code, before Carbon graded it. Carbon: given the reference photo, five screenshots (default view, orbit left, orbit right, from above, zoomed out) and the scene's HTML, with the rubric. Each Carbon run is a separate request with no shared history, at temperature 0, on one provider (Google AI Studio). Carbon's verdict is the majority of its runs; an even split is shown as a tie.</p>
     <h2>Consistency</h2>
-    <p class="note">${all.length ? `Carbon gave the same verdict in every run on ${unanAll} of ${all.length} criteria (${pct(unanAll, all.length)}). Fleiss' kappa across all runs: ${kfmt(STATS.kappa)} (1 means the runs always agree).` : 'Carbon runs pending.'}</p>
-    <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Sample</th><th>Human</th><th>Carbon, per run</th><th>Range (mean)</th><th>Unanimous</th><th>Kappa</th><th>Majority vs human</th></tr></thead><tbody>${results}</tbody></table></div>
+    <p class="note">${all.length ? `Any two Carbon runs gave the same verdict on ${pct1(STATS.pair)} of criteria. Every run agreed on ${unanAll} of ${all.length} criteria (${pct(unanAll, all.length)}). Fleiss' kappa across all runs: ${kfmt(STATS.kappa)} (1 means the runs always agree).` : 'Carbon runs pending.'}</p>
+    <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Sample</th><th>Human</th><th>Carbon mean (SD)</th><th>Range</th><th>Pairwise agree</th><th>Unanimous</th><th>Kappa</th><th>Majority vs human</th></tr></thead><tbody>${results}</tbody></table></div>
     <h2>By category</h2>
     <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Category</th><th>Criteria</th><th>Unanimous across runs</th><th>Majority agrees with human</th></tr></thead><tbody>${cats}</tbody></table></div>`;
 }
@@ -192,9 +202,9 @@ function rubricTable(rows) {
     const dis = both(r) && r.h !== r.j, split = r.k && r.v !== 0 && r.v !== r.k;
     const cls = [dis ? 'dis' : (split ? 'agree splitrow' : 'agree'), r.n.startsWith('G') ? 'gate' : ''].join(' ');
     const cm = (r.hc ? `<p class="cl"><span class="src">Human</span> ${esc(r.hc)}</p>` : '')
-      + (r.jc ? `<p class="cl"><span class="src">Carbon${split ? ' &middot; majority' : ''}</span> ${esc(r.jc)}</p>` : '')
-      + (split && r.jo ? `<p class="cl"><span class="src">Carbon &middot; minority</span> ${esc(r.jo)}</p>` : '');
-    const votes = r.k ? `${r.v}/${r.k} pass${split ? '<br><span class="split">split</span>' : ''}` : '&ndash;';
+      + (r.jc ? `<p class="cl"><span class="src">Carbon${split ? (r.j === null ? ' &middot; pass' : ' &middot; majority') : ''}</span> ${esc(r.jc)}</p>` : '')
+      + (split && r.jo ? `<p class="cl"><span class="src">Carbon &middot; ${r.j === null ? 'fail' : 'minority'}</span> ${esc(r.jo)}</p>` : '');
+    const votes = r.k ? `${r.v}/${r.k} pass${split ? `<br><span class="split">${r.j === null ? 'tie' : 'split'}</span>` : ''}` : '&ndash;';
     return `<tr class="${cls}"><td><strong>${esc(r.n)}</strong> &mdash; ${esc(r.c)}</td><td class="c">${mark(r.h)}</td><td class="c">${mark(r.j)}</td><td class="c votes">${votes}</td><td class="cm">${cm}</td></tr>`;
   }).join('')).join('');
   return `<div class="legend label"><span><i style="background:rgba(63,140,232,.5)"></i>Gate</span><span><i style="background:rgba(248,113,113,.6)"></i>Carbon majority disagrees with human</span><span><i style="background:#E8BE3F"></i>Runs split</span></div>
@@ -208,7 +218,7 @@ function renderSample(s) {
     ? `<div class="frame"><iframe data-src="${esc(s.model)}" title="${esc(MODEL)} scene" allow="fullscreen" allowfullscreen></iframe><div class="loading" aria-live="polite"><span class="spin" aria-hidden="true"></span><span class="label">Loading</span></div></div>`
     : `<div class="frame"><div class="pending">Scene pending</div></div>`;
   page.innerHTML = `
-    <header class="title-row"><div><h1>${esc(s.name)}</h1><div class="label">${s.rows.length} criteria &middot; Human ${passes(s.rows, 'h')} &middot; Carbon ${s.runs.length ? s.runs.join(' / ') + ' over ' + s.runs.length + ' runs' : '&ndash;'}</div></div></header>
+    <header class="title-row"><div><h1>${esc(s.name)}</h1><div class="label">${s.rows.length} criteria &middot; Human ${passes(s.rows, 'h')} &middot; Carbon ${s.runs.length ? `${s.mean.toFixed(1)} on average (${Math.min(...s.runs)}&ndash;${Math.max(...s.runs)}) over ${s.runs.length} runs` : '&ndash;'}</div></div></header>
     <div class="prompt"><img src="${esc(s.thumb)}" alt="Reference photo sent with the prompt"><div><div class="label">Prompt &middot; sent with the reference photo</div><p>${esc(PROMPT)}</p></div></div>
     <section class="pair">
       <figure class="pane"><div class="pane-head"><span class="label">${esc(MODEL)}</span>${s.model ? `<a href="${esc(s.model)}" target="_blank" rel="noopener">Open full screen</a>` : ''}</div>${scene}</figure>
