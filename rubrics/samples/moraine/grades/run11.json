@@ -1,0 +1,54 @@
+{
+ "id": "gen-1795612233-d2i0eNuT5msQNiYHDByk",
+ "object": "chat.completion",
+ "created": 1795612233,
+ "model": "google/gemini-4-carbon",
+ "provider": "Google AI Studio",
+ "system_fingerprint": null,
+ "service_tier": "default",
+ "choices": [
+  {
+   "index": 0,
+   "logprobs": null,
+   "finish_reason": "stop",
+   "native_finish_reason": "STOP",
+   "message": {
+    "role": "assistant",
+    "content": "{\"results\":[{\"n\":\"G1\",\"evidence\":\"Screenshots 1-5 show the scene rendering in Chrome without blank screens or crashes.\",\"pass\":true},{\"n\":\"G2\",\"evidence\":\"Screenshots 1-5 show huge visible borders of the projected canvas plane surrounded by dark teal background void, meaning the view easily exposes outside the scene.\",\"pass\":false},{\"n\":\"G3\",\"evidence\":\"In the script, geometry consists of a 360x200 terrain mesh, planar Water with 1024x1024 reflection texture, and 90 particles with no shadow maps, easily maintaining >30 fps on integrated graphics.\",\"pass\":true},{\"n\":\"1\",\"evidence\":\"Screenshots 1-5 display an upload banner, a '3D Scene Controls' panel with sliders and preset buttons, and a bottom-right hint bar.\",\"pass\":false},{\"n\":\"2\",\"evidence\":\"In `animate()`, `water.material.uniforms['time'].value += dt * 0.42` and `mistParticles.position.x` run continuously on load without user input.\",\"pass\":true},{\"n\":\"3\",\"evidence\":\"Screenshot 1 roughly places the horizon, lake, left cliff, right trees, and peaks in positions corresponding to the reference photo, though framed inside a floating rectangle with dark borders.\",\"pass\":false},{\"n\":\"4\",\"evidence\":\"Screenshot 1 shows dull grey-brown water reflecting the procedural backdrop rather than the vibrant glacial turquoise of the reference photo.\",\"pass\":false},{\"n\":\"5\",\"evidence\":\"Screenshot 1 shows flat, low-detail 2D polygonal triangles drawn on a projected canvas rather than a row of jagged 3D peaks matching the photo's skyline.\",\"pass\":false},{\"n\":\"6\",\"evidence\":\"Screenshot 1 only shows uniform horizontal white lines across the mountain polygon in `createProceduralPreviewCanvas()` rather than snow patches and couloirs matching the photo.\",\"pass\":false},{\"n\":\"7\",\"evidence\":\"Screenshot 1 shows a flat dark-green 2D sawtooth shape painted onto the projected mesh on the right rather than a conifer forest lining the shore.\",\"pass\":false},{\"n\":\"8\",\"evidence\":\"Screenshot 1 uses unlit `MeshBasicMaterial` with a flat orange-brown gradient painted on canvas, lacking sunrise light on peaks.\",\"pass\":false},{\"n\":\"9\",\"evidence\":\"Screenshots 1-4 show the mountains as a warped 2D canvas (`projectedMesh`) painted with flat gradients and horizontal white stripes, not rock faces with ridges and gullies.\",\"pass\":false},{\"n\":\"10\",\"evidence\":\"Screenshots 1-4 show trees represented merely as a 2D sine-wave sawtooth silhouette (`Math.sin(x * 380)`) painted onto the terrain texture.\",\"pass\":false},{\"n\":\"11\",\"evidence\":\"Screenshots 1-3 show a sharp, smooth intersection where the planar water meets the warped canvas mesh, with no shoreline rocks or debris.\",\"pass\":false},{\"n\":\"12\",\"evidence\":\"Screenshots 1-5 clearly show the rectangular outer edges of the projected terrain mesh floating against a dark background.\",\"pass\":false},{\"n\":\"13\",\"evidence\":\"The terrain uses `MeshBasicMaterial` with a 2D canvas gradient (`createProceduralPreviewCanvas`), providing no 3D lighting or warm low-angle sun vs cooler shade.\",\"pass\":false},{\"n\":\"14\",\"evidence\":\"Screenshot 1 shows all background peaks painted with the same flat gradient on a single surface, without atmospheric perspective separating near and far peaks.\",\"pass\":false},{\"n\":\"15\",\"evidence\":\"Screenshot 1 shows bright blown-out white glowing spots (`mistParticles` with `AdditiveBlending`) along the base of the mountains near the center-left.\",\"pass\":false},{\"n\":\"16\",\"evidence\":\"There are no 3D trees, rocks, lights, or shadow maps in the code (`MeshBasicMaterial` is used), so contact shadows are completely absent in Screenshots 1-5.\",\"pass\":false},{\"n\":\"17\",\"evidence\":\"Screenshots 1-3 show the `THREE.Water` plane reflecting the mountain silhouettes and pale sky.\",\"pass\":true},{\"n\":\"18\",\"evidence\":\"Screenshots 1-4 show uniform planar mirror reflection across the water with no clear/lighter shallow shore transition.\",\"pass\":false},{\"n\":\"19\",\"evidence\":\"Screenshot 1 shows flat vector fills and uniform horizontal white lines on the cliffs and peaks instead of rock texture detail.\",\"pass\":false},{\"n\":\"20\",\"evidence\":\"Screenshot 1 has no snow material, only semi-transparent horizontal white strokes (`ctx.stroke()`) drawn across the peaks.\",\"pass\":false},{\"n\":\"21\",\"evidence\":\"Screenshot 1 shows a level water horizon line across the middle of the frame.\",\"pass\":true},{\"n\":\"22\",\"evidence\":\"In `animate()`, `water.material.uniforms['time'].value` increments every frame on the `THREE.Water` shader, moving ripples that distort the planar reflection seen in Screenshots 1-3.\",\"pass\":true},{\"n\":\"23\",\"evidence\":\"While `mistParticles` oscillates horizontally via `Math.sin(t * 0.08) * 6.0`, Screenshots 1-3 show it renders as stationary-looking bright white additive blobs on the water rather than drifting mist or low cloud.\",\"pass\":false},{\"n\":\"24\",\"evidence\":\"Trees are static 2D drawings on a canvas texture in `createProceduralPreviewCanvas()` with no sway animation in `animate()`.\",\"pass\":false},{\"n\":\"25\",\"evidence\":\"In `animate()`, water time advances smoothly by `dt * 0.42` and mist/drone motion use continuous `Math.sin`/`Math.cos` functions without jumps.\",\"pass\":true},{\"n\":\"26\",\"evidence\":\"Screenshots 1-5 show no repeating texture tiles on the mountains, and the procedural multi-frequency water normal map shows no obvious grid tiling.\",\"pass\":true},{\"n\":\"27\",\"evidence\":\"There are no individual 3D trees in the scene at all\u2014only a repeating sine-wave sawtooth edge (`Math.sin(x * 380)`) in Screenshot 1-4, failing to depict non-identical trees.\",\"pass\":false},{\"n\":\"28\",\"evidence\":\"`PROJ_FOV` is 45 degrees with `ACESFilmicToneMapping` at 1.04 exposure and no heavy post-processing, giving a natural perspective in Screenshot 1.\",\"pass\":true},{\"n\":\"29\",\"evidence\":\"Screenshot 1 looks like a minimal vector-art placeholder with UI overlays and visible canvas borders, bearing no photorealistic resemblance to the reference photo.\",\"pass\":false}]}",
+    "refusal": null,
+    "reasoning": null,
+    "reasoning_details": [
+     {
+      "type": "reasoning.encrypted",
+      "data": "EpwBCpkBAWkUfRNLDKxRSAYIJObnIu9GwxpyA7akyLVzgr/bVLD0IE4cPIp5EPgwa/0Z772NHWM0STwDpCavk/c/15hdu/9BpZThl6kj54CAAPh0o+CkEWv4LDzqqy+CQkFhAGPa7zG/U7rGV4ZrukLiBpiNJfwjUZQfAUY07XTSDx5bwtOOYeednW4x7EpQLSMR7FpcbhSe97Mh9mli.eyJlbmRwb2ludF9zbHVnIjoiZ29vZ2xlL2dlbWluaS00LWNhcmJvbi0yMDI2MTExMHxnb29nbGUtYWktc3R1ZGlvIn0",
+      "format": "google-gemini-v1",
+      "index": 0
+     }
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 17776,
+  "completion_tokens": 1408,
+  "total_tokens": 19184,
+  "cost": 0.0197507,
+  "is_byok": false,
+  "prompt_tokens_details": {
+   "cached_tokens": 15727,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0
+  },
+  "cost_details": {
+   "upstream_inference_cost": 0.0197507,
+   "upstream_inference_prompt_cost": 0.0056707,
+   "upstream_inference_completions_cost": 0.01408
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ }
+}
