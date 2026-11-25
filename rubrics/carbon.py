@@ -7,12 +7,12 @@ Run from the repo root, with your key in the environment (never committed):
     python3 rubrics/carbon.py generate            # all five samples
     python3 rubrics/carbon.py generate toast      # just one
     python3 rubrics/carbon.py followup toast      # second turn asking for the HTML, after a refusal
-    python3 rubrics/carbon.py grade               # after the captures are in
+    python3 rubrics/carbon.py grade --runs 5      # 5 independent grading runs per sample
 
 generate writes   rubrics/samples/<id>/model.html           the scene
                   rubrics/samples/<id>/model_response.json  the raw reply (earlier tries kept as _attemptN)
-grade    writes   rubrics/samples/<id>/carbon_grade.json    the raw reply
-                  rubrics/carbon.json                       verdicts for every sample graded so far
+grade    writes   rubrics/samples/<id>/grades/runN.json     every raw reply
+                  rubrics/carbon_runs.json                  verdicts per sample and run
 
 grade sends Carbon the reference photo, the captures in rubrics/captures/<id>/ (the running
 scene from several angles) and the scene's HTML, plus the rubric. It never sees the human scores.
@@ -35,21 +35,53 @@ RUBRICS = json.load(open(os.path.join(HERE, "rubrics.json")))
 PROMPT = RUBRICS["prompt"]
 SAMPLES = {s["id"]: s for s in RUBRICS["samples"]}
 
-GRADER = """You are reviewing a 3D scene that a model built from a reference photo, given the prompt
-"{prompt}". The first image is the reference photo. The other images are captures of the running
-scene: {captures}. The scene's full HTML source follows the images.
+GRADER = """You are reviewing a real-time 3D scene. A model was given the reference photo below and the
+prompt "{prompt}", and answered with the HTML page below. Score that page against the rubric.
 
-Score every rubric criterion below as pass or fail, judging what the captures and the code show.
-For criteria the captures can't show (frame rate, motion, what happens when orbiting further), judge
-from the code. Be strict: pass a criterion only when the scene clearly meets it.
+You receive:
+1. The reference photo.
+2. Five screenshots of the page running in Chrome, in this order:
+   1 default view, as the page opens, before any input
+   2 orbited about 90° to the left
+   3 orbited about 90° to the right
+   4 from above
+   5 zoomed all the way out
+3. The page's full HTML source.
 
-Reply with JSON only, no other text, in this shape:
-{{"results": [{{"n": "G1", "pass": true, "comment": "One or two plain sentences on why."}}, ...]}}
-Include every criterion exactly once, using its id.
+How to judge
+- Judge what a visitor sees and experiences, not what the code intends. A comment or variable
+  name such as "photorealistic snow" is not evidence of photorealistic snow.
+- Use the screenshots for anything visual: shapes, colours, materials, lighting, framing,
+  edges, clipping, on-screen UI.
+- Use the code only for what screenshots can't show: motion, camera limits, frame rate, and
+  what happens beyond the captured angles. Name the part of the code you relied on.
+- When a criterion refers to the photo, compare with the reference photo.
+- Pass a criterion only when the evidence clearly meets all of it. If it is partly met, or the
+  evidence is missing or unclear, fail it.
+- Score each criterion on its own. A failed gate does not affect the other criteria.
+- Frame rate (G3): estimate from the scene's load (geometry, draw calls, shadow maps,
+  post-processing) on a typical laptop with integrated graphics. The screenshots were rendered
+  in software, so they say nothing about speed.
 
-Rubric:
+Output
+Reply with one JSON object and nothing else:
+{{"results": [{{"n": "<criterion id>", "evidence": "<what you saw or read, citing screenshot numbers or code>", "pass": true or false}}]}}
+Write the evidence before the verdict, in one or two sentences. Include every criterion exactly
+once, in rubric order.
+
+Rubric
 {rubric}
 """
+
+# The five screenshots, in the order the prompt lists them (the low-angle capture is not sent).
+SHOTS = ["01_default_view", "02_orbit_left", "03_orbit_right", "04_from_above", "06_zoomed_out"]
+# One backend for every grading call, so run-to-run differences come from the model alone.
+PROVIDER = {"order": ["google-ai-studio"], "allow_fallbacks": False}
+SCHEMA = {"type": "json_schema", "json_schema": {"name": "rubric_results", "strict": True, "schema": {
+    "type": "object", "additionalProperties": False, "required": ["results"],
+    "properties": {"results": {"type": "array", "items": {
+        "type": "object", "additionalProperties": False, "required": ["n", "evidence", "pass"],
+        "properties": {"n": {"type": "string"}, "evidence": {"type": "string"}, "pass": {"type": "boolean"}}}}}}}}
 
 
 def data_url(path):
@@ -143,62 +175,79 @@ def followup(sid, key):
     print(f"  wrote model.html ({len(html):,} bytes, served by {resp.get('model')})")
 
 
-def grade(sid, key):
+def grade_once(sid, key, run):
+    """One independent grading call (no shared history). Returns {criterion: {pass, evidence}} or None."""
     d = os.path.join(HERE, "samples", sid)
-    caps = sorted(glob.glob(os.path.join(HERE, "captures", sid, "*.jpg")))
-    if not os.path.exists(os.path.join(d, "model.html")):
-        print(f"{sid}: no model.html yet, skipped")
+    caps = [os.path.join(HERE, "captures", sid, f"{n}.jpg") for n in SHOTS]
+    missing = [c for c in caps if not os.path.exists(c)]
+    if missing or not os.path.exists(os.path.join(d, "model.html")):
+        print(f"{sid} run {run}: missing scene or captures, skipped")
         return None
-    if not caps:
-        print(f"{sid}: no captures in rubrics/captures/{sid}/ yet, skipped")
-        return None
-    names = ", ".join(os.path.splitext(os.path.basename(c))[0].split("_", 1)[-1].replace("_", " ") for c in caps)
     crit = SAMPLES[sid]["criteria"]
     rubric = "\n".join(f'{c["n"]} [{c["d"]}]: {c["c"]}' for c in crit)
-    text = GRADER.format(prompt=PROMPT, captures=names, rubric=rubric)
-    content = [{"type": "text", "text": text},
+    content = [{"type": "text", "text": GRADER.format(prompt=PROMPT, rubric=rubric)},
                {"type": "image_url", "image_url": {"url": data_url(os.path.join(HERE, "img", f"{sid}.jpg"))}}]
     content += [{"type": "image_url", "image_url": {"url": data_url(c)}} for c in caps]
-    content.append({"type": "text", "text": "HTML source of the scene:\n\n" + open(os.path.join(d, "model.html")).read()})
-    print(f"{sid}: grading {len(crit)} criteria with {MODEL} ({len(caps)} captures) ...")
-    resp = post({"model": MODEL, "temperature": 0, "messages": [{"role": "user", "content": content}]}, key)
-    reply = save_response(os.path.join(d, "carbon_grade.json"), resp)
-    m = re.search(r"\{.*\}", reply, re.S)
-    try:
-        results = json.loads(m.group(0))["results"]
-    except (AttributeError, ValueError, KeyError):
-        print(f"  Could not read JSON from the reply (see {d}/carbon_grade.json). Run grade again for this sample.")
-        return None
-    got = {str(r["n"]): r for r in results}
-    missing = [c["n"] for c in crit if c["n"] not in got]
-    if missing:
-        print(f"  Missing verdicts for {missing}. Run grade again for this sample.")
-        return None
-    out = {c["n"]: {"pass": bool(got[c["n"]]["pass"]), "comment": str(got[c["n"]].get("comment", "")).strip()} for c in crit}
-    print(f"  {sum(v['pass'] for v in out.values())} / {len(crit)} pass")
-    return out
+    content.append({"type": "text", "text": "HTML source of the page:\n\n" + open(os.path.join(d, "model.html")).read()})
+    out_dir = os.path.join(d, "grades")
+    os.makedirs(out_dir, exist_ok=True)
+    for attempt in range(1, 4):  # a reply we can't read is not a verdict, so it is retried
+        try:
+            resp = post({"model": MODEL, "temperature": 0, "provider": PROVIDER, "response_format": SCHEMA,
+                         "messages": [{"role": "user", "content": content}]}, key)
+        except SystemExit as e:  # an HTTP error skips this run only; rerunning the command fills it in
+            print(f"  {sid} run {run}: request failed ({e}), skipped")
+            return None
+        name = f"run{run}.json" if attempt == 1 else f"run{run}_retry{attempt - 1}.json"
+        with open(os.path.join(out_dir, name), "w") as f:
+            json.dump(resp, f, indent=1)
+        served, prov = resp.get("model"), resp.get("provider")
+        if served != MODEL:
+            print(f"  WARNING {sid} run {run}: served {served!r}")
+        reply = resp["choices"][0]["message"].get("content") or ""
+        m = re.search(r"\{.*\}", reply, re.S)
+        try:
+            got = {str(r["n"]): r for r in json.loads(m.group(0))["results"]}
+        except (AttributeError, ValueError, KeyError, TypeError):
+            print(f"  {sid} run {run}: unreadable reply (attempt {attempt}), retrying")
+            continue
+        if any(c["n"] not in got for c in crit):
+            print(f"  {sid} run {run}: missing criteria (attempt {attempt}), retrying")
+            continue
+        res = {c["n"]: {"pass": bool(got[c["n"]]["pass"]), "evidence": str(got[c["n"]].get("evidence", "")).strip()} for c in crit}
+        print(f"{sid} run {run}: {sum(v['pass'] for v in res.values())} / {len(crit)} pass ({prov})")
+        return {"provider": prov, "results": res}
+    return None
 
 
 def main():
     if len(sys.argv) < 2 or sys.argv[1] not in ("generate", "followup", "grade"):
         sys.exit(__doc__)
     key = os.environ.get("OPENROUTER_API_KEY") or sys.exit("Set OPENROUTER_API_KEY first.")
-    ids = sys.argv[2:] or list(SAMPLES)
-    for s in ids:
+    ids = sys.argv[2:]
+    for s in [x for x in ids if not x.startswith("--") and not x.isdigit()] or list(SAMPLES):
         if s not in SAMPLES:
             sys.exit(f"Unknown sample {s!r}; choose from {list(SAMPLES)}")
     if sys.argv[1] in ("generate", "followup"):
-        for s in ids:
+        for s in ids or list(SAMPLES):
             (generate if sys.argv[1] == "generate" else followup)(s, key)
         return
-    path = os.path.join(HERE, "carbon.json")
+    runs = 1
+    if "--runs" in ids:
+        i = ids.index("--runs"); runs = int(ids[i + 1]); ids = ids[:i] + ids[i + 2:]
+    ids = ids or list(SAMPLES)
+    path = os.path.join(HERE, "carbon_runs.json")
     store = json.load(open(path)) if os.path.exists(path) else {}
-    for s in ids:
-        res = grade(s, key)
-        if res:
-            store[s] = res
-            with open(path, "w") as f:
-                json.dump(store, f, indent=1, ensure_ascii=False)
+    jobs = [(s, r) for s in ids for r in range(1, runs + 1) if str(r) not in store.get(s, {})]
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        for (s, r), res in zip(jobs, pool.map(lambda j: grade_once(j[0], key, j[1]), jobs)):
+            if res:
+                store.setdefault(s, {})[str(r)] = res
+    with open(path, "w") as f:
+        json.dump(store, f, indent=1, ensure_ascii=False)
+    done = {s: len(v) for s, v in store.items()}
+    print(f"saved {path}: runs per sample {done}")
 
 
 if __name__ == "__main__":
