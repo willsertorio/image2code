@@ -74,7 +74,22 @@ cats = []
 for d, *_ in all_votes:
     if d not in cats:
         cats.append(d)
-STATS = {"pair": sum(a for a, _ in pair_counts) / sum(b for _, b in pair_counts) if pair_counts else None, "runs": sorted(nruns_all), "kappa": fleiss_kappa([v for _, v, k, *_ in all_votes], max(nruns_all)) if len(nruns_all) == 1 else None,
+buckets = {"stable_agree": 0, "stable_disagree": 0, "unstable": 0, "tie": 0, "stable_disagree_strict": 0}
+for sm in samples:
+    for r in sm["rows"]:
+        if not r["k"]:
+            continue
+        if 2 * r["v"] == r["k"]:
+            buckets["tie"] += 1
+        elif min(r["v"], r["k"] - r["v"]) <= r["k"] // 20:
+            if r["h"] == r["j"]:
+                buckets["stable_agree"] += 1
+            else:
+                buckets["stable_disagree"] += 1
+                buckets["stable_disagree_strict"] += r["h"] is True and r["j"] is False
+        else:
+            buckets["unstable"] += 1
+STATS = {"buckets": buckets, "pair": sum(a for a, _ in pair_counts) / sum(b for _, b in pair_counts) if pair_counts else None, "runs": sorted(nruns_all), "kappa": fleiss_kappa([v for _, v, k, *_ in all_votes], max(nruns_all)) if len(nruns_all) == 1 else None,
          "cats": [{"d": d, "n": len(x), "unan": sum(v in (0, k) for _, v, k, *_ in x),
                    "agree": sum(h == m for *_, h, m in x if h is not None), "scored": sum(h is not None for *_, h, m in x)}
                   for d in cats for x in [[t for t in all_votes if t[0] == d]]]}
@@ -191,7 +206,30 @@ function renderOverview() {
     <p class="note">${all.length ? `Any two Carbon runs gave the same verdict on ${pct1(STATS.pair)} of criteria. Every run agreed on ${unanAll} of ${all.length} criteria (${pct(unanAll, all.length)}). Fleiss' kappa across all runs: ${kfmt(STATS.kappa)} (1 means the runs always agree).` : 'Carbon runs pending.'}</p>
     <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Sample</th><th>Human</th><th>Carbon mean (SD)</th><th>Range</th><th>Pairwise agree</th><th>Unanimous</th><th>Kappa</th><th>Majority vs human</th></tr></thead><tbody>${results}</tbody></table></div>
     <h2>By category</h2>
-    <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Category</th><th>Criteria</th><th>Unanimous across runs</th><th>Majority agrees with human</th></tr></thead><tbody>${cats}</tbody></table></div>`;
+    <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Category</th><th>Criteria</th><th>Unanimous across runs</th><th>Majority agrees with human</th></tr></thead><tbody>${cats}</tbody></table></div>
+    ${nextSteps()}`;
+}
+
+// Plan for making the rubrics reliable: shared with the team before work starts.
+function nextSteps() {
+  const b = STATS.buckets, k = STATS.runs.length === 1 ? STATS.runs[0] : 0;
+  if (!k) return '';
+  const groups = [
+    ['Stable, agrees with the human review', b.stable_agree, 'Working', 'Leave as is'],
+    ['Stable, disagrees with the human review', b.stable_disagree, `Carbon is sure but reads the criterion differently. In ${b.stable_disagree_strict} of ${b.stable_disagree}, Carbon fails what the human review passed`, 'Check with human raters before rewriting'],
+    ['Unstable: the runs split', b.unstable + b.tie, `The wording leaves room for a coin flip${b.tie ? ` (including ${b.tie} exact tie${b.tie > 1 ? 's' : ''})` : ''}`, 'Rewrite'],
+  ].map(([g, n, m, a]) => `<tr><td>${esc(g)}</td><td class="mono">${n}</td><td class="cm">${esc(m)}</td><td>${esc(a)}</td></tr>`).join('');
+  const steps = [
+    ['Triage', 'Claude', 'List the criteria to fix, with Carbon’s vote, the human verdict, and Carbon’s majority and minority reasoning side by side.', ['Triage sheet of the criteria to fix']],
+    ['Human check', '2 to 3 team members', `Score the ${b.stable_disagree} stable disagreements independently, without seeing the earlier scores, then discuss the criteria you split on.`, ['If the raters agree with each other but not Carbon: tell Carbon where to look', 'If the raters disagree with each other: rewrite the criterion', 'If the raters side with Carbon: change the human score']],
+    ['Rewrite', 'The team, with Claude drafting', 'Rewrite the unstable criteria and the ones the human check flags.', ['One check per criterion, not several bundled together', 'Say what to look at and what counts, instead of "reads as" or "matches the photo"', 'Describe the photo instead of pointing at it', 'Move what screenshots can’t show (motion, camera limits, repeated objects) to the code', 'Say what fails', 'Drop criteria the photo doesn’t support, such as the Bamboo Grove path and fence']],
+    ['Validate', 'Claude', 'Grade each changed criterion 10 times. Keep a rewrite only if it splits less and agrees with the human raters more.', ['The redesigns, which pass every criterion, should still pass', 'The Argon and Neon answers should still fail where they did', 'Rewrite using three designs, check on the other two', 'Before-and-after agreement numbers']],
+  ].map(([title, who, what, out], i) => `<li class="step"><div class="step-head"><span class="num">${i + 1}</span><h2>${esc(title)}</h2></div><dl><dt>Who</dt><dd>${esc(who)}</dd><dt>What</dt><dd>${esc(what)}</dd><dt>Output</dt><dd><ul>${out.map(o => `<li>${esc(o)}</li>`).join('')}</ul></dd></dl></li>`).join('');
+  return `<h2>Next: making the rubrics reliable</h2>
+    <p class="note">The goal is criteria that Carbon grades the same way every run, and the same way careful human raters do. Tuning the wording until Carbon passes the scenes would only make the rubric lenient.</p>
+    <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Group (over ${k} runs)</th><th>Criteria</th><th>What it means</th><th>Action</th></tr></thead><tbody>${groups}</tbody></table></div>
+    <p class="note" style="margin-top:12px">Stable means at most ${Math.floor(k / 20)} of the ${k} runs went the other way.</p>
+    <ol class="boxes" aria-label="Plan">${steps}</ol>`;
 }
 
 function rubricTable(rows) {
