@@ -66,7 +66,7 @@ for s in R["samples"]:
         pair = None
     samples.append({"id": sid, "name": s["name"], "ref": f"img/{sid}.jpg", "thumb": f"img/{sid}_thumb.jpg",
                     "model": model if os.path.exists(os.path.join(HERE, model)) else None,
-                    "caps": caps, "rows": rows, "note": NOTES.get(sid, ""), "runs": totals, "pair": pair,
+                    "caps": caps, "rows": rows, "runs": totals, "pair": pair,
                     "mean": statistics.mean(totals) if totals else None, "sd": statistics.pstdev(totals) if totals else None,
                     "kappa": fleiss_kappa([r["v"] for r in rows], k) if k else None})
 
@@ -183,11 +183,10 @@ function renderOverview() {
   page.className = 'doc wide';
   page.innerHTML = `
     <h1 class="home">Rubrics</h1>
-    <p class="lead">Five photos, each turned into a 3D scene by ${esc(MODEL)} from one prompt, then scored against its rubric by a human review and by ${esc(MODEL)} as a judge, ${runsLabel} per scene.</p>
     <div class="label refs-label">Reference images</div>
     <div class="refs">${SAMPLES.map(s => `<a href="#${s.id}"><img src="${esc(s.thumb)}" alt="Reference photo: ${esc(s.name)}" loading="lazy"><span class="label">${esc(s.name)}</span></a>`).join('')}</div>
     <h2>How it was scored</h2>
-    <p class="note">Human: Claude Opus 5.5, acting as the human reviewer, scored each scene from captures of the running scene and its code, before Carbon graded it. Carbon: given the reference photo, five screenshots (default view, orbit left, orbit right, from above, zoomed out) and the scene's HTML, with the rubric. Each Carbon run is a separate request with no shared history, at temperature 0, on one provider (Google AI Studio). Carbon's verdict is the majority of its runs; an even split is shown as a tie.</p>
+    <p class="note">Carbon got the reference photo, five screenshots of the running scene (default view, orbit left, orbit right, from above, zoomed out), the scene's HTML and the rubric. Each design was graded ${STATS.runs.length === 1 ? STATS.runs[0] : ''} times, each run a separate request with no shared history, at temperature 0, on one provider (Google AI Studio).</p>
     <h2>Consistency</h2>
     <p class="note">${all.length ? `Any two Carbon runs gave the same verdict on ${pct1(STATS.pair)} of criteria. Every run agreed on ${unanAll} of ${all.length} criteria (${pct(unanAll, all.length)}). Fleiss' kappa across all runs: ${kfmt(STATS.kappa)} (1 means the runs always agree).` : 'Carbon runs pending.'}</p>
     <div class="table-wrap"><table class="rubric plain"><thead><tr><th>Sample</th><th>Human</th><th>Carbon mean (SD)</th><th>Range</th><th>Pairwise agree</th><th>Unanimous</th><th>Kappa</th><th>Majority vs human</th></tr></thead><tbody>${results}</tbody></table></div>
@@ -218,13 +217,12 @@ function renderSample(s) {
     ? `<div class="frame"><iframe data-src="${esc(s.model)}" title="${esc(MODEL)} scene" allow="fullscreen" allowfullscreen></iframe><div class="loading" aria-live="polite"><span class="spin" aria-hidden="true"></span><span class="label">Loading</span></div></div>`
     : `<div class="frame"><div class="pending">Scene pending</div></div>`;
   page.innerHTML = `
-    <header class="title-row"><div><h1>${esc(s.name)}</h1><div class="label">${s.rows.length} criteria &middot; Human ${passes(s.rows, 'h')} &middot; Carbon ${s.runs.length ? `${s.mean.toFixed(1)} on average (${Math.min(...s.runs)}&ndash;${Math.max(...s.runs)}) over ${s.runs.length} runs` : '&ndash;'}</div></div></header>
+    <header class="title-row"><div><h1>${esc(s.name)}</h1></div></header>
     <div class="prompt"><img src="${esc(s.thumb)}" alt="Reference photo sent with the prompt"><div><div class="label">Prompt &middot; sent with the reference photo</div><p>${esc(PROMPT)}</p></div></div>
     <section class="pair">
       <figure class="pane"><div class="pane-head"><span class="label">${esc(MODEL)}</span>${s.model ? `<a href="${esc(s.model)}" target="_blank" rel="noopener">Open full screen</a>` : ''}</div>${scene}</figure>
       <figure class="pane"><div class="pane-head"><span class="label">Reference photo</span><a href="${esc(s.ref)}" target="_blank" rel="noopener">Open full size</a></div><div class="ref-frame"><img src="${esc(s.ref)}" alt="Reference photo: ${esc(s.name)}"></div></figure>
     </section>
-    ${s.note ? `<p class="gen-note">${esc(s.note)}</p>` : ''}
     ${s.caps.length ? `<details class="sec"><summary><h2>Captures</h2><span class="label">${s.caps.length} views &middot; what both reviews saw</span></summary><div class="caps">${s.caps.map(c => `<a href="${esc(c)}" target="_blank" rel="noopener"><img src="${esc(c)}" alt="${esc(capName(c))}" loading="lazy"><span class="label">${esc(capName(c))}</span></a>`).join('')}</div></details>` : ''}
     <details class="sec" open><summary><h2>Rubrics</h2><span class="label">${agreeText(s.rows)} agree with human</span></summary>${rubricTable(s.rows)}</details>`;
   page.querySelectorAll('.only-dis-box').forEach(b => b.addEventListener('change', () => {
