@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photorealistic 3D Bamboo Forest Scene</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { overflow: hidden; background: #071209; font-family: system-ui, -apple-system, sans-serif; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    #ui {
+      position: fixed; bottom: 20px; left: 20px; z-index: 10;
+      display: flex; gap: 10px; align-items: center;
+      background: rgba(8, 20, 12, 0.72); backdrop-filter: blur(10px);
+      padding: 10px 16px; border-radius: 999px;
+      border: 1px solid rgba(140, 210, 140, 0.25); color: #e6f5e6;
+      font-size: 13px; box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+    }
+    button {
+      background: rgba(110, 195, 115, 0.22); color: #ebffeb;
+      border: 1px solid rgba(140, 220, 140, 0.4); border-radius: 999px;
+      padding: 6px 14px; cursor: pointer; font-size: 12px; font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    button:hover { background: rgba(110, 195, 115, 0.42); }
+    .hint { opacity: 0.8; padding-right: 6px; }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="ui">
+    <span class="hint">Drag to look around in 3D • Scroll to move</span>
+    <button id="resetBtn">Match Photo Angle</button>
+    <button id="exploreBtn">Ground Walk View</button>
+    <button id="windBtn">Wind: ON</button>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+    // --- 1. SCENE, CAMERA & RENDERER ---
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x162b17, 0.012);
+
+    const camera = new THREE.PerspectiveCamera(68, window.innerWidth / window.innerHeight, 0.1, 180);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxDistance = 45;
+
+    function setPhotoAngle() {
+      // Low wide-angle view looking sharply upward toward converging bamboo tips
+      camera.position.set(0, 1.35, 2.9);
+      controls.target.set(0.35, 14.5, -1.2);
+      camera.fov = 68;
+      camera.updateProjectionMatrix();
+      controls.update();
+    }
+    setPhotoAngle();
+
+    // --- 2. SKY DOME (HDR-STYLE BRIGHT OVERCAST CANOPY GLOW) ---
+    const skyGeo = new THREE.SphereGeometry(130, 32, 24);
+    const skyMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      depthWrite: false,
+      uniforms: {
+        topColor: { value: new THREE.Color(0x2d502c) }, // Multiplied > 1 in shader for HDR bloom
+        midColor: { value: new THREE.Color(0xdfffe0) },
+        botColor: { value: new THREE.Color(0x0b1c0d) }
+      },
+      vertexShader: `
+        varying vec3 vWorldPos;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorldPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vWorldPos;
+        void main() {
+          vec3 dir = normalize(vWorldPos);
+          float h = clamp(dir.y, 0.0, 1.0);
+          // Bright blown-out sky opening high above, deep lush forest at horizon
+          vec3 horizon = vec3(0.08, 0.18, 0.08);
+          vec3 canopyGlow = vec3(0.65, 0.95, 0.55);
+          vec3 zenithSky = vec3(2.35, 2.50, 2.35); // HDR bright white sky for natural light wrap
+          vec3 col = mix(horizon, canopyGlow, smoothstep(0.0, 0.42, h));
+          col = mix(col, zenithSky, smoothstep(0.38, 0.82, h));
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
+    scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+    // --- 3. LIGHTING ---
+    const hemiLight = new THREE.HemisphereLight(0xdfffe2, 0x102612, 1.85);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xf6fff0, 2.6);
+    sunLight.position.set(4, 38, 2);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.set(2048, 2048);
+    sunLight.shadow.camera.near = 5;
+    sunLight.shadow.camera.far = 55;
+    const d = 18;
+    sunLight.shadow.camera.left = -d;
+    sunLight.shadow.camera.right = d;
+    sunLight.shadow.camera.top = d;
+    sunLight.shadow.camera.bottom = -d;
+    sunLight.shadow.bias = -0.0005;
+    scene.add(sunLight);
+
+    // Subtle green bounce light from forest floor & surrounding foliage
+    const bounceLight = new THREE.DirectionalLight(0x4f8a48, 0.85);
+    bounceLight.position.set(-6, -5, 5);
+    scene.add(bounceLight);
+
+    // --- 4. PROCEDURAL PBR BAMBOO TEXTURES (100% ALIGNED WITH 3D JOINTS) ---
+    function createBambooTextures() {
+      const w = 512, h = 512;
+      const diffCanvas = document.createElement('canvas');
+      const bumpCanvas = document.createElement('canvas');
+      const roughCanvas = document.createElement('canvas');
+      diffCanvas.width = bumpCanvas.width = roughCanvas.width = w;
+      diffCanvas.height = bumpCanvas.height = roughCanvas.height = h;
+
+      const dCtx = diffCanvas.getContext('2d');
+      const bCtx = bumpCanvas.getContext('2d');
+      const rCtx = roughCanvas.getContext('2d');
+
+      // Base dusty Moso bamboo green
+      const grad = dCtx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0.0, '#496e55');
+      grad.addColorStop(0.44, '#567c62');
+      grad.addColorStop(0.485, '#3b5743');
+      grad.addColorStop(0.50, '#182419'); // Dark node ring right at v = 0.5
+      grad.addColorStop(0.515, '#2b3d2c');
+      grad.addColorStop(0.54, '#799980'); // Powdery white-green waxy band below/above node
+      grad.addColorStop(0.63, '#52785d');
+      grad.addColorStop(1.0, '#496e55');
+      dCtx.fillStyle = grad;
+      dCtx.fillRect(0, 0, w, h);
+
+      // Fine vertical organic bamboo fibers & weathered mottling
+      for (let i = 0; i < 900; i++) {
+        const x = Math.random() * w;
+        const width = 1 + Math.random() * 2.5;
+        const alpha = 0.03 + Math.random() * 0.06;
+        dCtx.fillStyle = Math.random() > 0.5 ? `rgba(185,215,185,${alpha})` : `rgba(25,45,30,${alpha})`;
+        dCtx.fillRect(x, 0, width, h);
+      }
+      // Subtle organic lichen/dust patches
+      for (let i = 0; i < 140; i++) {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        const rx = 6 + Math.random() * 22;
+        const ry = 12 + Math.random() * 45;
+        dCtx.fillStyle = Math.random() > 0.45 ? 'rgba(165, 195, 170, 0.04)' : 'rgba(20, 38, 24, 0.05)';
+        dCtx.beginPath();
+        dCtx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+        dCtx.fill();
+      }
+
+      // Crisp dark double-seam at the bamboo joint (y = h * 0.5)
+      dCtx.fillStyle = 'rgba(14, 20, 13, 0.88)';
+      dCtx.fillRect(0, h * 0.493, w, h * 0.014);
+      dCtx.fillStyle = 'rgba(35, 48, 32, 0.65)';
+      dCtx.fillRect(0, h * 0.514, w, h * 0.008);
+
+      // Bump map (raised ridge at 0.5 + subtle vertical striations)
+      const bGrad = bCtx.createLinearGradient(0, 0, 0, h);
+      bGrad.addColorStop(0.0, '#808080');
+      bGrad.addColorStop(0.46, '#808080');
+      bGrad.addColorStop(0.49, '#e8e8e8');
+      bGrad.addColorStop(0.502, '#404040'); // Indented seam inside double ridge
+      bGrad.addColorStop(0.515, '#d8d8d8');
+      bGrad.addColorStop(0.55, '#808080');
+      bGrad.addColorStop(1.0, '#808080');
+      bCtx.fillStyle = bGrad;
+      bCtx.fillRect(0, 0, w, h);
+      for (let i = 0; i < 500; i++) {
+        bCtx.fillStyle = `rgba(255,255,255,0.03)`;
+        bCtx.fillRect(Math.random() * w, 0, 1.2, h);
+      }
+
+      // Roughness map (waxy sheen on internodes, rougher matte at joint ring)
+      rCtx.fillStyle = '#787878';
+      rCtx.fillRect(0, 0, w, h);
+      rCtx.fillStyle = '#d0d0d0';
+      rCtx.fillRect(0, h * 0.485, w, h * 0.045);
+
+      const SEGMENTS = 26;
+      const configure = (canvas, srgb = false) => {
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(1, SEGMENTS);
+        tex.anisotropy = 8;
+        if (srgb) tex.colorSpace = THREE.SRGBColorSpace;
+        return tex;
+      };
+
+      return {
+        SEGMENTS,
+        map: configure(diffCanvas, true),
+        bumpMap: configure(bumpCanvas),
+        roughnessMap: configure(roughCanvas)
+      };
+    }
+
+    const bambooTex = createBambooTextures();
+
+    // --- 5. SEGMENTED 3D BAMBOO CULM GEOMETRY WITH REALISTIC WIND SWAY ---
+    function createBambooGeometry(height = 28, baseRadius = 0.145, segments = 26) {
+      const radialSegs = 18;
+      const heightSegs = segments * 6;
+      const geo = new THREE.CylinderGeometry(baseRadius * 0.34, baseRadius, height, radialSegs, heightSegs, false);
+      geo.translate(0, height / 2, 0); // Pivot at ground y = 0
+
+      const pos = geo.attributes.position;
+      const uv = geo.attributes.uv;
+
+      for (let i = 0; i < pos.count; i++) {
+        const y = pos.getY(i);
+        const vNorm = y / height;
+        uv.setY(i, vNorm);
+
+        // Align 3D geometric joint bulge with texture ring at fractional 0.5
+        const segCoord = vNorm * segments;
+        const frac = segCoord - Math.floor(segCoord);
+        const distToNode = Math.abs(frac - 0.5);
+        const nodeFlare = 1.0 + 0.095 * Math.exp(-Math.pow(distToNode / 0.055, 2.0));
+        // Slight natural internode concavity
+        const internodeDip = 1.0 - 0.025 * Math.cos((frac - 0.5) * Math.PI * 2.0);
+
+        // Gentle organic bow along height
+        const curveX = Math.pow(vNorm, 1.85) * 0.65;
+        const x = pos.getX(i) * nodeFlare * internodeDip + curveX;
+        const z = pos.getZ(i) * nodeFlare * internodeDip;
+
+        pos.setXYZ(i, x, y, z);
+      }
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    const windUniforms = { uTime: { value: 0 }, uWindStrength: { value: 1.0 } };
+
+    const bambooMat = new THREE.MeshStandardMaterial({
+      map: bambooTex.map,
+      bumpMap: bambooTex.bumpMap,
+      bumpScale: 0.018,
+      roughnessMap: bambooTex.roughnessMap,
+      roughness: 0.85,
+      metalness: 0.02
+    });
+
+    bambooMat.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = windUniforms.uTime;
+      shader.uniforms.uWindStrength = windUniforms.uWindStrength;
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <common>',
+        `#include <common>
+         uniform float uTime;
+         uniform float uWindStrength;`
+      );
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+         float hFactor = clamp(transformed.y / 28.0, 0.0, 1.0);
+         float phase = instanceMatrix[3][0] * 0.45 + instanceMatrix[3][2] * 0.45;
+         float swayX = sin(uTime * 0.85 + phase) * 0.32 + sin(uTime * 1.9 + phase * 1.7) * 0.08;
+         float swayZ = cos(uTime * 0.72 + phase * 1.2) * 0.24;
+         transformed.x += swayX * pow(hFactor, 2.1) * uWindStrength;
+         transformed.z += swayZ * pow(hFactor, 2.1) * uWindStrength;`
+      );
+    };
+
+    // --- 6. POPULATE HERO & FOREST BAMBOO STALKS (MATCHING PHOTO CONVERGENCE) ---
+    const stalkCount = 340;
+    const bambooGeo = createBambooGeometry(28, 0.145, bambooTex.SEGMENTS);
+    const bambooInstanced = new THREE.InstancedMesh(bambooGeo, bambooMat, stalkCount);
+    bambooInstanced.castShadow = true;
+    bambooInstanced.receiveShadow = true;
+
+    const dummy = new THREE.Object3D();
+    const colorAttr = new THREE.Color();
+    const canopyAnchorPoints = [];
+
+    // Hand-placed hero foreground culms matching the reference photo's dramatic framing
+    const heroStalks = [
+      // Prominent right foreground cluster
+      { x: 0.78, z: 1.55, s: 1.25, tiltX: -0.04, tiltZ: 0.055, rotY: 2.4 },
+      { x: 1.08, z: 1.42, s: 1.15, tiltX: -0.035, tiltZ: 0.06, rotY: 2.5 },
+      { x: 0.62, z: 1.25, s: 0.92, tiltX: -0.03, tiltZ: 0.04, rotY: 2.2 },
+      // Prominent center-left hero culm
+      { x: -0.22, z: 1.52, s: 1.18, tiltX: -0.04, tiltZ: -0.035, rotY: 0.4 },
+      { x: -0.58, z: 1.38, s: 0.96, tiltX: -0.03, tiltZ: -0.04, rotY: 0.6 },
+      { x: -0.95, z: 1.55, s: 0.90, tiltX: -0.03, tiltZ: -0.05, rotY: 0.2 },
+      // Far right overhanging culms angling inward
+      { x: 2.15, z: 2.15, s: 1.12, tiltX: -0.10, tiltZ: 0.14, rotY: 2.9 },
+      { x: 2.45, z: 1.85, s: 1.05, tiltX: -0.08, tiltZ: 0.16, rotY: 3.0 },
+      { x: 1.85, z: 0.95, s: 1.0,  tiltX: -0.04, tiltZ: 0.09, rotY: 2.6 },
+      // Left dense diagonal row
+      { x: -1.45, z: 1.75, s: 0.95, tiltX: -0.02, tiltZ: -0.07, rotY: 0.3 },
+      { x: -1.85, z: 1.45, s: 0.92, tiltX: -0.02, tiltZ: -0.08, rotY: 0.5 },
+      { x: -2.25, z: 1.15, s: 0.88, tiltX: -0.02, tiltZ: -0.09, rotY: 0.1 }
+    ];
+
+    let idx = 0;
+    for (const h of heroStalks) {
+      dummy.position.set(h.x, -0.3, h.z);
+      dummy.rotation.set(h.tiltX, h.rotY, h.tiltZ);
+      dummy.scale.set(h.s, 0.98 + Math.random() * 0.12, h.s);
+      dummy.updateMatrix();
+      bambooInstanced.setMatrixAt(idx, dummy.matrix);
+      colorAttr.setHSL(0.36 + (Math.random() - 0.5) * 0.03, 0.28, 0.48 + Math.random() * 0.08);
+      bambooInstanced.setColorAt(idx, colorAttr);
+      canopyAnchorPoints.push({ x: h.x, z: h.z, h: 27 * dummy.scale.y });
+      idx++;
+    }
+
+    // Procedural surrounding bamboo grove leaving a natural upward sky clearing
+    while (idx < stalkCount) {
+      const angle = Math.random() * Math.PI * 2;
+      // Bias slightly outside immediate camera center so looking up reveals the bright sky gap
+      const radius = 1.9 + Math.pow(Math.random(), 0.78) * 19.5;
+      const x = Math.cos(angle) * radius + 0.25;
+      const z = Math.sin(angle) * radius - 0.5;
+
+      // Keep camera personal space clear
+      if (Math.hypot(x - 0, z - 2.9) < 1.15) continue;
+
+      const scaleR = 0.68 + Math.random() * 0.55;
+      const scaleY = 0.82 + Math.random() * 0.32;
+
+      dummy.position.set(x, -0.4, z);
+      // Subtle inward lean toward the light opening high above
+      const toCenterAngle = Math.atan2(-z - 1.2, -x + 0.35);
+      dummy.rotation.set(
+        (Math.random() - 0.5) * 0.07,
+        toCenterAngle + (Math.random() - 0.5) * 1.2,
+        (Math.random() - 0.5) * 0.07
+      );
+      dummy.scale.set(scaleR, scaleY, scaleR);
+      dummy.updateMatrix();
+
+      bambooInstanced.setMatrixAt(idx, dummy.matrix);
+      const distDarken = Math.max(0.28, 0.55 - radius * 0.012);
+      colorAttr.setHSL(0.35 + (Math.random() - 0.5) * 0.04, 0.32, distDarken + Math.random() * 0.08);
+      bambooInstanced.setColorAt(idx, colorAttr);
+
+      if (radius < 15) canopyAnchorPoints.push({ x, z, h: 27 * scaleY });
+      idx++;
+    }
+
+    bambooInstanced.instanceMatrix.needsUpdate = true;
+    bambooInstanced.instanceColor.needsUpdate = true;
+    scene.add(bambooInstanced);
+
+    // --- 7. BACKLIT TRANSLUCENT BAMBOO LEAF CLUSTERS ---
+    function createLeafSprayTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, 512, 512);
+
+      // Thin twig stem
+      ctx.strokeStyle = '#2d4724';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(256, 490);
+      ctx.quadraticCurveTo(252, 260, 260, 70);
+      ctx.stroke();
+
+      // Draw clusters of slender lanceolate bamboo leaves
+      const drawLeaf = (ox, oy, angle, len, wid, hueShift) => {
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.rotate(angle);
+        const g = ctx.createLinearGradient(0, 0, 0, -len);
+        g.addColorStop(0, `hsl(${96 + hueShift}, 58%, 28%)`);
+        g.addColorStop(0.5, `hsl(${92 + hueShift}, 68%, 42%)`);
+        g.addColorStop(1, `hsl(${86 + hueShift}, 76%, 52%)`);
+        ctx.fillStyle = g;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(wid, -len * 0.35, 0, -len);
+        ctx.quadraticCurveTo(-wid, -len * 0.35, 0, 0);
+        ctx.fill();
+
+        // Central leaf midrib
+        ctx.strokeStyle = 'rgba(195, 240, 140, 0.35)';
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        ctx.moveTo(0, -4);
+        ctx.lineTo(0, -len * 0.9);
+        ctx.stroke();
+        ctx.restore();
+      };
+
+      const leafNodes = [430, 360, 290, 220, 155, 105];
+      leafNodes.forEach((ny, nIdx) => {
+        const fanCount = 3 + (nIdx % 2);
+        for (let f = 0; f < fanCount; f++) {
+          const side = (f - (fanCount - 1) / 2);
+          const ang = side * 0.52 + (Math.random() - 0.5) * 0.16;
+          const len = 115 + Math.random() * 48 - nIdx * 6;
+          const wid = 13 + Math.random() * 4.5;
+          drawLeaf(256, ny, ang, len, wid, (Math.random() - 0.5) * 10);
+        }
+      });
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    const leafTex = createLeafSprayTexture();
+    const leafGeo = new THREE.PlaneGeometry(2.7, 2.7);
+    const leafMat = new THREE.MeshStandardMaterial({
+      map: leafTex,
+      alphaTest: 0.32,
+      side: THREE.DoubleSide,
+      roughness: 0.55,
+      // Emissive simulates sunlit subsurface translucency glowing green from the bright sky
+      emissive: new THREE.Color(0x478c28),
+      emissiveMap: leafTex,
+      emissiveIntensity: 0.65
+    });
+
+    leafMat.onBeforeCompile = (shader) => {
+      shader.uniforms.uTime = windUniforms.uTime;
+      shader.uniforms.uWindStrength = windUniforms.uWindStrength;
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <common>',
+        `#include <common>
+         uniform float uTime;
+         uniform float uWindStrength;`
+      );
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+         vec3 iPos = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
+         float flutter = sin(uTime * 2.4 + iPos.x * 0.9 + iPos.z * 0.9 + position.x * 2.0) * 0.14;
+         float canopySway = sin(uTime * 0.85 + iPos.x * 0.45 + iPos.z * 0.45) * 0.28;
+         transformed.x += (flutter + canopySway) * uWindStrength;
+         transformed.z += flutter * 0.7 * uWindStrength;`
+      );
+    };
+
+    const leafCount = 3400;
+    const leafInstanced = new THREE.InstancedMesh(leafGeo, leafMat, leafCount);
+
+    for (let i = 0; i < leafCount; i++) {
+      const anchor = canopyAnchorPoints[i % canopyAnchorPoints.length];
+      const heightRatio = 0.44 + Math.pow(Math.random(), 0.75) * 0.58;
+      const y = anchor.h * heightRatio;
+      const spread = 1.6 + (1.0 - heightRatio) * 1.2;
+
+      dummy.position.set(
+        anchor.x + (Math.random() - 0.5) * spread * 2.2,
+        y,
+        anchor.z + (Math.random() - 0.5) * spread * 2.2
+      );
+      dummy.rotation.set(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI
+      );
+      const s = 0.75 + Math.random() * 0.85;
+      dummy.scale.set(s, s, s);
+      dummy.updateMatrix();
+      leafInstanced.setMatrixAt(i, dummy.matrix);
+
+      // Sunlit bright lime-green leaves high up; rich emerald leaves lower down
+      const sunFactor = THREE.MathUtils.clamp((y - 11) / 16, 0, 1);
+      colorAttr.setHSL(
+        0.25 + (1.0 - sunFactor) * 0.08,
+        0.65 + sunFactor * 0.2,
+        0.26 + sunFactor * 0.46
+      );
+      leafInstanced.setColorAt(i, colorAttr);
+    }
+    leafInstanced.instanceMatrix.needsUpdate = true;
+    leafInstanced.instanceColor.needsUpdate = true;
+    scene.add(leafInstanced);
+
+    // --- 8. OVERHANGING GNARLED DARK TREE BRANCH (TOP-LEFT MATCHING PHOTO) ---
+    const barkMat = new THREE.MeshStandardMaterial({
+      color: 0x161b14,
+      roughness: 0.92
+    });
+
+    function addBranch(points, rStart, rEnd) {
+      const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)));
+      const segs = 36;
+      const geo = new THREE.TubeGeometry(curve, segs, rStart, 10, false);
+      // Taper radius along tube length
+      const pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const ringIdx = Math.floor(i / 11);
+        const t = ringIdx / segs;
+        const center = curve.getPointAt(Math.min(t, 1));
+        const taper = THREE.MathUtils.lerp(1.0, rEnd / rStart, t);
+        pos.setXYZ(
+          i,
+          center.x + (pos.getX(i) - center.x) * taper,
+          center.y + (pos.getY(i) - center.y) * taper,
+          center.z + (pos.getZ(i) - center.z) * taper
+        );
+      }
+      geo.computeVertexNormals();
+      const mesh = new THREE.Mesh(geo, barkMat);
+      scene.add(mesh);
+    }
+
+    // Main dark silhouetted bough & twisting twigs in the upper-left corner of the photo
+    addBranch([
+      [-4.8, 9.2, 2.2], [-3.1, 8.9, 1.5], [-2.1, 9.1, 1.2], [-1.35, 9.8, 0.9], [-0.85, 11.1, 0.6]
+    ], 0.26, 0.035);
+
+    addBranch([
+      [-2.8, 8.95, 1.4], [-2.2, 8.3, 1.1], [-1.55, 7.9, 0.85], [-1.05, 8.2, 0.6]
+    ], 0.11, 0.018);
+
+    addBranch([
+      [-1.95, 9.15, 1.15], [-1.4, 8.85, 0.65], [-0.9, 9.25, 0.25], [-0.55, 10.2, 0.0]
+    ], 0.075, 0.014);
+
+    addBranch([
+      [-1.55, 7.9, 0.85], [-1.25, 7.2, 0.55], [-0.75, 6.95, 0.25]
+    ], 0.045, 0.01);
+
+    // --- 9. FOREST FLOOR (VISIBLE WHEN EXPLORING IN 3D) ---
+    const groundGeo = new THREE.CircleGeometry(45, 48);
+    groundGeo.rotateX(-Math.PI / 2);
+    groundGeo.translate(0, -0.35, 0);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x1a2616, roughness: 0.96 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // --- 10. PHOTOGRAPHIC POST-PROCESSING (CANOPY SKY HALATION / BLOOM) ---
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      0.34, // subtle natural lens bloom on bright sky gaps
+      0.65,
+      0.88
+    );
+    composer.addPass(bloomPass);
+    composer.addPass(new OutputPass());
+
+    // --- 11. UI CONTROLS & ANIMATION LOOP ---
+    document.getElementById('resetBtn').addEventListener('click', setPhotoAngle);
+
+    document.getElementById('exploreBtn').addEventListener('click', () => {
+      camera.position.set(0, 1.7, 6.2);
+      controls.target.set(0, 4.5, -4);
+      controls.update();
+    });
+
+    let windOn = true;
+    const windBtn = document.getElementById('windBtn');
+    windBtn.addEventListener('click', () => {
+      windOn = !windOn;
+      windUniforms.uWindStrength.value = windOn ? 1.0 : 0.0;
+      windBtn.textContent = `Wind: ${windOn ? 'ON' : 'OFF'}`;
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      windUniforms.uTime.value = clock.getElapsedTime();
+      controls.update();
+      composer.render();
+    }
+    animate();
+  </script>
+</body>
+</html>

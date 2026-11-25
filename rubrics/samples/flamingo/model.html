@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photorealistic 3D Flamingo Scene</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #7aaad3;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    #ui {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 35, 58, 0.45);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="ui">Drag to Orbit 3D &bull; Scroll to Zoom &bull; Right-Drag to Pan</div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { Water } from 'three/addons/objects/Water.js';
+
+    // --- 1. Scene, Camera & Renderer ---
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x82b0d9, 0.012);
+
+    const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 300);
+    camera.position.set(0.1, 2.05, 9.2);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0.05, 1.95, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI * 0.492; // Keep camera above water surface
+    controls.minDistance = 3.5;
+    controls.maxDistance = 26;
+
+    // --- 2. Seamless Atmospheric Sky Dome ---
+    const skyGeo = new THREE.SphereGeometry(180, 48, 32);
+    const skyMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      depthWrite: false,
+      uniforms: {
+        topColor: { value: new THREE.Color(0x6d9ec9) },
+        horizonColor: { value: new THREE.Color(0x8bb8de) }
+      },
+      vertexShader: `
+        varying vec3 vWorldPos;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorldPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 topColor;
+        uniform vec3 horizonColor;
+        varying vec3 vWorldPos;
+        void main() {
+          float h = clamp(normalize(vWorldPos).y * 1.8, 0.0, 1.0);
+          gl_FragColor = vec4(mix(horizonColor, topColor, pow(h, 0.65)), 1.0);
+        }
+      `
+    });
+    scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+    // --- 3. Sunlight & Fill Lighting (Matching Reference Lighting from Front-Right) ---
+    const sunLight = new THREE.DirectionalLight(0xfff6eb, 3.1);
+    sunLight.position.set(7.5, 6.5, 5.5);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.set(2048, 2048);
+    sunLight.shadow.camera.near = 1;
+    sunLight.shadow.camera.far = 25;
+    sunLight.shadow.camera.left = -4;
+    sunLight.shadow.camera.right = 4;
+    sunLight.shadow.camera.top = 5;
+    sunLight.shadow.camera.bottom = -1;
+    sunLight.shadow.bias = -0.0005;
+    scene.add(sunLight);
+
+    const hemiLight = new THREE.HemisphereLight(0xaad4ff, 0x4f84b8, 1.35);
+    scene.add(hemiLight);
+
+    // --- 4. Procedural Normal Map & Reflective Rippling Water ---
+    function createWaterNormals() {
+      const size = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const img = ctx.createImageData(size, size);
+      const data = img.data;
+
+      const heightAt = (x, y) => {
+        const u = (x / size) * Math.PI * 2;
+        const v = (y / size) * Math.PI * 2;
+        // Subtle horizontal wind ripples matching the calm lagoon water
+        return (
+          Math.sin(v * 18 + Math.sin(u * 3) * 0.6) * 0.45 +
+          Math.sin(v * 34 - u * 4) * 0.22 +
+          Math.cos(u * 8 + v * 12) * 0.12
+        );
+      };
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const dx = (heightAt((x + 1) % size, y) - heightAt((x - 1 + size) % size, y)) * 0.25;
+          const dy = (heightAt(x, (y + 1) % size) - heightAt(x, (y - 1 + size) % size)) * 0.25;
+          const len = Math.hypot(dx, dy, 1);
+          const idx = (y * size + x) * 4;
+          data[idx]     = ((-dx / len) * 0.5 + 0.5) * 255;
+          data[idx + 1] = ((-dy / len) * 0.5 + 0.5) * 255;
+          data[idx + 2] = ((1 / len) * 0.5 + 0.5) * 255;
+          data[idx + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      return tex;
+    }
+
+    const waterGeo = new THREE.PlaneGeometry(300, 300);
+    const water = new Water(waterGeo, {
+      textureWidth: 1024,
+      textureHeight: 1024,
+      waterNormals: createWaterNormals(),
+      sunDirection: sunLight.position.clone().normalize(),
+      sunColor: 0xdbeeff,
+      waterColor: 0x5d94c7,
+      distortionScale: 0.28,
+      fog: true
+    });
+    water.rotation.x = -Math.PI / 2;
+    water.material.uniforms.size.value = 3.2;
+    scene.add(water);
+
+    // Subtle concentric foot-entry ripple where the left leg touches the surface
+    const rippleGeo = new THREE.RingGeometry(0.06, 0.34, 48);
+    const rippleMat = new THREE.MeshBasicMaterial({
+      color: 0x3b6790,
+      transparent: true,
+      opacity: 0.28,
+      side: THREE.DoubleSide
+    });
+    const footRipple = new THREE.Mesh(rippleGeo, rippleMat);
+    footRipple.rotation.x = -Math.PI / 2;
+    footRipple.scale.set(1.5, 0.45, 1);
+    footRipple.position.set(-0.86, 0.006, -0.1);
+    scene.add(footRipple);
+
+    // --- 5. Procedural Feather Bump Texture ---
+    function createFeatherTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#808080';
+      ctx.fillRect(0, 0, 256, 256);
+      for (let i = 0; i < 900; i++) {
+        const x = Math.random() * 256;
+        const y = Math.random() * 256;
+        ctx.strokeStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.14)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 8, 2.5, 0.15, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 3);
+      return tex;
+    }
+    const featherBump = createFeatherTexture();
+
+    // --- 6. Construct Anatomically Sculpted 3D Flamingo ---
+    const flamingo = new THREE.Group();
+    scene.add(flamingo);
+
+    // Helper: Variable-radius organic tube along a 3D spline
+    function buildOrganicTube(points, tubularSegs, radialSegs, radiusFn, colorFn) {
+      const curve = new THREE.CatmullRomCurve3(points);
+      const geo = new THREE.TubeGeometry(curve, tubularSegs, 1, radialSegs, false);
+      const pos = geo.attributes.position;
+      const colors = [];
+      const center = new THREE.Vector3();
+      const vertex = new THREE.Vector3();
+
+      for (let i = 0; i <= tubularSegs; i++) {
+        const u = i / tubularSegs;
+        curve.getPointAt(u, center);
+        const r = radiusFn(u);
+        const col = colorFn ? colorFn(u) : null;
+
+        for (let j = 0; j <= radialSegs; j++) {
+          const idx = i * (radialSegs + 1) + j;
+          vertex.fromBufferAttribute(pos, idx).sub(center);
+          // Slight lateral flattening on neck/beak for realistic bird anatomy
+          vertex.z *= 0.86;
+          vertex.multiplyScalar(r).add(center);
+          pos.setXYZ(idx, vertex.x, vertex.y, vertex.z);
+
+          if (col) colors.push(col.r, col.g, col.b);
+        }
+      }
+      if (colorFn) {
+        geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      }
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    // Materials
+    const plumageMat = new THREE.MeshPhysicalMaterial({
+      vertexColors: true,
+      roughness: 0.58,
+      metalness: 0.0,
+      sheen: 0.85,
+      sheenRoughness: 0.45,
+      sheenColor: new THREE.Color(0xffb5a3),
+      bumpMap: featherBump,
+      bumpScale: 0.012
+    });
+
+    const wingCoralMat = new THREE.MeshPhysicalMaterial({
+      color: 0xff6b4a,
+      roughness: 0.52,
+      sheen: 0.85,
+      sheenColor: new THREE.Color(0xffaa94),
+      bumpMap: featherBump,
+      bumpScale: 0.015
+    });
+
+    const blackFeatherMat = new THREE.MeshPhysicalMaterial({
+      color: 0x0c0d10,
+      roughness: 0.42,
+      sheen: 0.4,
+      sheenColor: new THREE.Color(0x2b303a)
+    });
+
+    const legMat = new THREE.MeshPhysicalMaterial({
+      color: 0xf47b80,
+      roughness: 0.42,
+      clearcoat: 0.25
+    });
+
+    const jointMat = new THREE.MeshPhysicalMaterial({
+      color: 0xe64352,
+      roughness: 0.38,
+      clearcoat: 0.35
+    });
+
+    // 6A. Torso (Sculpted spine tube from tail to chest with pale pink belly shading)
+    const bodyPoints = [
+      new THREE.Vector3(-0.78, 2.52, 0),
+      new THREE.Vector3(-0.42, 2.60, 0),
+      new THREE.Vector3( 0.05, 2.64, 0),
+      new THREE.Vector3( 0.48, 2.55, 0),
+      new THREE.Vector3( 0.78, 2.48, 0)
+    ];
+    const bodyGeo = buildOrganicTube(
+      bodyPoints,
+      64,
+      28,
+      (u) => Math.sin(Math.pow(u, 0.82) * Math.PI) * 0.41 + 0.03,
+      (u) => new THREE.Color().lerpColors(new THREE.Color(0xffa796), new THREE.Color(0xff7257), u)
+    );
+    // Lighten underside vertices to match pale pink belly & fluffy femoral tuft
+    const bPos = bodyGeo.attributes.position;
+    const bCol = bodyGeo.attributes.color;
+    for (let i = 0; i < bPos.count; i++) {
+      const y = bPos.getY(i);
+      if (y < 2.48) {
+        const t = THREE.MathUtils.clamp((2.48 - y) * 2.4, 0, 1);
+        const c = new THREE.Color(bCol.getX(i), bCol.getY(i), bCol.getZ(i));
+        c.lerp(new THREE.Color(0xffe1d6), t * 0.8);
+        bCol.setXYZ(i, c.r, c.g, c.b);
+      }
+    }
+    const bodyMesh = new THREE.Mesh(bodyGeo, plumageMat);
+    bodyMesh.scale.set(1, 0.88, 0.82);
+    bodyMesh.position.y = 0.31;
+    bodyMesh.castShadow = true;
+    bodyMesh.receiveShadow = true;
+    flamingo.add(bodyMesh);
+
+    // 6B. Graceful S-Curved Neck, Head & Down-Hooked Roman Beak
+    const neckAndBeakPoints = [
+      new THREE.Vector3(0.56, 2.48, 0),   // Chest base
+      new THREE.Vector3(0.95, 2.31, 0),   // Lower neck dip
+      new THREE.Vector3(1.26, 2.56, 0),   // Outer S-curve crest
+      new THREE.Vector3(1.00, 3.08, 0),   // Mid-neck sweeping up-left
+      new THREE.Vector3(0.62, 3.62, 0),   // Upper neck curve
+      new THREE.Vector3(0.68, 4.02, 0),   // Back of skull
+      new THREE.Vector3(0.89, 4.10, 0),   // Crown of head
+      new THREE.Vector3(1.09, 3.98, 0),   // Pale bill base
+      new THREE.Vector3(1.24, 3.82, 0),   // Down-curved orange mid-bill
+      new THREE.Vector3(1.27, 3.55, 0)    // Glossy black hooked tip
+    ];
+
+    const neckGeo = buildOrganicTube(
+      neckAndBeakPoints,
+      160,
+      24,
+      (u) => {
+        if (u < 0.16) return THREE.MathUtils.lerp(0.24, 0.115, u / 0.16); // Chest taper
+        if (u < 0.66) return THREE.MathUtils.lerp(0.115, 0.088, (u - 0.16) / 0.50); // Slender neck
+        if (u < 0.77) return THREE.MathUtils.lerp(0.088, 0.148, Math.sin(((u - 0.66) / 0.11) * Math.PI * 0.65)); // Skull
+        if (u < 0.90) return THREE.MathUtils.lerp(0.118, 0.082, (u - 0.77) / 0.13); // Bill bridge
+        return THREE.MathUtils.lerp(0.082, 0.012, (u - 0.90) / 0.10); // Sharp beak tip
+      },
+      (u) => {
+        if (u < 0.76) return new THREE.Color(0xff6749); // Rich coral-orange neck & crown
+        if (u < 0.84) return new THREE.Color(0xfff1df); // Pale cream facial mask & upper bill
+        if (u < 0.91) return new THREE.Color(0xff7846); // Orange mid-bill
+        return new THREE.Color(0x101115);               // Jet-black beak tip
+      }
+    );
+    const neckMesh = new THREE.Mesh(neckGeo, plumageMat);
+    neckMesh.castShadow = true;
+    neckMesh.receiveShadow = true;
+    flamingo.add(neckMesh);
+
+    // 6C. Eyes (Both sides for full 360° 3D viewing)
+    [-1, 1].forEach((side) => {
+      const eyeGroup = new THREE.Group();
+      eyeGroup.position.set(0.95, 4.02, side * 0.105);
+
+      const iris = new THREE.Mesh(
+        new THREE.SphereGeometry(0.026, 16, 16),
+        new THREE.MeshStandardMaterial({ color: 0xf7d648, roughness: 0.2 })
+      );
+      const pupil = new THREE.Mesh(
+        new THREE.SphereGeometry(0.014, 12, 12),
+        new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1 })
+      );
+      pupil.position.set(0.008, 0, side * 0.014);
+      eyeGroup.add(iris, pupil);
+      flamingo.add(eyeGroup);
+    });
+
+    // 6D. Sculpted Coral Wings & Layered Jet-Black Primary Flight Feathers (Both Left & Right Sides)
+    [-1, 1].forEach((side) => {
+      const wingGroup = new THREE.Group();
+      wingGroup.position.set(-0.02, 2.66, side * 0.25);
+      // Slight raised wing posture matching the reference photo's shadow & silhouette
+      wingGroup.rotation.z = 0.18;
+      wingGroup.rotation.y = side * -0.08;
+
+      // Upper coral wing covert shell
+      const covertPoints = [
+        new THREE.Vector3(0.38, -0.02, 0),
+        new THREE.Vector3(0.06, 0.14, side * 0.08),
+        new THREE.Vector3(-0.35, 0.02, side * 0.06),
+        new THREE.Vector3(-0.78, -0.26, side * 0.02)
+      ];
+      const covertGeo = buildOrganicTube(
+        covertPoints,
+        40,
+        18,
+        (u) => Math.sin(Math.pow(u, 0.65) * Math.PI) * 0.24 + 0.02
+      );
+      const covertMesh = new THREE.Mesh(covertGeo, wingCoralMat);
+      covertMesh.scale.set(1, 0.72, 0.42);
+      covertMesh.castShadow = true;
+      wingGroup.add(covertMesh);
+
+      // Fan of jet-black primary & secondary flight feathers extending down-left
+      const featherCount = 8;
+      for (let f = 0; f < featherCount; f++) {
+        const t = f / (featherCount - 1);
+        const len = THREE.MathUtils.lerp(0.62, 1.05, Math.sin(t * Math.PI * 0.75 + 0.2));
+        const featherGeo = new THREE.ConeGeometry(0.065, len, 8);
+        featherGeo.scale(0.22, 1, 1);
+        featherGeo.translate(0, -len * 0.5, 0);
+
+        const feather = new THREE.Mesh(featherGeo, blackFeatherMat);
+        feather.position.set(-0.38 - t * 0.22, 0.02 - t * 0.09, side * (0.03 - t * 0.015));
+        feather.rotation.z = -1.02 - t * 0.24; // Angled backward-left
+        feather.rotation.y = side * 0.06;
+        feather.castShadow = true;
+        wingGroup.add(feather);
+      }
+
+      // Coral median covert overlap feathers on top of black primaries
+      for (let c = 0; c < 5; c++) {
+        const t = c / 4;
+        const cGeo = new THREE.ConeGeometry(0.075, 0.55, 8);
+        cGeo.scale(0.25, 1, 1);
+        cGeo.translate(0, -0.27, 0);
+        const cMesh = new THREE.Mesh(cGeo, wingCoralMat);
+        cMesh.position.set(-0.18 - t * 0.26, 0.05 - t * 0.06, side * 0.065);
+        cMesh.rotation.z = -0.98 - t * 0.14;
+        cMesh.castShadow = true;
+        wingGroup.add(cMesh);
+      }
+
+      flamingo.add(wingGroup);
+    });
+
+    // 6E. Long Slender Wading Legs (Matching Exact Stride Pose)
+    function createLeg(hipPos, anklePos, footPos, isTouchingSurface) {
+      const legGroup = new THREE.Group();
+
+      // White-pink feathered upper thigh tuft ("crural feathers")
+      const tuft = new THREE.Mesh(
+        new THREE.ConeGeometry(0.11, 0.26, 16),
+        new THREE.MeshPhysicalMaterial({ color: 0xffe5dc, roughness: 0.65 })
+      );
+      tuft.position.copy(hipPos).add(new THREE.Vector3(0, 0.04, 0));
+      tuft.rotation.x = Math.PI;
+      legGroup.add(tuft);
+
+      // Helper for tapered cylindrical leg bone between A and B
+      const addSegment = (pA, pB, rTop, rBot) => {
+        const dir = new THREE.Vector3().subVectors(pB, pA);
+        const len = dir.length();
+        const geo = new THREE.CylinderGeometry(rTop, rBot, len, 16);
+        const mesh = new THREE.Mesh(geo, legMat);
+        mesh.position.copy(pA).addScaledVector(dir, 0.5);
+        mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+        mesh.castShadow = true;
+        legGroup.add(mesh);
+      };
+
+      // Upper tibiotarsus & lower tarsometatarsus
+      addSegment(hipPos, anklePos, 0.036, 0.028);
+      addSegment(anklePos, footPos, 0.027, 0.022);
+
+      // Prominent reddish-pink intertarsal ("ankle") joint
+      const joint = new THREE.Mesh(new THREE.SphereGeometry(0.046, 18, 18), jointMat);
+      joint.scale.set(0.95, 1.35, 0.9);
+      joint.position.copy(anklePos);
+      joint.castShadow = true;
+      legGroup.add(joint);
+
+      // Webbed foot
+      const foot = new THREE.Mesh(new THREE.ConeGeometry(0.065, 0.18, 12), jointMat);
+      foot.position.copy(footPos).add(new THREE.Vector3(0.03, 0.03, 0));
+      foot.rotation.z = isTouchingSurface ? -0.45 : -Math.PI * 0.48;
+      foot.scale.set(0.7, 1, 0.9);
+      legGroup.add(foot);
+
+      flamingo.add(legGroup);
+    }
+
+    // Left-side leg in image: bent backward at the joint, foot delicately lifting at water surface
+    createLeg(
+      new THREE.Vector3(-0.20, 2.24, -0.10),
+      new THREE.Vector3(-1.05, 1.36, -0.10),
+      new THREE.Vector3(-0.85, 0.02, -0.10),
+      true
+    );
+
+    // Right-side leg in image: straight vertical support leg planted in shallow water
+    createLeg(
+      new THREE.Vector3(0.02, 2.24, 0.10),
+      new THREE.Vector3(-0.02, 1.18, 0.10),
+      new THREE.Vector3(0.04, -0.22, 0.10),
+      false
+    );
+
+    // --- 7. Animation Loop (Subtle Breathing & Live Rippling Water Reflections) ---
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+
+      // Gentle real-time water ripple flow
+      water.material.uniforms['time'].value = elapsed * 0.22;
+
+      // Subtle organic breathing motion on the flamingo
+      flamingo.position.y = Math.sin(elapsed * 1.6) * 0.008;
+      neckMesh.rotation.z = Math.sin(elapsed * 1.2) * 0.004;
+
+      // Subtle pulse on the foot ripple
+      const pulse = 1 + Math.sin(elapsed * 2.2) * 0.06;
+      footRipple.scale.set(1.5 * pulse, 0.45 * pulse, 1);
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Responsive resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

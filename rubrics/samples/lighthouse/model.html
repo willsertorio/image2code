@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peggy's Cove Lighthouse - 3D Scene</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: sans-serif; }
+        canvas { display: block; }
+        #loading {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: white; font-size: 1.2rem; pointer-events: none; transition: opacity 0.5s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        #controls-hint {
+            position: absolute; bottom: 20px; left: 20px; color: rgba(255,255,255,0.7);
+            font-size: 0.85rem; pointer-events: none; background: rgba(0,0,0,0.4);
+            padding: 8px 12px; border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Generating Procedural Terrain & Textures...</div>
+    <div id="controls-hint">Left Click: Rotate | Right Click: Pan | Scroll: Zoom</div>
+
+    <!-- Import maps polyfill -->
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { Water } from 'three/addons/objects/Water.js';
+        import { Sky } from 'three/addons/objects/Sky.js';
+        import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+
+        // --- 1. SCENE SETUP ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x8bb7f0, 0.0006);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.5, 10000);
+        // Position camera to match the reference photo perspective
+        camera.position.set(18, 8, 65);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 0.95;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(0, 12, 0);
+        controls.maxPolarAngle = Math.PI * 0.495; // Prevent going underwater
+        controls.minDistance = 15;
+        controls.maxDistance = 300;
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // --- 2. PROCEDURAL NOISE & TEXTURE GENERATORS ---
+        const perlin = new ImprovedNoise();
+        
+        function fbm(x, y, z, octaves = 4, persistence = 0.5, lacunarity = 2.0) {
+            let total = 0, frequency = 1, amplitude = 1, maxValue = 0;
+            for(let i = 0; i < octaves; i++) {
+                total += perlin.noise(x * frequency, y * frequency, z * frequency) * amplitude;
+                maxValue += amplitude;
+                amplitude *= persistence;
+                frequency *= lacunarity;
+            }
+            return total / maxValue;
+        }
+
+        // Generate Water Normals Procedurally (avoids external image dependencies)
+        function createWaterNormals() {
+            const size = 512;
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.createImageData(size, size);
+            const data = imgData.data;
+
+            // Create tileable heightmap first
+            const heights = new Float32Array(size * size);
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    // Seamless tiling math using 4D mapping approximation or simple multi-scale sine/noise
+                    let nx = x / size, ny = y / size;
+                    let angleX = nx * Math.PI * 2, angleY = ny * Math.PI * 2;
+                    let v = perlin.noise(Math.cos(angleX)*2, Math.sin(angleX)*2, ny*8) * 0.5 +
+                            perlin.noise(nx*16, Math.cos(angleY)*4, Math.sin(angleY)*4) * 0.25 +
+                            perlin.noise(nx*32, ny*32, 1.5) * 0.125;
+                    heights[y * size + x] = v;
+                }
+            }
+
+            // Sobel filter for normals
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const left = heights[y * size + ((x - 1 + size) % size)];
+                    const right = heights[y * size + ((x + 1) % size)];
+                    const up = heights[((y - 1 + size) % size) * size + x];
+                    const down = heights[((y + 1) % size) * size + x];
+
+                    const dx = (left - right) * 4.0;
+                    const dy = (up - down) * 4.0;
+                    const dz = 1.0;
+                    const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    const idx = (y * size + x) * 4;
+                    data[idx] = ((dx / len) * 0.5 + 0.5) * 255;
+                    data[idx + 1] = ((dy / len) * 0.5 + 0.5) * 255;
+                    data[idx + 2] = ((dz / len) * 0.5 + 0.5) * 255;
+                    data[idx + 3] = 255;
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            return tex;
+        }
+
+        // Generate Granite & Snow Textures
+        function createDetailTexture(isGranite) {
+            const size = 512;
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.createImageData(size, size);
+            const data = imgData.data;
+
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const idx = (y * size + x) * 4;
+                    if (isGranite) {
+                        // Speckled granite look
+                        const n1 = perlin.noise(x * 0.1, y * 0.1, 0);
+                        const n2 = perlin.noise(x * 0.5, y * 0.5, 5.2);
+                        const speckle = Math.random() > 0.85 ? -30 : (Math.random() > 0.85 ? 25 : 0);
+                        let val = 135 + n1 * 30 + n2 * 20 + speckle;
+                        val = Math.max(40, Math.min(220, val));
+                        // Slight cool grey tint
+                        data[idx] = val * 0.96;
+                        data[idx + 1] = val * 0.98;
+                        data[idx + 2] = val * 1.02;
+                    } else {
+                        // Crisp snow sparkle/grain
+                        const n = perlin.noise(x * 0.2, y * 0.2, 10.5);
+                        const grain = (Math.random() - 0.5) * 10;
+                        let val = 242 + n * 10 + grain;
+                        val = Math.max(210, Math.min(255, val));
+                        data[idx] = val * 0.97;
+                        data[idx + 1] = val * 0.99;
+                        data[idx + 2] = 255;
+                    }
+                    data[idx + 3] = 255;
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            tex.colorSpace = THREE.SRGBColorSpace;
+            return tex;
+        }
+
+        // --- 3. LIGHTING, SKY & OCEAN ---
+        const sun = new THREE.Vector3();
+        
+        // Sky
+        const sky = new Sky();
+        sky.scale.setScalar(10000);
+        scene.add(sky);
+
+        const skyUniforms = sky.material.uniforms;
+        skyUniforms['turbidity'].value = 2.5; // Clear crisp winter air
+        skyUniforms['rayleigh'].value = 1.8;  // Deep blue sky
+        skyUniforms['mieCoefficient'].value = 0.003;
+        skyUniforms['mieDirectionalG'].value = 0.8;
+
+        // Sun Position (Matching photo: coming from front-left, moderately high)
+        const phi = THREE.MathUtils.degToRad(90 - 32); // Elevation
+        const theta = THREE.MathUtils.degToRad(-55);   // Azimuth (front-left relative to camera)
+        sun.setFromSphericalCoords(1, phi, theta);
+        skyUniforms['sunPosition'].value.copy(sun);
+
+        // Directional Sunlight
+        const dirLight = new THREE.DirectionalLight(0xfff8ed, 3.2);
+        dirLight.position.copy(sun).multiplyScalar(150);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 10;
+        dirLight.shadow.camera.far = 350;
+        const d = 80;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+        dirLight.shadow.bias = -0.0005;
+        scene.add(dirLight);
+
+        // Cold Sky & Snow Bounce Ambient Light
+        const hemiLight = new THREE.HemisphereLight(0x6da6ff, 0xd8e8ff, 1.1);
+        scene.add(hemiLight);
+
+        // Environment Map for Realistic Glass/Water Reflections
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmremGenerator.fromScene(sky).texture;
+
+        // Ocean
+        const waterGeometry = new THREE.PlaneGeometry(10000, 10000);
+        const water = new Water(waterGeometry, {
+            textureWidth: 512,
+            textureHeight: 512,
+            waterNormals: createWaterNormals(),
+            sunDirection: new THREE.Vector3(),
+            sunColor: 0xffffff,
+            waterColor: 0x0a2e52, // Deep Atlantic blue
+            distortionScale: 2.8,
+            fog: scene.fog !== undefined
+        });
+        water.rotation.x = -Math.PI / 2;
+        water.material.uniforms['sunDirection'].value.copy(sun).normalize();
+        scene.add(water);
+
+
+        // --- 4. PROCEDURAL ROCKY PENINSULA & SNOW SHADER ---
+        
+        // Define terrain elevation mathematically so we can place boulders accurately too
+        function getTerrainData(x, z) {
+            // Elongated peninsula stretching towards +Z (camera)
+            const distFromSpine = Math.sqrt(Math.pow(x * 1.15, 2) + Math.pow((z - 18) * 0.65, 2));
+            
+            // Base dome falloff
+            let baseHeight = 13.5 - Math.pow(distFromSpine * 0.14, 1.75);
+
+            // Smooth glaciated granite lobes (characteristic of Peggy's Cove)
+            const lobe1 = perlin.noise(x * 0.045, z * 0.045, 1.2) * 3.8;
+            const lobe2 = Math.abs(perlin.noise(x * 0.09, z * 0.09, 4.7)) * -2.2; // Crevices between lobes
+            const micro = fbm(x * 0.25, z * 0.25, 8.1, 3) * 0.7;
+
+            let h = baseHeight + lobe1 + lobe2 + micro;
+
+            // Flatten summit slightly for lighthouse foundation
+            const distToLighthouse = Math.sqrt(x * x + z * z);
+            if (distToLighthouse < 7) {
+                const flatFactor = THREE.MathUtils.smoothstep(distToLighthouse, 2.5, 7.0);
+                h = THREE.MathUtils.lerp(13.2, h, flatFactor);
+            }
+
+            // Carve out the tire-track / walkway path curving from foreground-right up towards center
+            // Path curve: x = pathCenterX(z)
+            let pathMask = 0;
+            if (z > 2 && z < 62) {
+                const t = (z - 2) / 60; // 0 near lighthouse, 1 near foreground
+                const pathCenterX = Math.sin(t * Math.PI * 0.65) * 18 - 2; 
+                const distToPath = Math.abs(x - pathCenterX);
+                
+                // Double tire track / cleared walkway profile
+                if (distToPath < 2.2) {
+                    const track1 = Math.exp(-Math.pow(distToPath - 0.65, 2) * 8.0);
+                    const track2 = Math.exp(-Math.pow(distToPath + 0.65, 2) * 8.0);
+                    const centerClear = Math.exp(-Math.pow(distToPath, 2) * 0.8) * 0.6;
+                    pathMask = Math.min(1.0, track1 + track2 + centerClear);
+                    h -= pathMask * 0.18; // Slight depression in snow
+                }
+            }
+
+            return { height: Math.max(-4.0, h), pathMask };
+        }
+
+        const terrainGeo = new THREE.PlaneGeometry(140, 160, 320, 360);
+        terrainGeo.rotateX(-Math.PI / 2);
+
+        const posAttr = terrainGeo.attributes.position;
+        const pathAttr = new Float32Array(posAttr.count);
+        const snowNoiseAttr = new Float32Array(posAttr.count);
+
+        for (let i = 0; i < posAttr.count; i++) {
+            const x = posAttr.getX(i);
+            const z = posAttr.getZ(i);
+            const data = getTerrainData(x, z);
+            posAttr.setY(i, data.height);
+            pathAttr[i] = data.pathMask;
+            // Low-frequency drift noise for natural patchy snow distribution
+            snowNoiseAttr[i] = fbm(x * 0.08, z * 0.08, 21.4, 3);
+        }
+
+        terrainGeo.setAttribute('aPathMask', new THREE.BufferAttribute(pathAttr, 1));
+        terrainGeo.setAttribute('aSnowNoise', new THREE.BufferAttribute(snowNoiseAttr, 1));
+        terrainGeo.computeVertexNormals();
+
+        const graniteTex = createDetailTexture(true);
+        const snowTex = createDetailTexture(false);
+
+        // Custom Shader Modification on Standard Material for Photorealistic Snow/Rock Blending
+        const terrainMat = new THREE.MeshStandardMaterial({
+            roughness: 0.75,
+            metalness: 0.05
+        });
+
+        terrainMat.onBeforeCompile = (shader) => {
+            shader.uniforms.tGranite = { value: graniteTex };
+            shader.uniforms.tSnow = { value: snowTex };
+
+            shader.vertexShader = `
+                attribute float aPathMask;
+                attribute float aSnowNoise;
+                varying float vPathMask;
+                varying float vSnowNoise;
+                varying vec3 vWorldPos;
+                varying vec3 vWorldNorm;
+            ` + shader.vertexShader;
+
+            shader.vertexShader = shader.vertexShader.replace(
+                '#include <begin_vertex>',
+                `
+                #include <begin_vertex>
+                vPathMask = aPathMask;
+                vSnowNoise = aSnowNoise;
+                vWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
+                vWorldNorm = normalize(mat3(modelMatrix) * objectNormal);
+                `
+            );
+
+            shader.fragmentShader = `
+                uniform sampler2D tGranite;
+                uniform sampler2D tSnow;
+                varying float vPathMask;
+                varying float vSnowNoise;
+                varying vec3 vWorldPos;
+                varying vec3 vWorldNorm;
+            ` + shader.fragmentShader;
+
+            shader.fragmentShader = shader.fragmentShader.replace(
+                '#include <map_fragment>',
+                `
+                // Tri-planar or world-UV mapping
+                vec2 uvRock = vWorldPos.xz * 0.35;
+                vec2 uvSnow = vWorldPos.xz * 0.5;
+
+                vec4 rockCol = texture2D(tGranite, uvRock);
+                vec4 snowCol = texture2D(tSnow, uvSnow);
+
+                // Add subtle crevices/cracks in granite
+                float crack = smoothstep(0.02, 0.0, abs( fract(vWorldPos.x * 0.12 + vSnowNoise) - 0.5 ));
+                rockCol.rgb *= (1.0 - crack * 0.35);
+
+                // Dark wet rock near waterline
+                float wetLine = 1.0 - smoothstep(0.2, 2.2, vWorldPos.y);
+                rockCol.rgb = mix(rockCol.rgb, rockCol.rgb * 0.45, wetLine);
+
+                // Calculate snow accumulation based on upward slope, height above waves, noise, and cleared path
+                float upDot = clamp(vWorldNorm.y, 0.0, 1.0);
+                float heightMask = smoothstep(2.0, 4.2, vWorldPos.y);
+                
+                // Snow settles in flatter spots & crevices, blown off steep convex faces
+                float snowFactor = smoothstep(0.76, 0.89, upDot + vSnowNoise * 0.22);
+                snowFactor *= heightMask;
+                
+                // Remove snow on the tire-track / walkway path, revealing wet/slushy grey concrete/rock
+                snowFactor *= (1.0 - vPathMask * 0.92);
+                vec3 pathColor = vec3(0.42, 0.41, 0.39); // Slushy cleared track tint
+                rockCol.rgb = mix(rockCol.rgb, pathColor, vPathMask * 0.7);
+
+                // Subtle blue tint in snow shadows/edges
+                vec3 finalAlbedo = mix(rockCol.rgb, snowCol.rgb, snowFactor);
+                diffuseColor.rgb = finalAlbedo;
+                `
+            );
+
+            shader.fragmentShader = shader.fragmentShader.replace(
+                '#include <roughnessmap_fragment>',
+                `
+                float roughnessFactor = roughness;
+                float upDotR = clamp(vWorldNorm.y, 0.0, 1.0);
+                float heightMaskR = smoothstep(2.0, 4.2, vWorldPos.y);
+                float snowFactorR = smoothstep(0.76, 0.89, upDotR + vSnowNoise * 0.22) * heightMaskR * (1.0 - vPathMask * 0.92);
+                float wetLineR = 1.0 - smoothstep(0.2, 2.2, vWorldPos.y);
+
+                // Wet rock is glossy (0.2), dry granite is matte (0.8), snow is crisp/sparkly (0.55)
+                float rockRough = mix(0.82, 0.2, wetLineR);
+                roughnessFactor = mix(rockRough, 0.55, snowFactorR);
+                if(vPathMask > 0.3) roughnessFactor = mix(roughnessFactor, 0.35, vPathMask); // Wet tire tracks
+                `
+            );
+        };
+
+        const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+        terrain.receiveShadow = true;
+        terrain.castShadow = true;
+        scene.add(terrain);
+
+
+        // --- 5. GRANITE BOULDERS (Matching reference ridge & foreground) ---
+        const boulderMat = new THREE.MeshStandardMaterial({
+            map: graniteTex,
+            roughness: 0.78,
+            metalness: 0.05
+        });
+
+        // Add subtle top-dusting of snow to boulders too
+        boulderMat.onBeforeCompile = (shader) => {
+            shader.uniforms.tSnow = { value: snowTex };
+            shader.vertexShader = `
+                varying vec3 vWorldNorm;
+                varying vec3 vWorldPos;
+            ` + shader.vertexShader.replace(
+                '#include <begin_vertex>',
+                `#include <begin_vertex>
+                vWorldNorm = normalize(mat3(modelMatrix) * objectNormal);
+                vWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
+            );
+            shader.fragmentShader = `
+                uniform sampler2D tSnow;
+                varying vec3 vWorldNorm;
+                varying vec3 vWorldPos;
+            ` + shader.fragmentShader.replace(
+                '#include <map_fragment>',
+                `#include <map_fragment>
+                vec4 sCol = texture2D(tSnow, vWorldPos.xz * 0.5);
+                float sMask = smoothstep(0.82, 0.95, vWorldNorm.y) * smoothstep(2.5, 4.0, vWorldPos.y);
+                diffuseColor.rgb = mix(diffuseColor.rgb, sCol.rgb, sMask * 0.85);`
+            );
+        };
+
+        function createBoulder(x, z, scaleX, scaleY, scaleZ, rotY = 0) {
+            const geo = new THREE.IcosahedronGeometry(1, 3);
+            const pos = geo.attributes.position;
+            const seed = Math.abs(x * 13.7 + z * 7.3);
+            for (let i = 0; i < pos.count; i++) {
+                let vx = pos.getX(i), vy = pos.getY(i), vz = pos.getZ(i);
+                // Flatten bottom slightly and angularize like glacial erratic granite
+                const n = perlin.noise(vx * 1.4 + seed, vy * 1.4, vz * 1.4) * 0.28;
+                vx *= (1 + n);
+                vy *= (1 + n);
+                vz *= (1 + n);
+                if (vy < -0.3) vy = -0.3 + (vy + 0.3) * 0.3;
+                pos.setXYZ(i, vx, vy, vz);
+            }
+            geo.computeVertexNormals();
+
+            const mesh = new THREE.Mesh(geo, boulderMat);
+            const groundY = getTerrainData(x, z).height;
+            mesh.position.set(x, groundY + scaleY * 0.38, z);
+            mesh.scale.set(scaleX, scaleY, scaleZ);
+            mesh.rotation.set((Math.random() - 0.5) * 0.2, rotY, (Math.random() - 0.5) * 0.2);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+        }
+
+        // Key boulders visible in the photo:
+        // 1. Large rounded boulders right in front/left of the lighthouse base
+        createBoulder(-4.2, 4.5, 2.8, 1.7, 2.1, 0.4);
+        createBoulder(-1.2, 4.8, 2.0, 1.3, 1.6, -0.2);
+        createBoulder(-7.5, 6.0, 2.2, 1.4, 1.8, 1.1);
+        createBoulder(-11.0, 8.2, 2.5, 1.5, 2.0, 0.7);
+        
+        // 2. Left coastline rugged boulder cluster
+        createBoulder(-24, 18, 3.5, 2.4, 3.0, 0.2);
+        createBoulder(-27, 22, 3.2, 2.8, 2.8, 1.0);
+        createBoulder(-22, 24, 2.8, 1.9, 2.5, 0.5);
+        createBoulder(-30, 26, 3.8, 2.5, 3.2, -0.4);
+        createBoulder(-19, 14, 2.6, 1.8, 2.2, 0.8);
+
+        // 3. Prominent solitary boulder on the right side near the path (very distinct in photo!)
+        createBoulder(15.5, 38.5, 1.8, 1.55, 1.6, -0.3);
+        createBoulder(7.2, 29.0, 1.3, 0.9, 1.2, 0.5); // Smaller rock mid-right
+
+        // 4. Scattered dry winter grass tufts poking through snow crevices
+        const grassGeo = new THREE.ConeGeometry(0.04, 0.45, 4);
+        grassGeo.translate(0, 0.22, 0);
+        const grassMat = new THREE.MeshStandardMaterial({ color: 0x7a684b, roughness: 0.9 });
+        const grassInst = new THREE.InstancedMesh(grassGeo, grassMat, 350);
+        const dummy = new THREE.Object3D();
+        let gIdx = 0;
+        for (let i = 0; i < 600 && gIdx < 350; i++) {
+            const gx = (Math.random() - 0.5) * 45;
+            const gz = 10 + Math.random() * 45;
+            const tData = getTerrainData(gx, gz);
+            if (tData.height > 4.5 && tData.pathMask < 0.2) {
+                dummy.position.set(gx, tData.height - 0.05, gz);
+                dummy.rotation.set((Math.random() - 0.5) * 0.5, Math.random() * Math.PI, (Math.random() - 0.5) * 0.5);
+                dummy.scale.setScalar(0.7 + Math.random() * 0.8);
+                dummy.updateMatrix();
+                grassInst.setMatrixAt(gIdx++, dummy.matrix);
+            }
+        }
+        scene.add(grassInst);
+
+
+        // --- 6. PEGGY'S COVE LIGHTHOUSE (Accurate Octagonal Architecture) ---
+        const lighthouse = new THREE.Group();
+        const baseElevation = getTerrainData(0, 0).height;
+        lighthouse.position.set(0, baseElevation - 0.2, 0);
+
+        const whitePaintMat = new THREE.MeshStandardMaterial({
+            color: 0xfcfcfc,
+            roughness: 0.45,
+            metalness: 0.02
+        });
+        const redPaintMat = new THREE.MeshStandardMaterial({
+            color: 0xb81422, // Classic Canadian Lighthouse Red
+            roughness: 0.35,
+            metalness: 0.1
+        });
+        const darkTrimMat = new THREE.MeshStandardMaterial({
+            color: 0x1a1c1e,
+            roughness: 0.5
+        });
+        const glassMat = new THREE.MeshPhysicalMaterial({
+            color: 0xdff2ff,
+            metalness: 0.0,
+            roughness: 0.05,
+            transmission: 0.92,
+            transparent: true,
+            ior: 1.5,
+            thickness: 0.2
+        });
+
+        // 1. Octagonal Tapered Tower Body
+        const towerHeight = 11.2;
+        const bottomRadius = 2.35;
+        const topRadius = 1.48;
+        const towerGeo = new THREE.CylinderGeometry(topRadius, bottomRadius, towerHeight, 8);
+        towerGeo.translate(0, towerHeight / 2, 0);
+        // Rotate by 22.5 deg (PI/8) so flat octagonal faces align nicely
+        towerGeo.rotateY(Math.PI / 8);
+        const towerMesh = new THREE.Mesh(towerGeo, whitePaintMat);
+        towerMesh.castShadow = true;
+        towerMesh.receiveShadow = true;
+        lighthouse.add(towerMesh);
+
+        // Subtle flared base plinth
+        const plinthGeo = new THREE.CylinderGeometry(bottomRadius * 0.98, bottomRadius * 1.06, 0.8, 8);
+        plinthGeo.translate(0, 0.4, 0);
+        plinthGeo.rotateY(Math.PI / 8);
+        const plinthMesh = new THREE.Mesh(plinthGeo, whitePaintMat);
+        plinthMesh.castShadow = true;
+        plinthMesh.receiveShadow = true;
+        lighthouse.add(plinthMesh);
+
+        // 2. Flared Cornice / Gallery Deck Overhang (Very characteristic curved/stepped flare at top of white tower)
+        const corniceGeo = new THREE.CylinderGeometry(topRadius * 1.32, topRadius * 0.99, 0.75, 8);
+        corniceGeo.translate(0, towerHeight + 0.37, 0);
+        corniceGeo.rotateY(Math.PI / 8);
+        const corniceMesh = new THREE.Mesh(corniceGeo, whitePaintMat);
+        corniceMesh.castShadow = true;
+        lighthouse.add(corniceMesh);
+
+        const deckFloorGeo = new THREE.CylinderGeometry(topRadius * 1.36, topRadius * 1.32, 0.18, 8);
+        deckFloorGeo.translate(0, towerHeight + 0.82, 0);
+        deckFloorGeo.rotateY(Math.PI / 8);
+        const deckFloor = new THREE.Mesh(deckFloorGeo, whitePaintMat);
+        deckFloor.castShadow = true;
+        lighthouse.add(deckFloor);
+
+        // 3. White Railing around Gallery Deck
+        const railRadius = topRadius * 1.28;
+        const railHeight = 0.85;
+        const railY = towerHeight + 0.9;
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2 + Math.PI / 8;
+            const nextAngle = ((i + 1) / 8) * Math.PI * 2 + Math.PI / 8;
+            
+            const px = Math.cos(angle) * railRadius;
+            const pz = Math.sin(angle) * railRadius;
+            const nx = Math.cos(nextAngle) * railRadius;
+            const nz = Math.sin(nextAngle) * railRadius;
+
+            // Vertical post
+            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, railHeight, 6), whitePaintMat);
+            post.position.set(px, railY + railHeight / 2, pz);
+            lighthouse.add(post);
+
+            // Horizontal top & mid rails
+            const segLen = Math.hypot(nx - px, nz - pz);
+            const midX = (px + nx) / 2, midZ = (pz + nz) / 2;
+            const segAngle = Math.atan2(nz - pz, nx - px);
+
+            [0.45, 0.85].forEach(hOffset => {
+                const bar = new THREE.Mesh(new THREE.BoxGeometry(segLen, 0.035, 0.035), whitePaintMat);
+                bar.position.set(midX, railY + hOffset, midZ);
+                bar.rotation.y = -segAngle;
+                lighthouse.add(bar);
+            });
+        }
+
+        // 4. Red Octagonal Lantern Room
+        const lanternBaseY = towerHeight + 0.9;
+        const lanternRadius = 1.25;
+        
+        // Red lower parapet wall of lantern
+        const parapetH = 0.95;
+        const parapetGeo = new THREE.CylinderGeometry(lanternRadius, lanternRadius, parapetH, 8);
+        parapetGeo.translate(0, lanternBaseY + parapetH / 2, 0);
+        parapetGeo.rotateY(Math.PI / 8);
+        const parapetMesh = new THREE.Mesh(parapetGeo, redPaintMat);
+        parapetMesh.castShadow = true;
+        lighthouse.add(parapetMesh);
+
+        // Glass Window Section + Red Mullion Bars
+        const glassH = 1.25;
+        const glassY = lanternBaseY + parapetH;
+        const glassCyl = new THREE.Mesh(
+            new THREE.CylinderGeometry(lanternRadius * 0.96, lanternRadius * 0.96, glassH, 8).rotateY(Math.PI / 8),
+            glassMat
+        );
+        glassCyl.position.y = glassY + glassH / 2;
+        lighthouse.add(glassCyl);
+
+        // Red Corner Mullions for Lantern Glass
+        for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
+            const mullion = new THREE.Mesh(new THREE.BoxGeometry(0.08, glassH, 0.08), redPaintMat);
+            mullion.position.set(Math.cos(a) * lanternRadius * 0.96, glassY + glassH / 2, Math.sin(a) * lanternRadius * 0.96);
+            mullion.rotation.y = -a;
+            lighthouse.add(mullion);
+        }
+
+        // Inner Fresnel Lens / Beacon Lamp Assembly (visible through glass!)
+        const lensMat = new THREE.MeshPhysicalMaterial({
+            color: 0xffffff, emissive: 0xffeedd, emissiveIntensity: 0.3,
+            roughness: 0.1, transmission: 0.8, ior: 1.6
+        });
+        const fresnel = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.7, 16), lensMat);
+        fresnel.position.y = glassY + glassH * 0.45;
+        lighthouse.add(fresnel);
+
+        const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.45, 0.4, 12), darkTrimMat);
+        pedestal.position.y = glassY + 0.15;
+        lighthouse.add(pedestal);
+
+        // Red Lantern Roof Cap & Vent Ball Finial
+        const roofY = glassY + glassH;
+        const roofEave = new THREE.Mesh(
+            new THREE.CylinderGeometry(lanternRadius * 1.12, lanternRadius * 1.12, 0.1, 8).rotateY(Math.PI / 8),
+            redPaintMat
+        );
+        roofEave.position.y = roofY + 0.05;
+        lighthouse.add(roofEave);
+
+        const roofCone = new THREE.Mesh(
+            new THREE.ConeGeometry(lanternRadius * 1.12, 0.95, 8).rotateY(Math.PI / 8),
+            redPaintMat
+        );
+        roofCone.position.y = roofY + 0.1 + 0.475;
+        roofCone.castShadow = true;
+        lighthouse.add(roofCone);
+
+        const ventBall = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), redPaintMat);
+        ventBall.position.y = roofY + 1.12;
+        lighthouse.add(ventBall);
+
+        const pinnacle = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.35, 8), redPaintMat);
+        pinnacle.position.y = roofY + 1.35;
+        lighthouse.add(pinnacle);
+
+        // 5. Entrance Vestibule Porch (Positioned on front-left side matching reference photo!)
+        const vestibule = new THREE.Group();
+        const vestW = 1.35, vestH = 2.45, vestD = 1.3;
+        const vestBox = new THREE.Mesh(new THREE.BoxGeometry(vestW, vestH, vestD), whitePaintMat);
+        vestBox.position.set(0, vestH / 2, 0);
+        vestBox.castShadow = true;
+        vestBox.receiveShadow = true;
+        vestibule.add(vestBox);
+
+        // Pitched Gable Roof on Vestibule
+        const roofShape = new THREE.Shape();
+        roofShape.moveTo(-vestW * 0.56, 0);
+        roofShape.lineTo(vestW * 0.56, 0);
+        roofShape.lineTo(0, 0.48);
+        roofShape.closePath();
+        const vestRoofGeo = new THREE.ExtrudeGeometry(roofShape, { depth: vestD * 1.08, bevelEnabled: false });
+        vestRoofGeo.translate(0, vestH, -vestD * 0.54);
+        const vestRoof = new THREE.Mesh(vestRoofGeo, whitePaintMat);
+        vestRoof.castShadow = true;
+        vestibule.add(vestRoof);
+
+        // Door frame detail on vestibule side
+        const doorRecess = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.85, 0.06), new THREE.MeshStandardMaterial({ color: 0xe2e6ea, roughness: 0.6 }));
+        doorRecess.position.set(0, 1.0, vestD / 2 + 0.01);
+        vestibule.add(doorRecess);
+
+        // Position vestibule protruding from the front-left face (matches sunlit left protrusion in photo)
+        const vestAngle = THREE.MathUtils.degToRad(-28); 
+        vestibule.position.set(Math.sin(vestAngle) * 2.0, 0, Math.cos(vestAngle) * 2.0);
+        vestibule.rotation.y = vestAngle;
+        lighthouse.add(vestibule);
+
+        // 6. Dark Rectangular Windows on Tower Faces (Matching photo: small dark window lower-front-right & mid-right)
+        // Lower-front-right dark window
+        const win1 = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.65, 0.15), darkTrimMat);
+        win1.position.set(0.72, 1.95, 1.92);
+        win1.rotation.y = THREE.MathUtils.degToRad(22.5);
+        lighthouse.add(win1);
+
+        // Upper-right narrow window
+        const win2 = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.85, 0.15), darkTrimMat);
+        win2.position.set(1.52, 5.8, 0.65);
+        win2.rotation.y = THREE.MathUtils.degToRad(67.5);
+        lighthouse.add(win2);
+
+        // Small black iron handrail near base steps on the right
+        const stepRail = new THREE.Group();
+        const srPost1 = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.85), darkTrimMat);
+        srPost1.position.set(2.4, 0.4, 1.6);
+        const srPost2 = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.85), darkTrimMat);
+        srPost2.position.set(3.2, 0.1, 2.2);
+        const srBar = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.08), darkTrimMat);
+        srBar.position.set(2.8, 0.68, 1.9);
+        srBar.rotation.z = Math.PI / 2.3;
+        srBar.rotation.y = -0.6;
+        stepRail.add(srPost1, srPost2, srBar);
+        lighthouse.add(stepRail);
+
+        // Rotate lighthouse slightly so octagonal planes match photo lighting (bright sunlit left planes, crisp shadow on right planes)
+        lighthouse.rotation.y = THREE.MathUtils.degToRad(14);
+        scene.add(lighthouse);
+
+
+        // --- 7. DISTANT NOVA SCOTIA COASTLINE (Right Horizon & Faint Left Island) ---
+        const landMat = new THREE.MeshStandardMaterial({
+            color: 0x2d3f54,
+            roughness: 0.95,
+            metalness: 0.0
+        });
+
+        function createDistantLand(width, depth, maxH, posX, posZ, rotY) {
+            const geo = new THREE.PlaneGeometry(width, depth, 80, 24);
+            geo.rotateX(-Math.PI / 2);
+            const p = geo.attributes.position;
+            for (let i = 0; i < p.count; i++) {
+                const lx = p.getX(i), lz = p.getZ(i);
+                // Taper edges to sea level
+                const edgeX = 1.0 - Math.pow(lx / (width * 0.5), 2);
+                const edgeZ = 1.0 - Math.pow(lz / (depth * 0.5), 2);
+                const mask = Math.max(0, edgeX * edgeZ);
+                const h = (perlin.noise(lx * 0.003, lz * 0.003, 3.3) * 0.5 + 0.6) * maxH * mask;
+                p.setY(i, h - 1.5);
+            }
+            geo.computeVertexNormals();
+            const mesh = new THREE.Mesh(geo, landMat);
+            mesh.position.set(posX, 0, posZ);
+            mesh.rotation.y = rotY;
+            scene.add(mesh);
+        }
+
+        // Distant headland stretching across right horizon (St. Margarets Bay side)
+        createDistantLand(2400, 350, 52, 850, -1450, -0.18);
+        // Faint low island on left horizon
+        createDistantLand(450, 120, 14, -650, -1600, 0.1);
+
+        // Subtle distant horizon clouds (matching the low wispy clouds on the right horizon in the photo)
+        const cloudCanvas = document.createElement('canvas');
+        cloudCanvas.width = 256; cloudCanvas.height = 64;
+        const cCtx = cloudCanvas.getContext('2d');
+        const grad = cCtx.createRadialGradient(128, 32, 5, 128, 32, 110);
+        grad.addColorStop(0, 'rgba(240, 245, 255, 0.55)');
+        grad.addColorStop(0.5, 'rgba(210, 225, 245, 0.25)');
+        grad.addColorStop(1, 'rgba(200, 220, 245, 0.0)');
+        cCtx.fillStyle = grad;
+        cCtx.fillRect(0, 0, 256, 64);
+        const cloudTex = new THREE.CanvasTexture(cloudCanvas);
+
+        const cloudMat = new THREE.SpriteMaterial({ map: cloudTex, transparent: true, fog: false, opacity: 0.65 });
+        for (let i = 0; i < 12; i++) {
+            const sprite = new THREE.Sprite(cloudMat);
+            const angle = THREE.MathUtils.degToRad(-15 - i * 4.5 + (Math.random() - 0.5) * 3);
+            const dist = 2800;
+            sprite.position.set(
+                 -Math.sin(angle) * dist + 500,
+                45 + Math.random() * 45,
+                -Math.cos(angle) * dist
+            );
+            sprite.scale.set(220 + Math.random() * 200, 32 + Math.random() * 25, 1);
+            scene.add(sprite);
+        }
+
+
+        // --- 8. ANIMATION LOOP & RESIZE ---
+        document.getElementById('loading').style.opacity = '0';
+        setTimeout(() => document.getElementById('loading').remove(), 600);
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            // Gentle realistic Atlantic ocean wave motion
+            water.material.uniforms['time'].value += delta * 0.45;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
