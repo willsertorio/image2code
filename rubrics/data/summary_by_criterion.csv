@@ -1,0 +1,165 @@
+design,criterion,category,criterion_text,runs,carbon_passes,carbon_majority,human_pass,human_comment
+Moraine Lake,G1,Builds,"The HTML opens in Chrome and the scene renders, with no errors or blank screen",20,20,pass,1,"Opens and renders with no errors, using a built-in painted preview until a photo is loaded. Needs internet for three.js from unpkg."
+Moraine Lake,G2,Orbit,Dragging orbits the camera around the scene; the camera can't go below the ground or outside the scene,20,0,fail,0,"Orbit is limited to about 15° either side, and the camera drifts on its own until dragged. Within that range the edges of the painted backdrop still show."
+Moraine Lake,G3,Builds,The scene runs at 30 fps or more on a standard laptop,20,20,pass,1,"One relief mesh, a reflective water plane and 90 mist sprites. Likely above 30 fps on a laptop, not measured on one."
+Moraine Lake,1,Prompt Adherence,"There is no UI, text or interaction other than orbiting",20,0,fail,0,"A slider panel, four camera presets, a 'Load Your Photo' bar and a controls hint sit over the scene."
+Moraine Lake,2,Prompt Adherence,"At least one environmental motion runs on load, without any input",20,20,pass,1,"The water ripples and the mist drifts from load, with no input."
+Moraine Lake,3,Composition,"The default view matches the photo's camera angle and framing (horizon height, lake in the lower part, peaks across the top)",20,3,fail,1,"Eye level, left cliff, lake in the lower half and peaks across the top, as in the photo."
+Moraine Lake,4,Reference Fidelity,"The lake water is glacial turquoise, as in the photo",20,0,fail,0,"The lake is a murky grey blue, not the photo's bright glacial turquoise."
+Moraine Lake,5,Reference Fidelity,"A row of jagged peaks spans the background, matching the photo's skyline",20,0,fail,0,"The skyline is a flat, painted band of angular shapes, not the photo's jagged peak profile."
+Moraine Lake,6,Reference Fidelity,Snow or ice shows on the peaks where it appears in the photo,20,0,fail,0,No clear snow on the peaks or in the couloir; the peaks are pink and brown stripes.
+Moraine Lake,7,Reference Fidelity,Conifer forest lines the shore where it does in the photo,20,0,fail,1,"A dark green forest mass lines the right shore, as in the photo, though it reads as one shape with a sawtooth edge."
+Moraine Lake,8,Reference Fidelity,Time of day and light match the photo (sunrise light on the peaks),20,0,fail,1,Pink sunrise sky with warm orange light on a peak tip.
+Moraine Lake,9,Scene Fidelity,"Mountains read as rock faces with ridges and gullies, not smooth cones",20,0,fail,0,"The mountains are a flat backdrop and flat panels with horizontal stripes, with no ridges or gullies."
+Moraine Lake,10,Scene Fidelity,Trees read as individual conifers of varied heights,20,0,fail,0,"There are no individual trees, only a dark mass with a sawtooth top edge."
+Moraine Lake,11,Scene Fidelity,The shoreline has rocks or debris where water meets land (no knife-edge line),20,0,fail,0,"The shoreline is a clean edge where the relief mesh meets the water, with no rocks or debris."
+Moraine Lake,12,Scene Fidelity,"When orbited, there are no floating objects, holes or visible scene edges",20,0,fail,0,"The edges of the backdrop show at the sides and top, and the mist reads as glowing blobs floating over the far shore."
+Moraine Lake,13,Lighting,"Peaks catch warm, low-angle sun while the valley and forest sit in cooler shade",20,0,fail,0,"Light is painted into the image. The peaks are evenly pink and brown, with no warm sunlit faces against a shaded valley."
+Moraine Lake,14,Lighting,Distant peaks are hazier and bluer than near ones (atmospheric perspective),20,0,fail,0,"Distance haze is warm pink, so the far peaks get hazier but not bluer."
+Moraine Lake,15,Lighting,No area of the default view is fully black or blown out to white,20,0,fail,1,"No area is fully black, and only a few pixels of the mist glow clip to white."
+Moraine Lake,16,Lighting,Trees and rocks are grounded by contact shadows,20,0,fail,0,No shadows. Nothing in the scene casts a contact shadow.
+Moraine Lake,17,Materials,The water reflects the mountains and sky,20,20,pass,1,The water reflects the backdrop and sky.
+Moraine Lake,18,Materials,"The water shows depth: lighter and clearer near the shore, deeper colour further out",20,0,fail,0,"The water has one murky colour, with no lighter, clearer water near the shore."
+Moraine Lake,19,Materials,Rock surfaces show texture detail at the default view,20,0,fail,0,"Rock is flat colour with horizontal stripes, with no rock texture at the default view."
+Moraine Lake,20,Materials,"Snow reads as snow (bright and soft, not grey plastic)",20,0,fail,0,There is no snow that reads as snow.
+Moraine Lake,21,Composition,The horizon is level,20,20,pass,1,The horizon is level.
+Moraine Lake,22,Motion,Ripples move across the water and distort the reflection,20,20,pass,1,Ripples move across the water and distort the reflection.
+Moraine Lake,23,Motion,Mist or low cloud drifts slowly through the scene,20,3,fail,1,"Mist drifts slowly over the far end of the lake, though it reads as glowing blobs."
+Moraine Lake,24,Motion,Tree tops sway gently in the wind,20,0,fail,0,There are no tree tops to sway.
+Moraine Lake,25,Motion,Motion runs at real-world speed and loops without visible jumps,20,20,pass,0,"The mist swings back and forth on a sine instead of drifting one way, which reads as a loop."
+Moraine Lake,26,Realism,No repeating texture tiles are visible on the mountains or water,20,11,pass,0,The same horizontal stripes repeat across the whole backdrop.
+Moraine Lake,27,Realism,No identical tree copies sit next to each other,20,0,fail,1,There are no tree models to repeat; the forest is one painted mass.
+Moraine Lake,28,Realism,"The camera looks real: natural field of view, no fisheye, post effects kept subtle",20,16,pass,1,"45° field of view, no fisheye, no post effects."
+Moraine Lake,29,Realism,A paused frame of the default view could pass for the reference photo at first glance,20,0,fail,0,"A paused frame reads as a flat painted illustration, not as the photo."
+Bamboo Grove,G1,Builds,"The HTML opens in Chrome and the scene renders, with no errors or blank screen",20,20,pass,1,Opens and renders with no errors. Needs internet for three.js from unpkg.
+Bamboo Grove,G2,Orbit,Dragging orbits the camera around the scene; the camera can't go below the ground or outside the scene,20,0,fail,0,"No lower angle limit, so the camera can go below the ground, and the 45 m zoom pulls out until the grove floats in a white void."
+Bamboo Grove,G3,Builds,The scene runs at 30 fps or more on a standard laptop,20,20,pass,1,"340 instanced stalks, 3,400 leaf cards, one shadow map and bloom. Likely above 30 fps on a laptop, not measured on one."
+Bamboo Grove,1,Prompt Adherence,"There is no UI, text or interaction other than orbiting",20,0,fail,0,"A bar with a hint and three buttons (Match Photo Angle, Ground Walk View, Wind) sits over the scene."
+Bamboo Grove,2,Prompt Adherence,"At least one environmental motion runs on load, without any input",20,20,pass,1,Stalks and leaves sway from load with no input.
+Bamboo Grove,3,Composition,The default view matches the photo's camera angle and framing,20,20,pass,1,"Low upward view with the stalks converging on the sky, as in the photo, though the convergence is more evenly radial."
+Bamboo Grove,4,Reference Fidelity,Bamboo density matches the photo (similar spacing between stalks),20,20,pass,1,Stalk spacing and density are close to the photo.
+Bamboo Grove,5,Reference Fidelity,The colour palette matches the photo (yellow-green to deep green),20,0,fail,0,A white haze turns the palette pale grey green. The photo's saturated yellow green and deep green are missing.
+Bamboo Grove,6,Reference Fidelity,"Ground elements in the photo (path, brushwood fence) are present",20,1,fail,0,No path and no brushwood fence.
+Bamboo Grove,7,Reference Fidelity,"The light matches the photo (sun or overcast, light direction)",20,9,fail,1,"Bright diffuse light from above, as in the photo, though the haze washes it out."
+Bamboo Grove,8,Scene Fidelity,Stalks show nodes (rings) at regular intervals,20,20,pass,1,"Nodes are modelled as small flares with a dark ring in the texture, at regular intervals."
+Bamboo Grove,9,Scene Fidelity,Stalk thickness and height vary,20,20,pass,1,Stalk thickness and height vary.
+Bamboo Grove,10,Scene Fidelity,"Stalks lean at slightly varied angles, not a perfect vertical grid",20,20,pass,1,Stalks lean at slightly varied angles toward the opening.
+Bamboo Grove,11,Scene Fidelity,"The canopy is made of thin, narrow leaves in clusters",20,20,pass,1,The canopy is made of narrow lance shaped leaves in sprays.
+Bamboo Grove,12,Scene Fidelity,"The ground is covered with soil and fallen leaves, not a flat plane",20,0,fail,0,"The ground is a flat, plain dark green disc."
+Bamboo Grove,13,Scene Fidelity,"When orbited, the grove continues in every direction with no visible edge",20,0,fail,0,"Zooming out shows the whole grove as a ball floating in white, with clear edges."
+Bamboo Grove,14,Lighting,Sunlight filtering through the canopy makes dappled patches on stalks and ground,20,0,fail,0,"Leaves cast no shadows, so there is no dappled light on the stalks or the ground."
+Bamboo Grove,15,Lighting,Soft light shafts or haze give depth between the stalks,20,13,pass,1,Fog and bloom give soft depth between the stalks.
+Bamboo Grove,16,Lighting,"Backlit leaves glow, with light passing through them",20,6,fail,1,Leaves glow with an emissive tint against the sky.
+Bamboo Grove,17,Lighting,Shadows between stalks are dark but never fully black,20,19,pass,1,No area between the stalks is fully black.
+Bamboo Grove,18,Materials,"Stalks show a waxy sheen and natural colour variation (yellowing, stains)",20,0,fail,1,"The culm texture has a waxy roughness map, mottling and slight colour variation between stalks."
+Bamboo Grove,19,Materials,Leaves are translucent,20,0,fail,1,"Leaves read as lit through, using an emissive tint rather than real translucency."
+Bamboo Grove,20,Materials,"Ground materials read as real soil, leaves or stone",20,0,fail,0,"The ground is a flat colour with no soil, leaf or stone texture."
+Bamboo Grove,21,Composition,Verticals are straight and level (no unintended tilt),20,20,pass,1,No unwanted roll. Verticals converge as in the upward photo.
+Bamboo Grove,22,Motion,The canopy sways in the wind,20,20,pass,1,The canopy sways in the wind.
+Bamboo Grove,23,Motion,Stalks bend more at the top than at the base,20,20,pass,1,"Sway grows with height, so stalks bend more at the top than at the base."
+Bamboo Grove,24,Motion,"Wind comes in varied gusts, not one uniform loop",20,0,fail,0,"Wind is a sum of steady sine waves, with no gusts."
+Bamboo Grove,25,Motion,Falling leaves or dust particles drift through the light,20,0,fail,0,No falling leaves or dust particles.
+Bamboo Grove,26,Motion,Motion runs at real-world speed and loops without visible jumps,20,20,pass,1,Motion runs on a continuous clock with no visible jumps.
+Bamboo Grove,27,Realism,No visibly cloned stalks (same curve or stain repeated nearby),20,3,fail,0,"All 340 stalks share one mesh with the same bow, so identical stalks stand side by side."
+Bamboo Grove,28,Realism,No pop-in or flicker when orbiting,20,20,pass,1,No popping seen in the captures. Not checked on a real GPU.
+Bamboo Grove,29,Realism,Leaves don't clip through stalks,20,0,fail,0,"Leaf cards up to about 4 m wide sit at random angles among the stalks and sway on their own, so they cut through stalks."
+Bamboo Grove,30,Realism,A paused frame of the default view could pass for the reference photo at first glance,20,0,fail,0,Too hazy and too pale to pass for the photo at a glance.
+Snowy Lighthouse,G1,Builds,"The HTML opens in Chrome and the scene renders, with no errors or blank screen",20,20,pass,1,Opens and renders with no errors. Needs internet for three.js from unpkg.
+Snowy Lighthouse,G2,Orbit,Dragging orbits the camera around the scene; the camera can't go below the ground or outside the scene,20,9,fail,1,"The polar limit keeps the camera above the water, and the 300 m zoom limit stays well inside the 10 km ocean."
+Snowy Lighthouse,G3,Builds,The scene runs at 30 fps or more on a standard laptop,20,20,pass,1,"One shadow map, a terrain mesh, a reflective water plane and simple primitives. Likely above 30 fps on a laptop, not measured on one."
+Snowy Lighthouse,1,Prompt Adherence,"There is no UI, text or interaction other than orbiting",20,0,fail,0,"A controls hint (Left Click: Rotate, Right Click: Pan, Scroll: Zoom) sits over the scene."
+Snowy Lighthouse,2,Prompt Adherence,"At least one environmental motion runs on load, without any input",20,20,pass,1,"The water surface moves from load, with no input."
+Snowy Lighthouse,3,Composition,The default view matches the photo's camera angle and framing,20,0,fail,0,The default view looks up a snow slope with the lighthouse small at the top and the horizon high. The photo looks across the rocks with the horizon in the lower third.
+Snowy Lighthouse,4,Reference Fidelity,"The lighthouse matches the photo's shape and colours (tower, lantern, trim)",20,19,pass,1,"White octagonal tapered tower with a red lantern, as in the photo."
+Snowy Lighthouse,5,Reference Fidelity,"The lighthouse sits on a rocky shore with snow on the rocks, as in the photo",20,0,fail,0,The headland is a snow dome with a few boulders. The photo's exposed grey granite is almost entirely missing.
+Snowy Lighthouse,6,Reference Fidelity,"The ocean is visible beyond the rocks, as in the photo",20,20,pass,1,"The ocean is visible beyond the headland, though it reads pale grey rather than blue."
+Snowy Lighthouse,7,Reference Fidelity,The clear blue winter sky and light match the photo,20,0,fail,0,"The sky is a pale white grey, not the photo's clear deep blue."
+Snowy Lighthouse,8,Scene Fidelity,The tower's shape and proportions match the photo,20,16,pass,1,"Slender tapered octagonal shaft, close to the photo's proportions."
+Snowy Lighthouse,9,Scene Fidelity,The lantern room has windows and a railing gallery,20,18,pass,1,The lantern has glass panes and a railed gallery deck.
+Snowy Lighthouse,10,Scene Fidelity,"Rocks show natural shapes with cracks and fissures, not smooth blobs",20,0,fail,0,The boulders are smooth blobs with no visible cracks or fissures.
+Snowy Lighthouse,11,Scene Fidelity,The lighthouse base sits flush on the rock (no floating or sinking),20,20,pass,1,"The tower sits on a plinth on a flattened summit, flush with the ground."
+Snowy Lighthouse,12,Scene Fidelity,"When orbited, the ocean reaches the horizon with no visible edge",20,17,pass,1,"The ocean plane reaches the horizon in every direction, with no visible edge."
+Snowy Lighthouse,13,Lighting,Shadows of the tower and rocks all match one sun direction,20,20,pass,1,"One sun with a shadow map, and every shadow falls the same way."
+Snowy Lighthouse,14,Lighting,The white tower shows shading on its shadow side and is not blown out,20,0,fail,1,The tower is not blown out and shows soft shading on its far side.
+Snowy Lighthouse,15,Lighting,The horizon fades into haze,20,0,fail,1,The sea fades into a pale haze at the horizon.
+Snowy Lighthouse,16,Lighting,No area of the default view is fully black or blown out to white,20,0,fail,1,No pure black or clipped white pixels in the default view.
+Snowy Lighthouse,17,Materials,"The paint shows subtle weathering, not clean plastic",20,0,fail,0,"Clean flat white paint with no grime, streaks or wear."
+Snowy Lighthouse,18,Materials,"Snow reads as snow (bright and soft, not grey plastic); exposed rock reads as real stone, darker and wet near the waterline",20,0,fail,0,"Snow reads as snow, but there is almost no exposed rock, and none of it is dark and wet at the waterline."
+Snowy Lighthouse,19,Materials,The lantern glass reflects and is see-through,20,20,pass,1,The lantern glass is highly transmissive and reflects an environment map of the sky.
+Snowy Lighthouse,20,Materials,The sea reflects more sky at grazing angles and shifts colour with depth,20,0,fail,0,"The water reflects the sky with a Fresnel falloff, but its colour doesn't shift with depth."
+Snowy Lighthouse,21,Composition,The horizon is level,20,20,pass,1,The horizon is level.
+Snowy Lighthouse,22,Motion,"Waves roll in continuously, with varied heights",20,0,fail,0,The sea is a flat plane with a scrolling normal map. No waves roll in and there are no wave heights.
+Snowy Lighthouse,23,Motion,Waves break on the rocks with foam and spray,20,0,fail,0,"No waves break on the rocks, and there is no foam or spray."
+Snowy Lighthouse,24,Motion,Foam spreads and fades gradually (doesn't pop in or out),20,0,fail,0,There is no foam.
+Snowy Lighthouse,25,Motion,"Wind shows in the scene (drifting snow, spray blown off the waves)",20,0,fail,0,"Nothing shows wind: no drifting snow, no spray, no moving grass."
+Snowy Lighthouse,26,Motion,Motion runs at real-world speed and loops without visible jumps,20,20,pass,1,"The water normals scroll continuously, with no visible jumps."
+Snowy Lighthouse,27,Realism,No repeating tile pattern on the ocean toward the horizon,20,1,fail,1,No obvious repeating pattern on the sea in the captures.
+Snowy Lighthouse,28,Realism,"Spray particles are soft, not visible sprite squares",20,0,fail,0,There are no spray particles in the scene.
+Snowy Lighthouse,29,Realism,"Water meets the rocks with foam, not a hard clipping line",20,0,fail,0,"The water meets the shore along a hard line, with no foam."
+Snowy Lighthouse,30,Realism,A paused frame of the default view could pass for the reference photo at first glance,20,0,fail,0,"The pale sky and sea and the smooth snow dome make the paused frame read as CG, not as the photo."
+French Toast,G1,Builds,"The HTML opens in Chrome and the scene renders, with no errors or blank screen",20,20,pass,1,Opens and renders with no errors. Needs internet for three.js from unpkg.
+French Toast,G2,Orbit,Dragging orbits the camera around the scene; the camera can't go below the ground or outside the scene,20,19,pass,0,"The camera stays above the table, but zooming out shows the edge of the tablecloth and a black void behind it."
+French Toast,G3,Builds,The scene runs at 30 fps or more on a standard laptop,20,20,pass,1,"Two shadow-casting lights, bloom and depth-of-field passes and dense geometry, the heaviest of the five. Likely above 30 fps on a laptop, not measured on one."
+French Toast,1,Prompt Adherence,"There is no UI, text or interaction other than orbiting",20,0,fail,0,"A bar with a hint and two buttons (Macro DoF, Hero Angle) sits over the scene."
+French Toast,2,Prompt Adherence,"At least one environmental motion runs on load, without any input",20,0,fail,0,Nothing moves. The animation loop only updates the camera.
+French Toast,3,Composition,"The default view matches the photo's camera angle and framing (close up, slightly above, the stack centred on the plate)",20,18,pass,1,"Close up from slightly above with the stack centred on the plate, as in the photo."
+French Toast,4,Reference Fidelity,"Three slices of French toast are stacked and slightly offset, as in the photo",20,20,pass,1,Three slices are stacked and slightly offset.
+French Toast,5,Reference Fidelity,Banana slices sit between the layers and around the stack on the plate,20,20,pass,1,"Banana slices sit between the layers and a few lie on the plate, though fewer than in the photo."
+French Toast,6,Reference Fidelity,Blueberries sit on top of the stack and are scattered across the plate,20,20,pass,1,Blueberries sit on top of the stack and around its base.
+French Toast,7,Reference Fidelity,The stack sits on a dark round plate on a grey-brown linen cloth,20,20,pass,1,The stack sits on a dark round plate on a grey-brown cloth.
+French Toast,8,Reference Fidelity,Powdered sugar is dusted over the plate and the toast,20,20,pass,1,Powdered sugar is dusted over the plate and lightly over the toast.
+French Toast,9,Scene Fidelity,"The toast reads as thick slices of bread with a rounded crust and soft cut edges, not flat boxes",20,0,fail,0,"The slices are glossy slabs with wavy, ridged edges. They read as crackers rather than thick bread with a rounded crust."
+French Toast,10,Scene Fidelity,Banana slices are round discs with the faint seeded pattern in the centre,20,18,pass,1,Banana slices are round discs with the faint seeded pattern in the centre.
+French Toast,11,Scene Fidelity,"Blueberries are round, vary in size and show the small crown at the top",20,20,pass,1,"Blueberries are round, vary slightly in size and show the star-shaped crown."
+French Toast,12,Scene Fidelity,"Fruit and toast rest on each other and on the plate, with nothing floating",20,3,fail,1,"Fruit and toast rest on each other and on the plate, with nothing floating."
+French Toast,13,Scene Fidelity,"When orbited, the back of the stack, the plate and the cloth have no holes, missing faces or visible edges",20,3,fail,0,Zooming out shows the edge of the tablecloth and a black void beyond it.
+French Toast,14,Lighting,"Soft window light comes from behind and to the left, with warm highlights on the syrup, as in the photo",20,0,fail,0,"The key light comes from the front left. The photo is lit from behind, with the warm highlights on the far edges."
+French Toast,15,Lighting,"Shallow depth of field: the stack is sharp and the plate rim and cloth behind it are soft, as in the photo",20,0,fail,1,"A depth-of-field pass softens the cloth behind the plate, though less than in the photo."
+French Toast,16,Lighting,"Fruit, toast and the stack are grounded by soft contact shadows",20,4,fail,1,"Fruit, toast and the plate cast soft shadows."
+French Toast,17,Lighting,No area of the default view is fully black or blown out to white (the dark plate still shows its sheen),20,0,fail,0,A strip of pure black void shows above the tablecloth at the top of the default view.
+French Toast,18,Materials,"The syrup is glossy, translucent amber, with bright specular highlights",20,0,fail,1,"Syrup runs in glossy, transmissive amber rivulets and drops down the crusts."
+French Toast,19,Materials,"The toast shows caramelised, uneven browning and a porous crumb at the cut edges",20,0,fail,0,"The toast is an even glossy orange with no uneven browning, and the porous crumb doesn't show."
+French Toast,20,Materials,"Blueberries show their dusty, matte bloom with soft highlights",20,6,fail,1,"Blueberries have a dusty, matte look with soft highlights."
+French Toast,21,Materials,Banana slices look moist and slightly translucent,20,0,fail,1,Banana slices look moist and slightly translucent.
+French Toast,22,Materials,The plate reads as glossy dark ceramic and the cloth as woven fabric,20,1,fail,1,"The plate reads as dark ceramic with a soft sheen, and the cloth has a woven texture."
+French Toast,23,Composition,"The plate and the table are level, with no unintended tilt",20,20,pass,1,The plate and the table are level.
+French Toast,24,Motion,Syrup slowly drips or runs down the edge of the stack,20,0,fail,0,The syrup drips are modelled but don't move.
+French Toast,25,Motion,Steam or warm haze rises gently from the toast,20,0,fail,0,There is no steam or haze.
+French Toast,26,Motion,Motion runs at real-world speed and loops without visible jumps,20,0,fail,0,There is no motion to judge.
+French Toast,27,Realism,No identical copies of a blueberry or banana slice sit next to each other,20,10,tie,1,"Each blueberry and banana slice is generated from its own seed, so no identical copies sit side by side."
+French Toast,28,Realism,Fruit does not clip into the toast or the plate,20,0,fail,0,"Banana discs about 0.23 thick sit tilted in roughly 0.22 gaps between the slices, so they cut into the toast."
+French Toast,29,Realism,"The sugar reads as fine powder, not visible sprite squares",20,0,fail,1,"The sugar reads as fine grains and a soft dusting, not sprite squares."
+French Toast,30,Realism,A paused frame of the default view could pass for the reference photo at first glance,20,0,fail,0,"The cracker-like slabs and the black void above the table make the paused frame read as CG, not as the photo."
+Flamingo,G1,Builds,"The HTML opens in Chrome and the scene renders, with no errors or blank screen",20,20,pass,1,Opens and renders with no errors. Needs internet for three.js from unpkg.
+Flamingo,G2,Orbit,Dragging orbits the camera around the scene; the camera can't go below the ground or outside the scene,20,20,pass,1,"The polar limit keeps the camera above the water and the zoom stops at 26 m, so the camera stays in the scene."
+Flamingo,G3,Builds,The scene runs at 30 fps or more on a standard laptop,20,20,pass,1,"One bird mesh, one shadow map and a reflective water plane. Likely above 30 fps on a laptop, not measured on one."
+Flamingo,1,Prompt Adherence,"There is no UI, text or interaction other than orbiting",20,0,fail,0,"A controls hint (Drag to Orbit, Scroll to Zoom, Right-Drag to Pan) sits over the scene."
+Flamingo,2,Prompt Adherence,"At least one environmental motion runs on load, without any input",20,20,pass,1,"The water moves and the bird bobs from load, with no input."
+Flamingo,3,Composition,"The default view matches the photo's camera angle and framing (side view at the bird's height, bird centred and filling most of the frame)",20,20,pass,1,"Side view at the bird's height with the bird filling most of the frame, though it sits right of centre."
+Flamingo,4,Reference Fidelity,"One flamingo stands in shallow, calm water, mid-stride with one leg forward, as in the photo",20,20,pass,1,"One flamingo stands in calm water, mid-stride with one leg forward."
+Flamingo,5,Reference Fidelity,"The colours match the photo: coral-orange neck and body, pink legs, black flight feathers, pale beak with a black tip",20,18,pass,1,"Coral neck and body, pink legs, black flight feathers and a pale beak with a black tip, as in the photo."
+Flamingo,6,Reference Fidelity,"The water and the background are a soft, even blue with no visible horizon detail, as in the photo",20,0,fail,0,"A sharp horizon splits a dark blue sky from pale water. The photo is one soft, even blue with no horizon."
+Flamingo,7,Reference Fidelity,"Bright sunlight comes from the front right, as in the photo",20,20,pass,1,"The sun comes from the front right, as in the photo."
+Flamingo,8,Scene Fidelity,"The neck forms the S curve, with the head bent down and the beak pointing down",20,20,pass,1,The neck forms the S curve with the head and beak pointing down.
+Flamingo,9,Scene Fidelity,"Proportions read as a flamingo: long thin legs with backward-bending joints, webbed feet, small body for the leg length",20,0,fail,1,Long thin legs with a backward-bending joint and a small body. The feet are simple cones rather than webbed.
+Flamingo,10,Scene Fidelity,"The wing is partly raised, showing the black flight feathers",20,1,fail,1,"The wing is partly raised, with black flight feathers fanning out behind."
+Flamingo,11,Scene Fidelity,"The feet enter the water with a ripple ring, without floating or sinking",20,1,fail,1,"The feet meet the water surface, with a ripple ring at the forward foot."
+Flamingo,12,Scene Fidelity,"When orbited, the bird is modelled all the way round, with no holes, missing faces or visible edge to the water",20,1,fail,1,"The bird is modelled on both sides, with no holes, and the water reaches the horizon."
+Flamingo,13,Lighting,"Shading follows the body form, with a lit side and a softer shaded side",20,20,pass,1,"Shading follows the body form, with a lit side and a softer shaded side."
+Flamingo,14,Lighting,No area of the default view is fully black or blown out to white,20,20,pass,1,No pure black or clipped white pixels in the default view.
+Flamingo,15,Lighting,"The background is soft and out of focus, a smooth gradient as in the photo",20,0,fail,0,"The background is a sharp sky gradient over a horizon, not the photo's soft, out-of-focus blue."
+Flamingo,16,Materials,"Feathers read as soft, layered plumage, not a smooth plastic shell",20,0,fail,0,"The body and neck are smooth sculpted shells with a fine bump, not layered plumage."
+Flamingo,17,Materials,"Legs read as matte skin with darker joints, and the beak tip as glossy black",20,0,fail,1,"The legs are matte with darker joints, and the beak tip is glossy black."
+Flamingo,18,Materials,"The water is a smooth, glossy surface that reflects more at grazing angles",20,20,pass,1,"The water is a smooth, glossy surface with a Fresnel reflection."
+Flamingo,19,Materials,"The bird and its legs reflect in the water, as in the photo",20,20,pass,1,The bird and its legs reflect in the water.
+Flamingo,20,Composition,"The water surface is level, with no unintended tilt",20,20,pass,1,The water is level.
+Flamingo,21,Motion,Ripples spread out from the legs across the water and distort the reflection,20,0,fail,0,One ring at the forward foot pulses in place. Ripples don't spread out from the legs.
+Flamingo,22,Motion,"The bird shows subtle life: breathing, a small head or neck movement, or feathers stirring",20,20,pass,0,"The bird bobs by 8 mm and the neck turns by a fraction of a degree, too little to see."
+Flamingo,23,Motion,A light breeze moves small wavelets across the water or ruffles the feathers,20,20,pass,1,A scrolling normal map moves small wavelets across the water.
+Flamingo,24,Motion,Motion runs at real-world speed and loops without visible jumps,20,20,pass,1,Motion runs on a continuous clock with no visible jumps.
+Flamingo,25,Realism,"Ripple rings are concentric and fade with distance, with no repeating tile pattern on the water",20,0,fail,0,"There is a single ring that keeps a hard edge, not concentric rings that fade with distance."
+Flamingo,26,Realism,The legs do not clip through the body or the water surface,20,8,fail,1,The legs don't cut through the body or the water in the captures.
+Flamingo,27,Realism,The plumage shows no visible texture seams or repeats,20,17,pass,1,No visible texture seams or repeats on the plumage.
+Flamingo,28,Realism,"The bird's outline is clean against the background, with no jagged cut-out edges or halos",20,20,pass,1,"The outline is clean geometry, with no cut-out edges or halos."
+Flamingo,29,Realism,A paused frame of the default view could pass for the reference photo at first glance,20,0,fail,0,"The horizon, the smooth shell body and the simple legs make the paused frame read as CG, not as the photo."
+Flamingo,30,Lighting,"Soft shadows fall under the wing and along the neck, matching the sun direction",20,8,fail,1,"The body casts soft shadows under the wing and along the neck, from the same sun."
