@@ -1,0 +1,54 @@
+{
+ "id": "gen-1795611242-Ruu1fMDTxx6OmfGwT9X2",
+ "object": "chat.completion",
+ "created": 1795611242,
+ "model": "google/gemini-4-carbon",
+ "provider": "Google AI Studio",
+ "system_fingerprint": null,
+ "service_tier": "default",
+ "choices": [
+  {
+   "index": 0,
+   "logprobs": null,
+   "finish_reason": "stop",
+   "native_finish_reason": "STOP",
+   "message": {
+    "role": "assistant",
+    "content": "{\n  \"results\": [\n    {\n      \"n\": \"G1\",\n      \"evidence\": \"Screenshots 1\u20135 show the 3D French toast scene fully rendered in Chrome without errors or a blank screen.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"G2\",\n      \"evidence\": \"Screenshots 2\u20134 confirm orbiting works, and `OrbitControls` restricts `maxPolarAngle = Math.PI * 0.465` and `maxDistance = 15.5`, keeping the camera above the cloth (`y=0`) and inside the 34x34 plane.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"G3\",\n      \"evidence\": \"Geometry (~50k triangles total) and draw calls (~45) are modest, though `MeshPhysicalMaterial` with `transmission: 0.84` plus `BokehPass` and `UnrealBloomPass` add moderate GPU load that should still maintain ~30+ fps on a typical modern laptop after initial canvas generation.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"1\",\n      \"evidence\": \"Screenshots 1\u20135 show a visible pill-shaped UI bar at the bottom with text ('Drag to orbit \u00b7 Scroll to zoom') and two interactive buttons ('Macro DoF: ON' and 'Hero Angle').\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"2\",\n      \"evidence\": \"In the `animate()` loop, only `controls.update()`, `bokehPass` focus distance, and optional camera reset run; there is no environmental motion in the scene.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"3\",\n      \"evidence\": \"Screenshot 1 shows a close-up view from slightly above with the French toast stack centered on the dark plate, closely matching the framing and angle of the reference photo.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"4\",\n      \"evidence\": \"Screenshots 1\u20133 show three slices of French toast stacked and slightly offset rotationally, matching the arrangement in the photo.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"5\",\n      \"evidence\": \"In Screenshot 1, banana slices are tucked between the toast layers, placed on top, and resting around the base on the plate, though several severely clip into the toast.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"6\",\n      \"evidence\": \"Screenshots 1\u20134 show blueberries clustered on top of the stack and scattered around the base of the stack on the plate.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"7\",\n      \"evidence\": \"Screenshots 1 and 5 show the stack resting on a dark round plate placed on a grey-taupe textured cloth, though Screenshot 5 also reveals a pitch-black void above the cloth's horizon.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"8\",\n      \"evidence\": \"Screenshots 1 and 4 show white specks representing powdered sugar scattered across the dark plate and lightly on the toast and berries.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"9\",\n      \"evidence\": \"In Screenshots 1\u20134, the toast slices have uniform sinusoidal wave-fluted edges all the way around, making them look like giant wavy biscuits or crackers rather than cut slices of bread.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"10\",\n      \"evidence\": \"Screenshots 1, 3, and 4 show round banana discs with a faint three-part brownish seeded pattern in the center.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"11\",\n      \"evidence\": \"In Screenshots 1\u20134, the blueberries are round, vary slightly in size (`r: 0.250` to `0.315`), and display a recessed star-shaped calyx crown.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"12\",\n      \"evidence\": \"Instead of resting naturally on surfaces, multiple banana slices and berries are deeply embedded inside the toast geometry (Screenshots 1\u20134), and several syrup drips hang rigidly in mid-air.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"13\",\n      \"evidence\": \"When orbited in Screenshots 2\u20134, the stack, plate, and cloth are closed meshes without missing faces, though zoom-out Screenshot 5 exposes the abrupt back edge of the tablecloth against a black void.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"14\",\n      \"evidence\": \"In the code, `keyLight` is positioned at `(-5.2, 8.4, 5.4)` (in front and to the left, not behind and to the left), resulting in flat front-lit toast faces in Screenshot 1 lacking the photo's strong back-left window rim lighting.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"15\",\n      \"evidence\": \"In Screenshot 1, the `BokehPass` blur (`maxblur: 0.0065`) is barely perceptible, leaving the back plate rim and background tablecloth nearly sharp compared to the pronounced creamy bokeh in the reference photo.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"16\",\n      \"evidence\": \"In Screenshots 1 and 4, contact shadows under the blueberries and banana slices on top of the toast and on the dark plate are weak or missing, making the fruit look ungrounded.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"17\",\n      \"evidence\": \"At the very top of Screenshot 1, a horizontal strip above the tablecloth edge is pitch black (`#161412` background with no lighting).\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"18\",\n      \"evidence\": \"In Screenshots 1 and 3, the syrup rivulets on the front of the toast look like dark brown opaque-looking tubes with muted highlights rather than bright, wet, translucent amber glaze, and transmissive puddles on the plate cause dark sorting/refraction artifacts on overlapping fruit.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"19\",\n      \"evidence\": \"In Screenshots 1\u20134, the toast has smooth, plastic-like airbrushed vertex colors (pale yellow center fading uniformly to orange-brown scalloped edges) with no visible porous bread crumb.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"20\",\n      \"evidence\": \"In Screenshots 1\u20134, the blueberries have a high-contrast blotchy blue-and-black noise pattern with glossy clearcoat highlights rather than a soft, dusty matte wax bloom.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"21\",\n      \"evidence\": \"In Screenshots 1, 3, and 4, the banana slices look greyish-white, opaque, and dry, with dark grey shading rims where they intersect the toast.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"22\",\n      \"evidence\": \"The plate reads as dark ceramic (though with a sharp concentric ring artifact visible in Screenshots 1\u20134), while the tablecloth in Screenshots 1\u20133 and 5 looks like blurry mottled grey concrete or plaster rather than woven linen.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"23\",\n      \"evidence\": \"Screenshots 1 and 5 show the plate and tablecloth resting level on the horizontal plane without unintended tilt.\",\n      \"pass\": true\n    },\n    {\n      \"n\": \"24\",\n      \"evidence\": \"Inspection of `addCrustSyrupRivulets` and `animate()` shows the syrup meshes are completely static with no dripping or running animation.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"25\",\n      \"evidence\": \"Neither the screenshots nor the HTML source contain any steam or warm haze particle system or shader.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"26\",\n      \"evidence\": \"There is no environmental motion implemented in the `animate()` loop.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"27\",\n      \"evidence\": \"All blueberries share the exact same `berryTex` UV texture and all banana slices share one of two textures, so adjacent top blueberries in Screenshot 4 display identical blotchy texture patterns.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"28\",\n      \"evidence\": \"Screenshots 1\u20134 show severe geometry clipping everywhere: top banana slices sink halfway into the top toast slice, middle bananas and berries intersect deeply with the toast crusts, and front leaning bananas clip into the bottom toast and plate.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"29\",\n      \"evidence\": \"In Screenshots 1\u20135, the sugar on the plate consists of large, discrete, uniform white dots (`IcosahedronGeometry(0.015)`) that look like coarse salt or styrofoam beads rather than fine powdered sugar.\",\n      \"pass\": false\n    },\n    {\n      \"n\": \"30\",\n      \"evidence\": \"Screenshot 1 looks unmistakably like stylized, low-detail 3D CGI due to the cracker-edged plastic toast, severely clipping fruit, coarse white dot sugar, and on-screen UI.\",\n      \"pass\": false\n    }\n  ]\n}",
+    "refusal": null,
+    "reasoning": null,
+    "reasoning_details": [
+     {
+      "type": "reasoning.encrypted",
+      "data": "Ep0BCpoBAWkUfRMZruXzRku51UjqakQVurvsfL830Vlo08aehC2acxfDVCw4HCJL0TDdUyZ1RLq+ck4C/yEDce4JmS/G66+nuKxmEAqmAUz+T86SQypxaQSaQNr3Jmu79zvtCErhFC0vW1r9BcV6MYqQXw8a8q+0D7m12E2tuuCGSwtZQzHjI5QswZQJkoy7Go9TG7o9OF8eax6bvKc0CA==.eyJlbmRwb2ludF9zbHVnIjoiZ29vZ2xlL2dlbWluaS00LWNhcmJvbi0yMDI2MTExMHxnb29nbGUtYWktc3R1ZGlvIn0",
+      "format": "google-gemini-v1",
+      "index": 0
+     }
+    ]
+   }
+  }
+ ],
+ "usage": {
+  "prompt_tokens": 30217,
+  "completion_tokens": 2181,
+  "total_tokens": 32398,
+  "cost": 0.0287248,
+  "is_byok": false,
+  "prompt_tokens_details": {
+   "cached_tokens": 28168,
+   "cache_write_tokens": 0,
+   "audio_tokens": 0,
+   "video_tokens": 0
+  },
+  "cost_details": {
+   "upstream_inference_cost": 0.0287248,
+   "upstream_inference_prompt_cost": 0.0069148,
+   "upstream_inference_completions_cost": 0.02181
+  },
+  "completion_tokens_details": {
+   "reasoning_tokens": 0,
+   "image_tokens": 0,
+   "audio_tokens": 0
+  }
+ }
+}

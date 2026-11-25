@@ -1,0 +1,3417 @@
+{
+ "moraine": {
+  "1": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1-5 show the WebGL canvas rendering the 3D water and procedural projected mesh without errors or a blank screen."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls restricts polar/azimuth angles and distance, yet right-drag panning is unrestrained and screenshots 1-5 clearly show the camera seeing outside the projected backdrop edges into dark background space."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses only one 360x200 terrain mesh, a Three.js Water reflection pass, a basic plane, and 90 mist points with no shadow maps or heavy post-processing, easily running above 30 fps."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 display a top upload banner, a bottom-left control panel with sliders and preset buttons, and a bottom-right navigation hint."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, water.material.uniforms['time'].value increments and mistParticles.position.x oscillates automatically on load."
+    },
+    "3": {
+     "pass": false,
+     "evidence": "Screenshot 1 frames the lake in the lower half, left slope, right trees, and mountain peaks across the upper half matching the reference horizon height, though outer canvas borders show."
+    },
+    "4": {
+     "pass": false,
+     "evidence": "In screenshot 1, the water mostly reflects grey/purple procedural backdrop tones and lacks the vivid glacial turquoise color of the reference photo."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows simplistic flat 2D polygonal triangles with horizontal white lines rather than a 3D row of jagged peaks matching the reference skyline."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Screenshot 1 depicts only uniform horizontal white strokes drawn across the flat backdrop canvas instead of snow or ice patches matching the photo."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows a dark green 2D sawtooth silhouette painted onto the projected mesh on the right rather than a 3D conifer forest."
+    },
+    "8": {
+     "pass": false,
+     "evidence": "Screenshot 1 uses flat 2D canvas gradients with bright white blobs near the water line rather than sunrise light illuminating the upper mountain peaks."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show the mountains are a warped 2D canvas projection with flat triangular silhouettes and painted horizontal lines, lacking 3D rock faces, ridges, or gullies."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "Screenshots 1 and 4 show the trees are just a 2D sawtooth edge stretched along a depth-warped sheet, not individual 3D conifers."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "Screenshots 1-3 show the warped backdrop mesh meeting the planar water along a sharp intersection line with no shoreline rocks or debris."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 clearly expose the sharp rectangular borders of the projected 3D backdrop mesh floating against the dark background void."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "The terrain uses MeshBasicMaterial with a 2D procedural gradient that puts bright white spots at the valley base in screenshot 1 rather than warm sun on peaks and cool shade below."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows all background peaks painted with the same flat gradient and horizontal lines without atmospheric depth or bluer distant peaks."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshot 1 has bright blown-out white glowing patches at the center horizon where the valley meets the water."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "The scene uses MeshBasicMaterial without lights or shadows, and screenshots 1-4 show no contact shadows grounding trees or rocks."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show the Three.js Water surface reflecting the mountain silhouettes and orange sky from the mesh above."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show uniform planar water reflections without clearer shallow water near the shore transitioning to deeper color."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows completely smooth, untextured brown polygons and ruled horizontal lines instead of rock surface detail."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "There is no snow material in screenshot 1, only semi-transparent horizontal white lines drawn on a 2D canvas."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a level water horizon across the center of the frame."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show normal-mapped ripples distorting the water reflection, and animate() updates water.material.uniforms['time'] each frame."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "The code creates 90 additive mist particles (mistParticles) and drifts them horizontally via Math.sin(t * 0.08) * 6.0, visible as bright hazy blobs along the horizon in screenshot 1."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "Trees are static 2D painted shapes on projectedMesh with no wind sway animation in the code."
+    },
+    "25": {
+     "pass": true,
+     "evidence": "In animate(), water time advances continuously at dt * 0.42 and mist/camera motions use continuous sine/cosine functions without discontinuous jumps."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "Screenshots 1-4 show no repeating texture tiles on the mountains or the multi-frequency procedural water normal map."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "There are no 3D trees in the scene, only a uniform repeating sine-wave sawtooth edge (Math.sin(x * 380)) in screenshot 1."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "The camera uses a 45-degree FOV and ACESFilmicToneMapping, though additive mist particles create unnatural glowing white orbs on the horizon in screenshot 1."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks like an abstract low-poly vector illustration on a floating card covered with UI panels, bearing no photorealistic resemblance to the reference photo."
+    }
+   }
+  },
+  "2": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1-5 show the scene rendering in Chrome without errors or a blank screen."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls restricts polar angle (`maxPolarAngle = Math.PI * 0.515`), azimuth, and distance, but screenshots 1-5 show the camera looking right past the edges of the projected 2.5D backdrop mesh into dark void."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses a single 360x200 terrain mesh, a Three.js Water plane, and 90 point particles with no shadow maps or heavy post-processing, which easily runs above 30 fps."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 display a top upload banner, a bottom-left control panel with sliders and preset buttons, and a bottom-right hint box."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In `animate()`, `water.material.uniforms['time'].value` increments and `mistParticles.position.x` oscillates automatically on load."
+    },
+    "3": {
+     "pass": false,
+     "evidence": "Screenshot 1 roughly frames a lake below and peaks above with a left slope and right forest, though the scene sits inside a visibly bounded rectangular backdrop with dark margins."
+    },
+    "4": {
+     "pass": false,
+     "evidence": "In screenshot 1, the water appears mostly dull grey-brown from reflecting the procedural canvas rather than vibrant glacial turquoise like the photo."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows flat 2D polygonal triangles drawn on a displaced plane rather than a 3D row of jagged peaks matching the photo's skyline."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Screenshot 1 only renders uniform horizontal white lines across the mountain polygon (`createProceduralPreviewCanvas`), with no snow patches or couloirs matching the photo."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows a flat dark-green 2D sawtooth silhouette along the right shore instead of a 3D conifer forest."
+    },
+    "8": {
+     "pass": false,
+     "evidence": "Screenshot 1 uses unlit `MeshBasicMaterial` with painted orange gradients and bright white mist blobs near the water, failing to match the photo's sunrise light on the peaks."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show the mountains are a 2D vector drawing with horizontal stripes projected onto a smooth relief mesh, not rock faces with ridges and gullies."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show trees are merely a 2D sawtooth edge painted onto a continuous green surface, not individual conifers."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show a sharp intersection where the flat water plane meets the projected mesh, with no shoreline rocks or debris."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 clearly show the hard rectangular outer boundaries of the projected terrain mesh floating against a dark background."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "The terrain uses `MeshBasicMaterial` with a 2D gradient (`createProceduralPreviewCanvas`) and bright additive blobs at the valley base in screenshot 1, lacking real warm sun and cool valley shade."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows all background peaks painted with the same flat gradient on a single surface, without atmospheric perspective separating near and distant peaks."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshot 1 has bright blown-out white spots along the central shoreline from additive `mistParticles` overlapping, and very dark void edges."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "There are no 3D trees, rocks, or shadow maps in the code, and screenshots 1-4 show no contact shadows."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show the planar `Water` shader reflecting the mountain silhouettes and orange sky above."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show uniform planar reflection across the water with no clear shallow shoreline transitioning into deeper colour."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows flat vector color fills and parallel horizontal strokes instead of rock texture detail."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "No snow material exists in screenshot 1, only semi-transparent horizontal white canvas lines."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a level water horizon across the center of the view."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "`Water` normals animate via `water.material.uniforms['time'].value += dt * 0.42` in `animate()`, and screenshots 1-3 show ripples distorting the reflection."
+    },
+    "23": {
+     "pass": false,
+     "evidence": "`mistParticles.position.x = Math.sin(t * 0.08) * 6.0` in `animate()` moves mist back and forth, though in screenshot 1 they appear as glowing white hotspots on the shoreline rather than drifting cloud."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "There are no 3D trees or wind animations in `animate()`; the forest is static painted canvas texture."
+    },
+    "25": {
+     "pass": true,
+     "evidence": "In `animate()`, water time advances continuously (`dt * 0.42`) and mist/camera use smooth sine waves without discontinuous jumps."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "Screenshots 1-4 show no repeating texture tiles on the procedural terrain canvas or the multi-frequency procedural water normal map."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "There are no 3D trees in the scene at all, only a uniform repeating sine-wave sawtooth (`Math.abs(Math.sin(x * 380))`) in `createProceduralPreviewCanvas`, failing to depict varied non-identical trees."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "`PROJ_FOV = 45` provides a natural perspective without fisheye, and ACESFilmic tone mapping is used without heavy post effects, though additive mist creates bright hotspots in screenshot 1."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks like a stylized 2D vector illustration projected onto a card with UI overlays, bearing no photorealistic resemblance to the reference photo."
+    }
+   }
+  },
+  "3": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1-5 show the scene rendering in Chrome without errors or a blank screen."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls restricts polar angle above the water (maxPolarAngle = Math.PI * 0.515), however screenshots 1-5 clearly show the camera seeing outside the projected mesh boundaries into dark empty space on the left and right edges."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses a single ~72k vertex terrain mesh, one 1024x1024 planar Water reflection pass, 90 particle points, and no shadow maps or heavy post-processing, which easily runs above 30 fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 display large UI overlays including a top upload banner, a bottom-left control panel with sliders and preset buttons, and a bottom-right hint box."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, water.material.uniforms['time'].value increments and mistParticles.position.x oscillates automatically on load."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the general horizon height and layout (left slope, right forest, central peaks, lower lake), though framed inside visible 2.5D projection borders."
+    },
+    "4": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the lake appears mostly muted grey-brown from reflecting the procedural canvas rather than vibrant glacial turquoise as in the photo."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows a flat 2D polygonal silhouette with horizontal ruled lines rather than a 3D row of jagged peaks matching the photo's skyline."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Screenshot 1 has uniform horizontal white/pink canvas strokes across the entire mountain silhouette instead of snow patches and couloirs matching the photo."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows a dark green 2D sawtooth strip on the right, lacking 3D conifer forest lining the shore and the left-shore trees seen in the photo."
+    },
+    "8": {
+     "pass": false,
+     "evidence": "Screenshot 1 depicts a stylized peach gradient and flat colour fills rather than directional sunrise alpenglow lighting on 3D peaks."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "In Screenshots 1-4, the mountains are a warped 2D canvas sheet painted with flat gradients and horizontal stripes, not 3D rock faces with ridges and gullies."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 4, trees are rendered as a flat 2D sawtooth silhouette stretched across a depth ramp (`createProceduralPreviewCanvas`), not individual 3D conifers."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "Screenshots 1-3 show a sharp geometric intersection where the flat water plane meets the stretched terrain sheet, with no rocks or shoreline debris."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 5 clearly expose the sharp outer edges of the projected terrain mesh floating against a dark background."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "The terrain uses `MeshBasicMaterial` with baked 2D canvas gradients (`createProceduralPreviewCanvas`), lacking 3D directional lighting or cool shaded valleys."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows a single flat-coloured mountain cutout with no depth separation or atmospheric perspective across nearer and farther peaks."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "In Screenshot 1, bright additive mist blobs near the base of the mountains blow out to near-white glare, while the outer borders are near-black."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "There are no 3D trees, rocks, or shadow maps in the code (`MeshBasicMaterial` is used), and no contact shadows appear in Screenshots 1-5."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show the planar `Water` shader reflecting the mountains, left slope, and sky."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 show uniform reflective water across the lake with no clear shallow transition near the shoreline."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows smooth vector gradients and straight horizontal lines on the rock areas rather than realistic rock texture detail."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "No snow material exists in Screenshot 1; there are only semi-transparent horizontal canvas lines."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a level water horizon across the middle of the frame."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show normal-mapped ripples distorting the water reflection, driven by `water.material.uniforms['time'].value += dt * 0.42` in `animate()`."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "`mistParticles` are rendered as additive sprites (visible as bright smudges along the horizon in Screenshot 1) and drift via `Math.sin(t * 0.08) * 6.0` in `animate()`."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "There are no 3D trees or vertex animations for tree sway in `animate()`; the forest is static 2D canvas art."
+    },
+    "25": {
+     "pass": true,
+     "evidence": "In `animate()`, water time advances continuously (`dt * 0.42`) and mist and camera drift use smooth continuous sine/cosine waves without jumps."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "Screenshots 1-4 show no repeating texture tiles on the procedurally generated multi-sine water normal map or the canvas terrain."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "There are no 3D tree instances at all, only a uniform repeating sine-wave sawtooth (`Math.abs(Math.sin(x * 380))`) drawn onto the 2D canvas in Screenshot 1 and 4."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "The camera uses a natural 45-degree FOV (`PROJ_FOV = 45`) and ACES filmic tone mapping without fisheye or heavy post-processing in Screenshot 1."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks like an abstract vector illustration projected onto a warped card with UI panels, bearing no photorealistic resemblance to the reference photo."
+    }
+   }
+  },
+  "4": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D scene rendering in Chrome without blank screens or errors."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls restricts polar/azimuth angles, but screenshots 1–5 show the camera looking right past the edges of the flat projected terrain backdrop into empty background space."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses a single ~72k-vertex mesh, one planar Water reflection pass, and 90 mist particles with no shadow maps or heavy post-processing, easily exceeding 30 fps."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display a top upload banner, a bottom-left control panel with sliders and preset buttons, and a bottom-right navigation hint."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In `animate()`, `water.material.uniforms['time'].value` increments and `mistParticles.position.x` oscillates automatically on load."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference framing with the lake in the lower half, left cliff, right forest wedge, and peaks across the upper half."
+    },
+    "4": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the water reflects the pale brown and peach backdrop so strongly that it appears grey-brown rather than glacial turquoise."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows a flat 2D procedural silhouette of simple triangles with horizontal white lines rather than a row of jagged 3D peaks matching the skyline."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows uniform horizontal white stripes drawn across the entire mountain polygon (`createProceduralPreviewCanvas`) instead of snow patches and couloirs matching the photo."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows a green sawtooth shape along the right shore, roughly matching the forest's placement, though the mid-valley trees on the left are missing."
+    },
+    "8": {
+     "pass": false,
+     "evidence": "Screenshot 1 has an orange gradient painted at the top of the 2D canvas, but `MeshBasicMaterial` is unlit and there are bright white glowing blobs at the base of the peaks."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show the mountains are a distorted 2D canvas projection with flat gradients and horizontal stripes, not 3D rock faces with ridges and gullies."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "Screenshots 1 and 4 show the trees are a flat 2D green sawtooth silhouette stretched across a sloped mesh rather than individual 3D conifers."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 show a sharp, straight geometric intersection where the flat water plane meets the projected terrain mesh, with no shoreline rocks or debris."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 clearly show the rectangular outer boundaries of the projected backdrop mesh floating against dark empty background space."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "Screenshot 1 uses an unlit `MeshBasicMaterial` with a vertical gradient and bright white glow spots at the valley floor, failing to create warm sunlit peaks and cool shaded valleys."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 show flat, cartoon-like 2D polygon colours without realistic atmospheric haze or bluer distant peaks."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshot 1 has bright white blown-out spots along the central horizon and very dark, near-black regions on the far left cliff and right forest."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "There are no 3D trees, rocks, or shadow maps in the code (`MeshBasicMaterial` only), and no contact shadows are visible in Screenshots 1–5."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show planar reflections of the mountains, left cliff, right trees, and sky on the water surface via Three.js `Water`."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show uniform planar reflection across the water with no shoreline clarity or depth transition."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows flat colour gradients and crude horizontal white lines instead of rock texture detail."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "Screenshot 1 has no realistic snow; only faint semi-transparent horizontal lines are drawn across the peaks."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a level water horizon across the center of the frame."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show normal-mapped ripples distorting the water reflection, and `water.material.uniforms['time'].value += dt * 0.42` animates them continuously."
+    },
+    "23": {
+     "pass": false,
+     "evidence": "`mistParticles` uses 90 additive points oscillating slightly side-to-side (`Math.sin(t * 0.08) * 6.0`), which creates static-looking white glow blobs on the horizon in Screenshot 1 rather than drifting mist."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "Trees are painted onto a static 2D canvas texture in `createProceduralPreviewCanvas()`, with no vertex animation or wind sway in `animate()`."
+    },
+    "25": {
+     "pass": true,
+     "evidence": "Water time advances linearly (`+= dt * 0.42`) and camera/mist motions use continuous sine/cosine waves in `animate()`, looping smoothly without jumps."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show no obvious repeating texture tiles on the water normal map or the procedural canvas mountains."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "Screenshot 1 and `createProceduralPreviewCanvas()` (`Math.abs(Math.sin(x * 380))`) show a uniform, repeating sawtooth wave for tree tops rather than varied individual trees."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "The camera uses a natural 45-degree FOV and ACESFilmicToneMapping without fisheye distortion or heavy post-processing."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks like a low-detail vector illustration projected onto a floating card with UI overlays, bearing no photorealistic resemblance to the reference photo."
+    }
+   }
+  },
+  "5": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1-5 show the WebGL scene rendering in Chrome with no blank screen or runtime errors."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 show the scene's outer edges and empty background void, while OrbitControls leaves panning enabled and allows polar angles (Math.PI * 0.515 at maxDistance 145) that dip below Y=0."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses a single ~72k-triangle mesh, basic planes, 90 point sprites, and one 1024x1024 planar water reflection with no shadows, easily sustaining over 30 fps on a laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 display prominent UI overlays including an upload banner, a 3D scene controls panel with sliders and buttons, and navigation hints."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In animate(), water ripple time, particle drift, and automated drone camera motion run immediately on load without user input."
+    },
+    "3": {
+     "pass": false,
+     "evidence": "Screenshot 1 places the horizon roughly mid-frame, but the terrain mesh cuts off before the viewport edges, leaving dark background margins that break the photo's framing."
+    },
+    "4": {
+     "pass": false,
+     "evidence": "In screenshots 1-3, the lake appears mostly muted grey and brown rather than the vivid glacial turquoise of the reference photo."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Screenshot 1 depicts the skyline as a flat, low-detail 2D polygon silhouette rather than the jagged 3D peaks in the reference photo."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Screenshot 1 draws uniform horizontal lines across the entire mountain band instead of placing snow patches and couloirs where they appear in the photo."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Screenshot 1 represents the right-hand shoreline forest only as a flat dark-green sawtooth silhouette rather than a conifer forest."
+    },
+    "8": {
+     "pass": false,
+     "evidence": "Screenshot 1 uses an unlit 2D gradient with bright white spots along the valley floor, failing to match the photo's warm sunrise light on the upper peaks."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show the mountains as a smooth warped sheet painted with 2D stripes rather than 3D rock faces with ridges and gullies."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show a flat 2D sawtooth pattern painted onto the mesh edge rather than individual 3D conifers of varied heights."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show a clean, featureless intersection between the water plane and projected mesh with no shoreline rocks or debris."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 expose the hard outer boundaries of the projected backdrop mesh floating against an empty dark background."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "The terrain uses an unlit MeshBasicMaterial, and screenshot 1 shows bright white glow at the shady valley base instead of warm sun on peaks and cool shade below."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "Screenshots 1-3 show a single flatly painted mountain silhouette with no atmospheric perspective separating near and distant peaks."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshot 1 contains blown-out white additive-blended blobs clustered along the distant waterline at the valley base."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "There are no 3D trees, rocks, lights, or shadows in screenshots 1-4 or the source code, so contact shadows are absent."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show planar reflections of the mountain silhouettes and warm sky on the water surface."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "Screenshots 1-4 show uniform water tone with a sharp rectangular overlay visible in screenshot 4, lacking natural shallow-to-deep shore clarity."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows flat colour gradients and horizontal canvas strokes on the mountains instead of rock surface texture detail."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "Screenshot 1 contains no recognizable snow material, only faint semi-transparent horizontal lines drawn across the mountain shape."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a level water horizon across the view."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show surface ripples distorting the reflections, and animate() continuously updates the Water shader's time uniform."
+    },
+    "23": {
+     "pass": false,
+     "evidence": "Although mistParticles sways in animate(), in screenshots 1-3 its additive sprites appear as glaring white orbs on the waterline rather than drifting mist or low cloud."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "The trees are painted statically onto a 2D canvas in createProceduralPreviewCanvas() with no wind sway animation in the render loop."
+    },
+    "25": {
+     "pass": true,
+     "evidence": "In animate(), continuous delta-time water updates and sine-wave oscillations run at calm speeds without abrupt loop resets."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show no visible repeating texture tiles on the procedural canvas backdrop or multi-wave water normal map."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "Screenshot 1 and createProceduralPreviewCanvas() depict the treeline as a uniform sine-wave sawtooth of identical repeated spikes side by side."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "The scene uses a natural 45-degree perspective FOV and subtle ACES filmic tone mapping without fisheye distortion or heavy post-processing."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks like a stylized vector placeholder with exposed mesh borders and UI panels, bearing little resemblance to a real photograph."
+    }
+   }
+  }
+ },
+ "bamboo": {
+  "1": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D bamboo scene rendering properly in Chrome without errors or blank screens."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls in the code has no minPolarAngle or maxPolarAngle limits, allowing the camera below ground, and screenshot 5 shows zooming out places the camera completely outside the grove."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses two InstancedMesh calls (340 stalks, 3400 leaves), one 2048x2048 shadow map, and UnrealBloomPass, easily achieving 30+ fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display a persistent bottom-left UI bar with instructional text and three interactive buttons."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, windUniforms.uTime updates automatically with windOn = true by default, swaying stalks and leaves on load."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference photo's sharp upward wide-angle view, converging foreground bamboo clusters, and upper-left overhanging branch."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show similar stalk spacing and density to the reference photo, framing a central upward canopy opening."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows heavily washed-out, milky desaturated greens due to fog and bloom, lacking the vibrant lime-yellows and deep dark greens of the photo."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "The reference photo looks strictly upward into the canopy and contains no ground elements, path, or brushwood fence, nor does the 3D scene include a path or fence."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the bright overhead overcast sky lighting of the photo, though excess haze washes out the foreground contrast."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 clearly show dark, raised node rings spaced at regular intervals along every bamboo stalk."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show varied stalk thicknesses, and the procedural placement code scales radius (0.68–1.23) and height (0.82–1.14) per instance."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show stalks leaning inward at varied, natural angles rather than standing on a vertical grid."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show the canopy composed of clusters of thin, narrow lanceolate bamboo leaves."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In section 9 of the code, the forest floor is a flat untextured CircleGeometry with a solid color (0x1a2616), with no soil texture or fallen leaves."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "Screenshot 5 shows the grove is a finite circular patch surrounded by empty white space when zoomed out."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 show uniform lighting and specular highlights along the stalks, and leafInstanced does not cast shadows to create dappled patches."
+    },
+    "15": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show strong atmospheric haze and bloom separating foreground and background stalks, though somewhat excessive."
+    },
+    "16": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show bright green glowing leaves against the bright sky, driven by emissive lighting and bloom."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show shaded areas between stalks and leaves retain soft green-dark tones and never crush to pure black."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 show a waxy sheen, but the procedural texture repeats identically across all 26 segments per stalk without visible natural stains or yellowing."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshot 4 shows completely opaque, flat-shaded green leaf cutouts without light transmission, and leafMat only uses a uniform emissive color rather than translucency."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "The ground mesh in section 9 is a solid-colored flat circle (color: 0x1a2616) with no textures or geometry reading as real soil, leaves, or stone."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshot 1 and camera setup (up-vector default 0,1,0) maintain level framing with intentional upward perspective convergence and no horizon roll."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "The vertex shader on leafMat displaces leaf vertices continuously using uTime for both canopySway and flutter."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "In bambooMat.onBeforeCompile, horizontal wind displacement is multiplied by pow(hFactor, 2.1), keeping the base fixed while bending more toward the top."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "In bambooMat and leafMat vertex shaders, uWindStrength is a static 1.0 and motion relies on fixed-amplitude sine/cosine waves rather than varied gusts."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Neither the screenshots nor the HTML source contain any particle systems, dust motes, or falling leaves."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "In animate(), uTime advances continuously via clock.getElapsedTime() driving low-frequency sine waves (0.72–2.4 rad/s), producing smooth, jump-free motion."
+    },
+    "27": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show clean, smooth stalks with varied rotations, scales, and tints so no distinct curve or stain appears visibly cloned."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "All geometry uses static InstancedMesh objects without LOD switching, alphaTest (0.32) avoids sorting flicker, and shadow bias prevents acne."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "In section 7, 3400 2.7m leaf planes are scattered randomly around stalk centers with random 3D rotations, causing planes to intersect stalks (visible in screenshot 4)."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks distinctly CG due to washed-out white fog, plastic-like specular streaks on uniform stalks, geometric tube branches, and UI overlay."
+    }
+   }
+  },
+  "2": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1-5 show the page loads and renders the 3D bamboo scene in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls lacks polar angle or height limits to prevent going underground, and Screenshot 5 shows zooming out to maxDistance (45) places the camera completely outside the grove."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses two InstancedMesh objects (340 stalks and 3400 leaf planes), four tube meshes, one 2048px shadow map, and UnrealBloomPass, keeping draw calls low enough for 30+ fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 display a persistent bottom-left UI bar (#ui) with instructional text and three interactive buttons."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In animate(), windUniforms.uTime updates automatically from load while windOn defaults to true, driving vertex sway shaders on stalks and leaves."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference photo's steep upward wide-angle framing with converging foreground culms and an overhanging upper-left branch."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows stalk spacing and cluster density around the central canopy opening comparable to the reference photo."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Screenshots 1-3 are heavily washed out by white sky bloom and grey-white highlights, lacking the deep forest greens and rich yellow-green contrast of the photo."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Neither a path nor a brushwood fence exists in the scene; the code only creates an untextured dark green CircleGeometry for the ground."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Unlike the soft diffused overhead light in the photo, Screenshots 1-3 exhibit harsh vertical white specular streaks on the stalks and blown-out white glare around the sides."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show dark horizontal node rings with slight geometric bulges at regular intervals along every stalk."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 and the instance scaling code (scaleR and scaleY) show clear variation in stalk diameter and height."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show stalks leaning inward at varied angles rather than standing in a uniform vertical grid."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1-4 show the canopy is formed from clusters of thin, narrow lanceolate leaves."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In the code (groundGeo/groundMat), the floor is a single flat CircleGeometry with a solid dark color and no soil texture or fallen leaves."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "Screenshots 1-3 expose empty white sky at the outer edges of the stalks, and Screenshot 5 reveals the finite circular boundary of the grove."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "leafInstanced does not cast shadows in the code, and Screenshots 1-3 show no dappled sunlight patches on the stalks or floor."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshots 1-3 show bright bloom halation bleeding from the sky rather than volumetric light shafts or natural depth haze between stalks."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "leafMat applies a constant uniform emissive color regardless of light direction, appearing flat green in Screenshots 1-4 rather than glowing from transmitted backlight."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Across Screenshots 1-4, shaded areas between stalks and leaves remain dark green rather than pure black due to HemisphereLight and bounceLight."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "Screenshots 1-3 show overly uniform green stalks with bright white specular stripes and no visible yellowing or distinct natural stains."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshot 4 shows the leaves are opaque alpha-tested planes with flat shading and no light transmission or translucency."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "The ground mesh uses a flat untextured MeshStandardMaterial (0x1a2616) rather than realistic soil, leaf litter, or stone."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "camera.up remains aligned to (0, 1, 0) with natural upward perspective convergence and no unintended roll or tilt in Screenshot 1."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "The vertex shaders on leafMat and bambooMat continuously displace upper stalks and leaf clusters using sine waves driven by uTime."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "In bambooMat.onBeforeCompile, horizontal sway is scaled by pow(hFactor, 2.1), keeping bases fixed while bending increases toward the tips."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "Wind motion in the vertex shaders uses fixed-amplitude sine/cosine waves with constant uWindStrength (1.0) rather than varied gusts and lulls."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "The HTML source contains no particle system, drifting dust, or falling leaf geometry."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "animate() feeds continuous elapsed time into smooth low-frequency trigonometric functions (0.72-2.4 rad/s), running at natural speed without loop jumps."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "All 340 stalks instance a single geometry with identical curvature and a single repeating canvas texture, creating uniform node patterns across adjacent culms in Screenshots 1-3."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "The scene uses static instanced geometry with alpha-tested depth-writing leaves and no LOD transitions or coplanar surfaces that cause pop-in or flicker."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Large 2.7m leaf planes are randomly positioned and rotated around stalk centers without clearance, visibly intersecting stalks in Screenshots 1-4."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 is immediately recognizable as a 3D render due to the on-screen UI, blown-out white background, plastic specular bands on stalks, and untextured dark branch tubes."
+    }
+   }
+  },
+  "3": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D bamboo scene rendering properly in Chrome without blank screens or visual errors."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls sets `maxDistance = 45` without `maxPolarAngle`, allowing the camera to go below the ground (`y = -0.35`) and outside the bamboo grove (Screenshot 5 shows the camera zoomed outside the grove)."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses two `InstancedMesh` calls (340 stalks, 3400 leaf planes), one 2048x2048 shadow map, and an `UnrealBloomPass`, which runs comfortably above 30 fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display a prominent UI bar (`#ui`) at the bottom left containing instructional text and three interactive buttons."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In `animate()`, `windUniforms.uTime.value` updates automatically on load with `windOn = true`, driving vertex displacement in both `bambooMat` and `leafMat`."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference photo's steep upward wide-angle perspective, converging foreground bamboo stalks, and dark overhanging branch on the upper left."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show spacing and density of foreground and midground stalks comparable to the reference photo, though background depth falls off into white haze."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, heavy white bloom and fog wash out the deep greens and rich yellow-greens seen in the reference photo into pale, desaturated grey-greens."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "The reference photo looks straight up into the canopy and contains no visible ground elements, path, or brushwood fence; the 3D scene also lacks any path or fence (`CircleGeometry` ground plane)."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Screenshot 1 reproduces the bright overhead sky illumination, though excessive bloom makes the scene much hazier and more overexposed than the crisp lighting in the photo."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 clearly show dark horizontal node rings with slight geometric bulges spaced at regular intervals along every bamboo stalk."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and the instance scaling code (`scaleR = 0.68 + Math.random() * 0.55`, `scaleY = 0.82 + Math.random() * 0.32`) show varied stalk thicknesses and heights."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show stalks leaning at varied natural angles, supported by randomized `rotation` and curved `CylinderGeometry` in the code."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshot 4 clearly shows the canopy composed of clusters of thin, narrow lanceolate leaves on twigs."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In section 9 of the code, the ground is a flat, untextured `THREE.CircleGeometry(45, 48)` with a solid dark green `MeshStandardMaterial` (`color: 0x1a2616`) and no soil or fallen leaves."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "Screenshot 5 shows the entire circular patch of bamboo isolated in white fog with clear outer edges when zoomed out, and even in Screenshots 1–3 the perimeter is thin and blown out."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In the code, `leafInstanced` does not have `castShadow = true`, and Screenshots 1–3 show smooth uniform highlights along the stalks rather than dappled sunlight patches."
+    },
+    "15": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show atmospheric bloom/haze (`FogExp2` and `UnrealBloomPass`) creating bright depth separation between foreground and background stalks."
+    },
+    "16": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show canopy leaves glowing with bright lime-green light against the sky, driven by `emissive` mapping and height-based color brightness."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show shaded areas on stalks and foliage retaining green ambient detail without crushing to pure black."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, the stalks exhibit a uniform, repetitive green gradient per segment and sharp specular streaks, lacking convincing natural yellowing, organic stains, or realistic waxy variation."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "In Screenshot 4, leaf clusters appear as opaque, flat-shaded green cutouts (`alphaTest: 0.32` with uniform `emissive`) without true translucency or light transmission."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "The ground is an untextured solid-color `CircleGeometry` (`color: 0x1a2616`), which does not read as real soil, leaves, or stone."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshot 1 intentionally looks steeply upward so verticals converge, and the camera has no roll tilt (`camera.up` is default Y-up)."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "In `leafMat.onBeforeCompile`, vertex positions are displaced horizontally using `sin(uTime * ...)` for `canopySway` and `flutter`."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "In `bambooMat.onBeforeCompile`, horizontal wind displacement is multiplied by `pow(hFactor, 2.1)` where `hFactor = clamp(transformed.y / 28.0, 0.0, 1.0)`, bending tops much more than bases."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "In `bambooMat` and `leafMat`, wind motion uses fixed-amplitude continuous sine/cosine waves (`sin(uTime * 0.85 + phase) * 0.32 + sin(uTime * 1.9 + ...)`), lacking varied wind gusts over time."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Neither the screenshots nor the HTML source code contain any particle systems, falling leaves, or drifting dust."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "In `animate()`, `uTime` advances continuously via `clock.getElapsedTime()` driving smooth, low-frequency sine functions (`0.85` and `0.72` rad/s) with no loop resets or jumps."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "Every stalk shares the exact same procedural texture (`bambooTex`) and geometry (`bambooGeo`), producing visibly identical dark node bands and pale rings across adjacent stalks in Screenshots 1–3."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "The code uses static instanced meshes without LOD switching, frustum-culling artifacts, or overlapping coplanar geometry, preventing pop-in or z-fighting flicker."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "In section 7 of the code, leaf planes (`PlaneGeometry(2.7, 2.7)`) are placed randomly around stalk coordinates (`anchor.x + (Math.random() - 0.5) * spread * 2.2`), causing flat leaf cards to intersect stalks as visible in Screenshot 4."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks distinctly synthetic due to the blown-out white background glow, harsh specular streaks on cylindrical stalks, flat dark tube branches, and on-screen UI."
+    }
+   }
+  },
+  "4": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D bamboo scene rendering cleanly in Chrome with no errors or blank screen."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls sets maxDistance to 45 without clamping maxPolarAngle, allowing the camera to orbit below the ground plane (y = -0.35) and zoom completely outside the grove into white fog as seen in screenshot 5."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses two InstancedMesh calls (340 stalks, 3400 leaf planes), one 2048x2048 shadow map, and an EffectComposer with UnrealBloomPass, which runs comfortably above 30 fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display a bottom-left UI bar containing helper text and three interactive buttons ('Match Photo Angle', 'Ground Walk View', 'Wind: ON')."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, windUniforms.uTime updates automatically from clock.getElapsedTime() with windOn = true by default, driving vertex shader sway on stalks and leaves."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference photo's upward wide-angle perspective, converging foreground bamboo stalks, and dark overhanging branch in the upper left."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show foreground and mid-ground stalk spacing similar to the reference photo, though background density fades quickly into bright white fog."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 appear washed out with bright white fog and pale desaturated greens, lacking the rich yellow-green to deep shadowed forest greens of the reference photo."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "The reference photo looks strictly upward into the canopy and contains no ground elements such as a path or brushwood fence, and the 3D scene likewise has only a flat dark circle for the floor."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Screenshot 1 shows bright overhead backlighting similar in direction to the reference photo, though heavy bloom and white fog make the scene much brighter and hazier than the photo."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 clearly show dark horizontal node rings with slight geometric bulges spaced at regular intervals along every bamboo stalk."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and the procedural placement loop (scaleR from 0.68 to 1.23, scaleY from 0.82 to 1.14) show varied stalk thicknesses and heights."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show stalks leaning at varied natural angles rather than standing on a strict vertical grid."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show the canopy composed of clusters of thin, narrow lanceolate leaves on textured planes."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In section 9 of the code, the ground is a single flat CircleGeometry with a solid dark green MeshStandardMaterial (0x1a2616) and no soil texture or fallen leaves."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "Screenshot 5 shows the entire circular grove ending abruptly in empty white space when zoomed out, and screenshots 1–3 show open white sky/fog gaps around the sides."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "leafInstanced does not have castShadow enabled in the code, and screenshots 1–3 show smooth uniform highlights along the stalks rather than dappled sunlight patches."
+    },
+    "15": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show atmospheric haze/fog and bloom creating brightness gradients and depth separation between foreground and background stalks."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "Leaf materials use emissive green maps and bright HSL colors up high, giving leaves a bright green look in screenshots 1 and 4, though it reads more as flat unlit green in screenshot 4 than realistic light transmission."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show soft dark green shadows between stalks and foliage that never clip to pure black."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 show strong specular highlights on the stalks, but the surface looks overly smooth and plastic-like with uniform green coloring rather than natural yellowing and organic stains."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "In screenshot 4, the leaves appear as opaque, flat-shaded bright green cutouts with visible alpha-tested edges rather than translucent foliage."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "The ground mesh is an untextured solid-color circle (color: 0x1a2616), which does not read as real soil, leaves, or stone."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "The camera looks sharply upward so verticals naturally converge toward the zenith without any unintended Dutch tilt or horizon roll (camera up vector remains default Y-up)."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "In leafMat.onBeforeCompile, vertex positions are displaced horizontally using sin(uTime) terms for canopySway and flutter."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "In bambooMat.onBeforeCompile, horizontal wind displacement is multiplied by pow(hFactor, 2.1) where hFactor = clamp(transformed.y / 28.0, 0.0, 1.0), bending stalks more at the top than at the base."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "The wind shader uses only fixed-amplitude sine/cosine waves (sin(uTime * 0.85 + phase) * 0.32 + sin(uTime * 1.9 + phase * 1.7) * 0.08) with constant uWindStrength = 1.0, rather than varied gusts."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Neither the screenshots nor the HTML source contain any particle system, falling leaves, or drifting dust."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "The vertex shader animations use continuous trigonometric functions of elapsed time (frequencies 0.72 to 2.4 rad/s and gentle amplitudes of 0.14–0.32m), running smoothly at real-world speed with no loop resets."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "Stalks share one procedural texture and curve geometry, and in screenshots 1–3 adjacent stalks show identical repeating horizontal node spacing and glossy linear highlights."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "All geometry is static instanced meshes without LOD switching, billboard flipping, or transparent depth-sorting issues (alphaTest is used), preventing pop-in or flicker during orbit."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Leaf planes (2.7x2.7m) are randomly scattered around canopyAnchorPoints without collision avoidance, causing leaf planes and stems to intersect stalks as seen in screenshots 1 and 4."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 has an obvious CG appearance due to blown-out white fog, shiny plastic-like specular streaks on the bamboo, and an on-screen UI bar, so it could not pass for the reference photo."
+    }
+   }
+  },
+  "5": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1-5 show the 3D bamboo scene rendering properly in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "OrbitControls in the code lacks a maxPolarAngle constraint to keep the camera above the ground, and Screenshot 5 shows zooming out moves the camera completely outside the grove into a blank white void."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses only two InstancedMeshes (340 stalks and 3,400 alpha-tested leaf planes), four tube meshes, one 2048x2048 shadow map, and a single bloom pass, easily running above 30 fps on a standard laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1-5 display a bottom-left UI bar (#ui) containing instructional text and three interactive buttons."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, windUniforms.uTime updates automatically on load with windOn = true, driving continuous vertex-shader wind sway on stalks and leaves without user input."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference photo's steep upward wide-angle framing, converging foreground bamboo clusters, and upper-left overhanging dark branch."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show foreground clusters and surrounding stalks spaced at a density comparable to the reference photo."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Compared to the reference photo's rich yellow-greens and deep dark greens, Screenshots 1-3 are heavily washed out by milky white bloom with uniform mid-green stalks and desaturated shadows."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Neither a path nor a brushwood fence is present; section 9 of the code defines the ground as a plain untextured CircleGeometry (color 0x1a2616) with no ground elements."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Unlike the balanced overhead daylight in the reference photo, Screenshots 1-3 exhibit blinding white sky glare and harsh directional white specular streaks down the foreground stalks."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show distinct dark horizontal node rings with raised ridges spaced at regular intervals along every bamboo stalk."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 and the instance scaling code (scaleR and scaleY randomization) show clear variation in stalk diameter and height."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show stalks leaning at varied inward and lateral angles rather than standing in a vertical grid."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshot 4 and Screenshots 1-3 show the canopy composed of fan-like clusters of thin, narrow lanceolate leaves."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In section 9 of the code, the ground is a flat, single-color CircleGeometry at y = -0.35 with no soil detail or fallen leaves."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "Screenshot 5 shows the bamboo grove terminates abruptly as a finite circular patch surrounded by empty white space."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In section 7 of the code, leafInstanced does not cast shadows, and Screenshots 1-3 show continuous smooth white highlights along the stalks rather than dappled sunlight patches."
+    },
+    "15": {
+     "pass": true,
+     "evidence": "Screenshots 1-3 show exponential fog and canopy bloom creating atmospheric haze that separates foreground stalks from paler background layers."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshots 1-3, leaves silhouetted against the bright white sky appear as flat, uniformly lit green shapes without realistic backlit glow or light transmission."
+    },
+    "17": {
+     "pass": true,
+     "evidence": "Across Screenshots 1-4, shaded areas between stalks retain dark green tones from the hemisphere and bounce lights without crushing to pure black."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "While stalks in Screenshots 1-3 have a glossy sheen and lighter bands near the nodes, they share a nearly uniform green hue and lack natural yellowing or organic stains."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshot 4 shows the leaves are opaque alpha-tested planes with flat shading and uniform emissive color rather than translucent foliage."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "The ground mesh in section 9 uses a plain solid-color MeshStandardMaterial (0x1a2616) with no textures or geometry representing soil, leaves, or stone."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshot 1 and setPhotoAngle() maintain a level camera up-vector with zero roll, so stalks converge naturally toward the zenith without unintended tilt."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "The vertex shaders in bambooMat.onBeforeCompile and leafMat.onBeforeCompile animate horizontal sway and leaf flutter continuously over time."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "In bambooMat.onBeforeCompile, horizontal wind displacement scales by pow(hFactor, 2.1), keeping the base fixed while bending increases toward the top."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "The wind shader uses fixed-amplitude sine and cosine waves with a constant uWindStrength of 1.0, producing steady oscillation rather than varied gusts."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Inspection of the HTML source shows no particle systems, falling leaves, or drifting dust motes in the scene."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "Wind motion is driven continuously by clock.getElapsedTime() through low-frequency trigonometric functions (~0.72-0.85 rad/s), running at a natural pace with no loop jumps."
+    },
+    "27": {
+     "pass": true,
+     "evidence": "In Screenshots 1-3, varied per-instance rotations, scales, and tilts prevent any visibly repeated stalk curves or stains nearby."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "The scene uses static instanced geometry without LOD switching and alphaTest (0.32) on leaves rather than blended transparency, avoiding pop-in or sorting flicker while orbiting."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Section 7 places 2.7-meter leaf planes randomly around stalk centers, and Screenshots 1 and 4 show leaf clusters intersecting directly through bamboo culms."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 clearly reads as a stylized WebGL rendering due to the on-screen UI bar, harsh plastic-like white highlights on the stalks, crude dark branch tubes, and washed-out bloom."
+    }
+   }
+  }
+ },
+ "lighthouse": {
+  "1": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 5 show the 3D lighthouse scene rendering in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "Screenshots 2 to 5 confirm camera orbiting, and OrbitControls sets maxPolarAngle = Math.PI * 0.495 and maxDistance = 300, but right-click panning remains enabled by default and orbiting near maxPolarAngle around target y = 12 allows the camera to clip below the terrain surface (which reaches y = 13 to 16)."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses a single 320x360 terrain mesh, 11 low-poly boulders, 350 instanced grass cones, one 2048x2048 shadow map, and a 512x512 planar water reflection with no post-processing, which will easily run above 30 fps on a standard laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1 to 5 display an on-screen text overlay in the bottom-left corner ('Left Click: Rotate | Right Click: Pan | Scroll: Zoom'), and OrbitControls also allows panning."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() function, water.material.uniforms['time'].value increments continuously on load using clock.getDelta() without requiring user input."
+    },
+    "3": {
+     "pass": false,
+     "evidence": "Compared to the reference photo, Screenshot 1 places the camera higher looking down onto a narrow rounded hill with open water in the lower-right corner, rather than low across wide foreground granite ledges filling the bottom of the frame."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 3 show a white tapered octagonal tower with a front-left entrance vestibule, dark lower window trim, and a red octagonal lantern room and peaked cap matching the photo's shape and colours."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "In Screenshot 1, instead of rugged exposed grey granite ledges with patchy snow as in the photo, the lighthouse sits atop a smooth rounded white snow mound dotted with uniform spiky brown cones and only a few isolated boulders."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 5 show the ocean extending beyond the shore on both sides of the peninsula, as in the reference photo."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "Whereas the reference photo has a rich, deep blue winter sky, Screenshots 1, 2, 3, and 5 show a washed-out, nearly pure white sky and pale grey lighting."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 3 show the tapered octagonal shaft, flared upper cornice, side vestibule, and lantern housing closely matching the proportions in the reference photo."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 3 and the lighthouse construction code show a glazed lantern room with red mullions and an interior lens, surrounded by an octagonal gallery deck with posts and horizontal railings."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 4, the main shore is a smooth dome with thin dark shader lines and the boulders are smooth, faceted icosahedron blobs rather than natural fractured granite with cracks and fissures."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 3 show the lighthouse plinth sitting flush against the summit of the rock mound with no floating gap or awkward sinking."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 2, 3, and 5, the 10000x10000 grey water plane ends visibly before the horizon, leaving a distinct bright blue band between the far edge of the water and the white sky."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, and 4 show shadows from the terrain ridges and boulders all falling consistently away from the single front-left directional sun light (dirLight)."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 3, the white tower is blown out to nearly flat pure white with almost no visible shading on its shadow side, blending into the white sky."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 2, 3, and 5, the horizon does not fade smoothly into haze; instead, there is a crisp blue stripe at the water's edge and a sharp silhouette on the distant right headland against the white sky."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshot 1, almost the entire sky and the white lighthouse tower are blown out to near-pure white."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "Screenshots 1 to 3 and the whitePaintMat/redPaintMat definitions use flat uniform colours with no texture maps or subtle paint weathering."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 2 and 3, the exposed shore looks like smooth blue-grey clay with thin dark contour lines rather than real stone, and there is no darker, wet rock appearance near the waterline."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 3 and glassMat (MeshPhysicalMaterial with transmission: 0.92, roughness: 0.05, and sky PMREM environment) show see-through lantern panes revealing the interior lens and mullions along with subtle sky reflections."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 5, the ocean is a flat, uniform pale grey reflective plane with no depth-based colour shift near the shore."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 show a completely flat and level horizon across the frame."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "The ocean is a flat PlaneGeometry using Three.js Water normal-map scrolling in animate(), so no 3D waves roll in with varied heights."
+    },
+    "23": {
+     "pass": false,
+     "evidence": "Screenshots 1 to 5 and the HTML source contain no breaking waves, shoreline foam, or spray effects."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "There is no foam implemented anywhere in the scene, as confirmed by Screenshots 1 to 5 and the source code."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "In animate(), only the water normal-map time uniform updates; grass cones and cloud sprites are completely static and there is no drifting snow or wind-blown spray."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "In animate(), water.material.uniforms['time'].value advances smoothly via clock.getDelta() * 0.45 at a gentle real-world speed without sudden loop jumps."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "Screenshots 1, 3, and 5 show repeating horizontal ripple bands and faint grid seams across the water surface from the tiled 512x512 procedural normal map."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "No spray particles exist in the screenshots or HTML source code."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshots 2, 3, and 4 show the water plane intersecting the smooth terrain mesh in a sharp, hard clipping line with no foam."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 has a blown-out white sky, a smooth snow hill with uniform cone spikes, flat grey water, and a UI hint box, so it could not pass for the reference photo at first glance."
+    }
+   }
+  },
+  "2": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D scene rendered in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 show successful camera orbiting, and `controls.maxPolarAngle = Math.PI * 0.495` prevents going below water, while `maxDistance = 300` keeps the camera well inside the 10000-unit sky and water bounds. However, panning is left enabled by default on `OrbitControls`, allowing a user to pan below ground or outside the scene if dragged far enough, though standard orbiting works."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses modest geometry (~230k triangles for terrain, 350 instanced grass cones, a few low-poly boulders, and one 2048x2048 shadow map plus Three.js `Water` planar reflection), which easily runs above 30 fps on integrated laptop graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display a persistent text box `#controls-hint` in the bottom-left corner reading 'Left Click: Rotate | Right Click: Pan | Scroll: Zoom', and right-click panning is enabled in addition to orbiting."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the `animate()` loop, `water.material.uniforms['time'].value += delta * 0.45` runs automatically on load without user input."
+    },
+    "3": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the camera looks down onto a narrow, steep mound from higher up than the wide, low-angle rocky foreground vista in the reference photo, cutting off the broad rocky shore on the left and right."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show a tapered octagonal white tower with a side vestibule, flared cornice, red lantern room, and dark windows, closely matching the reference lighthouse's architecture and colours (though the white tower is nearly washed out against the pale sky)."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "In Screenshot 1, instead of a rocky granite shore with patchy snow, the peninsula looks like a smooth snow-covered hill with almost no exposed dark rock visible, unlike the reference photo."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and 5 show the ocean extending beyond the peninsula to the horizon on both sides."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the sky is almost pure white/pale grey rather than the deep, clear winter blue sky of the reference photo, and the lighting washes out the white tower and snow."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the octagonal tapered tower, entrance vestibule on the left, flared gallery deck, and red lantern cap matching the proportions of Peggy's Cove lighthouse in the photo."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and the `lighthouse` construction code show a gallery deck with an 8-sided post-and-bar railing and a lantern room with glass panes and red mullions."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the main terrain reads as a smooth rounded mound, and the scattered boulders are faceted low-poly blobs (`IcosahedronGeometry(1, 3)` with visible flat triangles in Screenshot 4) lacking natural cracks and fissures."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the lighthouse plinth sitting cleanly and flush on the summit rock with no floating gap."
+    },
+    "12": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and 5 show the 10000x10000 water plane meeting the distant horizon seamlessly in all orbited views with no visible square edge."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "A single `DirectionalLight` casts consistent shadows to the right/back-right across the terrain and boulders, seen in Screenshots 1–3."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the white tower is blown out to near-uniform pure white with almost no discernible shading between its lit and shadow sides, blending right into the pale sky."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, there is a hard, crisp blue stripe along the distant horizon where the water plane meets the bright white sky rather than fading smoothly into atmospheric haze."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshot 1, large portions of the sky, the lighthouse tower, and the sunlit snow on the left slope are blown out to near-pure white."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "Both in Screenshot 1 and in the code (`whitePaintMat` and `redPaintMat` are uniform flat-coloured `MeshStandardMaterial`s with no texture or variation), the lighthouse paint has zero weathering."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, almost no exposed dark granite is visible; the terrain near the waterline in Screenshots 2 and 3 looks like smooth pale grey-blue plastic with faint dark contour lines rather than wet dark stone."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the lantern room windows are transparent (revealing the inner Fresnel lens cylinder) with subtle sky reflections from `glassMat` (`MeshPhysicalMaterial` with `transmission: 0.92`)."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "In Screenshots 1–5, the `Water` shader reflects the pale sky across the surface, looking uniformly silvery-grey rather than shifting colour with water depth near the shore."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and 5 show a completely flat, level horizon line."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "The ocean is a flat `PlaneGeometry(10000, 10000)` using Three.js `Water`, which only scrolls a normal map (`water.material.uniforms['time']`) and has no 3D rolling waves or varied wave heights."
+    },
+    "23": {
+     "pass": false,
+     "evidence": "Neither the screenshots (Screenshots 2, 3, 5) nor the HTML source contain any breaking waves, shore foam, or spray systems."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "There is no foam in the scene at all, as confirmed by Screenshots 2–5 and the source code."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Examining the `animate()` function confirms only `water.material.uniforms['time']` is updated; there is no drifting snow, grass sway, or wind-blown spray."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "In `animate()`, `water.material.uniforms['time'].value += delta * 0.45` scrolls the continuous normal map smoothly at a gentle speed without loop jumps."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 3, and 5, horizontal banding/ripples appear fairly soft, though in Screenshot 5 faint rectilinear grid/tile artifacts from the repeating 512x512 procedural normal map are visible in the foreground and midground water."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "There are no spray particles implemented anywhere in the scene or source code."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshots 2 and 3 clearly show a sharp, hard geometric clipping line where the smooth grey terrain mesh intersects the flat reflective water plane, with no foam."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks like an untextured, overexposed 3D snowy mound with uniform cone spikes for grass, a washed-out white sky, and grey water, which could not pass for the reference photo."
+    }
+   }
+  },
+  "3": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D scene rendered cleanly in Chrome with no blank screen or broken assets."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 show OrbitControls working properly, and in the code `controls.maxPolarAngle = Math.PI * 0.495` prevents going underwater while `controls.maxDistance = 300` keeps the camera well inside the 10000-unit sky/water bounds, though panning (`enablePan` defaults to true) could allow panning below ground if dragged far."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses a single 320x360 terrain mesh, ~11 low-poly icosahedron boulders, 350 instanced grass cones, one 2048x2048 shadow map, and Three.js planar reflection `Water` at 512x512 with no heavy post-processing, easily running above 30 fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display a persistent text box `#controls-hint` in the bottom-left corner reading 'Left Click: Rotate | Right Click: Pan | Scroll: Zoom', and right-click panning is enabled."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the `animate()` loop, `water.material.uniforms['time'].value += delta * 0.45;` animates the ocean surface normal ripples continuously on load without user input."
+    },
+    "3": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the camera is positioned higher and steeper looking down at a narrow rounded mound, cutting off the wide foreground rocky shelf on the left and right compared to the low eye-level wide framing of the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows an octagonal white tapered tower with a flared gallery cornice, red octagonal lantern room with red mullions and pinnacle roof, front-left vestibule, and dark lower window matching the photo."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "Instead of a rugged rocky shore with exposed granite and snow patches as in the reference photo, Screenshot 1 shows a smooth, completely snow-covered rounded hill with only three small grey boulders and uniform brown spikes poking out."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows the ocean extending to the horizon on both the left and right sides beyond the foreground landmass, along with distant coastline on the right."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the sky is completely washed out to near-white/pale grey rather than the deep, crisp winter blue sky in the reference photo."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the octagonal tapered tower, vestibule porch, gallery overhang, and lantern proportions closely matching the reference lighthouse."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the red lantern room has transparent glass window panes with mullions, an interior lens, and a white gallery railing around the deck."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show the main peninsula is a smooth, blobby dome and the scattered boulders are faceted low-poly blobs lacking natural granite cracks and fissures."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the lighthouse plinth sitting flush and embedded slightly (`baseElevation - 0.2`) into the summit rock with no floating gap."
+    },
+    "12": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and 5 show the 10,000-unit ocean plane reaching the distant horizon seamlessly from all orbited angles with no visible geometry edge."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "In Screenshots 1–3, shadows cast by the terrain lobes and boulders align consistently toward the back-right from a single `DirectionalLight` positioned at the sun coordinates."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, the white tower is completely blown out to flat white against the pale sky, with virtually no discernible shading on its shadow side."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 show a sharp blue band along the distant horizon line between the pale grey water and white sky rather than fading smoothly into atmospheric haze."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshot 1, both the sky and the white lighthouse tower are blown out to nearly pure white, causing the tower's silhouette to disappear into the sky."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, `whitePaintMat` and `redPaintMat` use uniform solid colors (`0xfcfcfc` and `0xb81422`) with no weathering, texture variation, or surface imperfection."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, the snow covers almost the entire mound cleanly while exposed shoreline areas (Screenshots 2–3) look like smooth airbrushed blue-grey plastic with thin black contour lines rather than wet, dark coastal stone."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the lantern glass is see-through (revealing the inner Fresnel lens assembly) and uses `MeshPhysicalMaterial` with `transmission: 0.92` and environment map reflections."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 use Three.js `Water` which reflects the pale sky across the flat plane, appearing milky grey-beige everywhere without shifting color with water depth near the shore."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 show a completely flat and level horizon line across the frame."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "The ocean is a flat `PlaneGeometry(10000, 10000)` using Three.js `Water` which only scrolls a normal map (`water.material.uniforms['time'].value += delta * 0.45`), producing flat surface ripples rather than rolling 3D waves of varied heights."
+    },
+    "23": {
+     "pass": false,
+     "evidence": "Screenshots 2–5 and the source code contain no breaking wave geometry, shoreline foam, or particle spray systems where the water meets the rocks."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "There is no foam shader or particle effect in the scene or HTML source code."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "The code only increments `water.material.uniforms['time']`; there is no drifting snow, wind-blown spray, or grass/cloud motion."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "In `animate()`, `water.material.uniforms['time'].value += delta * 0.45` scrolls procedural seamless water normals smoothly at a gentle real-world speed without loop jumps."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 3, and 5, visible horizontal banding and subtle grid-like repeating normal-map streaks appear across the flat water plane."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "There are no spray particles in the scene (Screenshots 1–5 and HTML code), so spray is completely absent."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshots 2, 3, and 5 show the flat reflective water plane intersecting the smooth grey terrain mesh in a razor-sharp hard clipping line with zero foam."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks like a bright, washed-out low-poly 3D render with a white sky, milky grey ocean, smooth snow hill dotted with brown spikes, and an on-screen UI label, which could not pass for the reference photo."
+    }
+   }
+  },
+  "4": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "All five screenshots show the 3D scene rendering properly with lighthouse, snow-covered island, sky, and water, with no blank screen or errors."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "Screenshots 2–5 show OrbitControls working with `maxPolarAngle = Math.PI * 0.495` and `maxDistance = 300`, though panning (`enablePan` is true by default) is unrestricted so the camera can be panned into the terrain hill."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses modest geometry (~230k triangles on terrain, 11 icosahedron boulders, 1 instanced grass mesh, 1 2048px shadow map, and Three.js `Water` planar reflection at 512x512 with no post-processing), which easily runs above 30 fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 all display a persistent UI text overlay in the bottom-left corner reading 'Left Click: Rotate | Right Click: Pan | Scroll: Zoom' (`#controls-hint` in HTML)."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In `animate()`, `water.material.uniforms['time'].value += delta * 0.45;` runs automatically on load, animating the ocean surface ripples."
+    },
+    "3": {
+     "pass": false,
+     "evidence": "In screenshot 1, the camera is positioned much higher and looks down at a steep dome rather than matching the low, broad foreground rock shelf perspective of the reference photo, and the lighthouse is centered rather than slightly right of center."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show an octagonal white tapered tower with a flared gallery, red octagonal lantern room with windows and pointed cap, side vestibule, and dark small windows matching the photo's colors and components."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "In screenshot 1, instead of a rocky granite shore with patchy snow, the foreground is almost a uniform smooth white snow mound with a few isolated boulders and tiny brown cones."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows the ocean extending beyond the island on both the left and right sides, along with distant land on the right horizon."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "In screenshots 1–5, the sky is completely washed out to near-white/pale grey instead of the crisp, deep clear winter blue sky seen in the reference photo."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the octagonal tapered tower, vestibule, flared cornice, and red lantern matching the proportions of Peggy's Cove lighthouse in the photo."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the red lantern room with glass windows, vertical mullions, inner lens assembly, and a white gallery railing around the deck (though the white railing blends into the bright white sky)."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show the terrain as a smooth rounded snow dome and the added boulders as faceted low-poly blobs with dark contour lines rather than natural cracked granite formations."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the lighthouse plinth sitting cleanly embedded (`baseElevation - 0.2`) on the summit rock without floating."
+    },
+    "12": {
+     "pass": true,
+     "evidence": "In screenshots 1–3 and 5, the 10000x10000 water plane meets the horizon seamlessly in all orbited directions with no visible geometry edge."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show consistent shadow casting from a single `DirectionalLight` (front-left sun position) across the terrain slopes and boulders."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In screenshots 1–3, the white lighthouse tower is almost completely blown out to flat white, making its octagonal faces and shadow side nearly indistinguishable against the white sky."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 and 5 show a sharp blue band along the horizon where the bright grey/silver water meets the washed-out white sky, rather than fading smoothly into atmospheric haze."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In screenshot 1, large portions of the sky, snow-covered mound, and white lighthouse tower are blown out to pure or near-pure white."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "The lighthouse uses flat `MeshStandardMaterial` colors (`0xfcfcfc` and `0xb81422`) with no weathering texture or variation (`lighthouse` code section and screenshots 1–3)."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In screenshots 1–4, virtually no realistic exposed rock is visible—the shoreline in screenshots 2 and 3 is smooth grey-blue geometry with dark contour rings rather than dark wet stone, and screenshot 1 looks like a smooth white dome."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the lantern room windows are transparent, clearly revealing the inner Fresnel lens cylinder and dark pedestal inside."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 use Three.js planar reflection `Water` which reflects the pale sky across the whole flat plane uniformly as grey/silver, with no depth-based color shift near the shore."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 all show a completely flat and level horizon line."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "The ocean is a flat `PlaneGeometry(10000, 10000)` using `THREE.Water` normal-map scrolling (`water.material.uniforms['time'].value += delta * 0.45`), producing only flat surface ripples with zero rolling 3D wave height variation."
+    },
+    "23": {
+     "pass": false,
+     "evidence": "Neither the screenshots (2, 3, 4) nor the source code contain any breaking waves, shoreline foam, or spray particle systems."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "There is no foam implemented anywhere in the water shader or scene code, and screenshots 2–4 show no foam."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Looking at the `animate()` loop in the HTML source, the only animation is `water.material.uniforms['time'].value`; there is no drifting snow, wind-blown spray, or grass sway."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "In `animate()`, `water.material.uniforms['time'].value += delta * 0.45` scrolls seamlessly at a gentle continuous rate without discrete loop resets or jumps."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "In screenshots 1, 3, and 5, horizontal banding and repeating linear ripple patterns are visible on the water surface stretching toward the horizon, along with faint grid lines in screenshot 5."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "There are no spray particles in the scene (confirmed by screenshots 1–5 and the HTML source code), so the criterion is not met."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshots 2, 3, and 4 clearly show the flat reflective water plane intersecting the terrain mesh in a sharp, hard clipping line with zero foam."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks like a simple, overexposed low-detail 3D render with a smooth white mound, spike-like grass cones, grey water, white sky, and a UI hint box, bearing little photorealistic resemblance to the reference photo."
+    }
+   }
+  },
+  "5": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "All five screenshots show the 3D lighthouse, terrain, and ocean rendered properly in Chrome without blank screens or error overlays."
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "Screenshots 2–5 show OrbitControls working, and the code sets maxPolarAngle = Math.PI * 0.495 and maxDistance = 300; however, OrbitControls enables right-click panning by default (advertised in #controls-hint), which lets the user pan the target below the ground or outside the scene."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses modest geometry (~115k-vertex terrain, low-poly lighthouse, 11 icosahedron boulders, 350 instanced cones), one 2048px shadow map, and a 512px planar reflection pass in Water.js, which runs comfortably above 30 fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "All screenshots display a persistent text box (#controls-hint) in the bottom-left corner reading 'Left Click: Rotate | Right Click: Pan | Scroll: Zoom', and panning is enabled alongside orbiting."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, water.material.uniforms['time'].value += delta * 0.45 runs continuously on load without user input."
+    },
+    "3": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the camera looks down onto a narrow rounded mound dropping steeply into water on the right, whereas the reference photo is taken from a lower angle across a wide, flat rocky foreground stretching edge-to-edge."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show a white octagonal tapered tower with a flared gallery cornice, red lantern parapet and cap, entrance vestibule, and dark lower windows matching the reference lighthouse."
+    },
+    "5": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the shore is rendered almost entirely as a smooth snow dome with uniform brown grass spikes rather than the rugged exposed grey granite ledges with patchy snow seen in the photo."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and 5 clearly show the ocean stretching out beyond the rocky peninsula on both sides."
+    },
+    "7": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the sky is completely washed out to pale off-white/grey rather than the crisp, deep winter blue sky of the reference photo."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show an octagonal tapered white tower, flared gallery overhang, entrance vestibule, and lantern proportions closely matching the reference lighthouse."
+    },
+    "9": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and the lighthouse build code show a glass lantern room with red mullions and a white post-and-rail gallery deck around it."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show smooth, rounded heightmap mounds and faceted low-poly icosahedron boulders with thin dark lines rather than natural granite rocks with cracks and fissures."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the lighthouse plinth sitting cleanly and flush against the summit rock with no floating or awkward sinking."
+    },
+    "12": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 and 5 show the 10000x10000 water plane meeting the horizon smoothly in all orbited views with no visible quad edge."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "In Screenshots 1–4, shadows from the terrain lobes and boulders fall consistently from a single directional light source (dirLight)."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, the white lighthouse tower is blown out to nearly uniform flat white against the pale sky, with virtually no discernible shading on its shadow side."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 and 5 show a sharp blue band along the horizon contrasting between the pale grey water and white sky rather than fading smoothly into atmospheric haze."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshot 1, large portions of the sky, snow mound, and white lighthouse tower are blown out to near-pure white."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "whitePaintMat and redPaintMat are plain solid-colour MeshStandardMaterials with no textures or shader variation, appearing completely clean and uniform in Screenshots 1–3."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, the snow looks smooth and overexposed with brown spikes poking out, while exposed rock in Screenshots 2 and 3 looks like smooth grey-blue plastic with thin dark contour lines and no darkened wet rock visible at the waterline."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show transparent glass panes in the lantern room through which the inner Fresnel lens assembly is visible, using MeshPhysicalMaterial with transmission and an environment map."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "The scene uses Three.js Water.js, a flat mirror plane with normal-map distortion that lacks depth-based colour shifts and appears pale grey across Screenshot 1 and 5."
+    },
+    "21": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 all show a flat, level horizon line."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "The ocean is a completely flat PlaneGeometry(10000, 10000) using scrolling normal maps in Water.js, so no 3D waves of varied heights roll in."
+    },
+    "23": {
+     "pass": false,
+     "evidence": "Screenshots 2, 3, and 5 and the source code confirm there are no breaking waves, shoreline foam, or spray systems implemented."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "There is no foam shader, texture, or particle system in the code or visible in any screenshot."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "The code only animates water.material.uniforms['time']; there is no drifting snow, blown spray, or grass wind animation."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "In animate(), water.material.uniforms['time'].value increments smoothly by delta * 0.45, providing gentle continuous normal-map ripple motion without loop jumps."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "In Screenshot 5 (zoomed out), faint rectangular grid seams and repeating ripple patterns are visible across the water surface."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "There are no spray particles in the scene at all, as confirmed by the screenshots and HTML source."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshots 2 and 3 show the flat mirror water plane intersecting the smooth terrain mesh in a sharp, hard clipping line with zero foam."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks unmistakably like an untextured/overexposed 3D render—with a washed-out white sky, smooth snow dome studded with uniform brown cones, pale grey water, and an on-screen UI hint—and could not pass for the reference photo."
+    }
+   }
+  }
+ },
+ "toast": {
+  "1": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "All five screenshots show the 3D scene rendering in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 confirm smooth camera orbiting and zooming around the stack, and OrbitControls sets maxPolarAngle to Math.PI * 0.465 and maxDistance to 15.5 so the camera stays above the cloth and within its 34x34 bounds."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses around 45 meshes, one InstancedMesh, one Points cloud, two shadow maps, a transmission pass, and basic post-processing (Bloom and BokehPass), which is light enough to maintain 30+ fps on a typical laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "All five screenshots display a bottom UI bar containing instructional text ('Drag to orbit · Scroll to zoom') and two interactive buttons ('Macro DoF: ON' and 'Hero Angle')."
+    },
+    "2": {
+     "pass": false,
+     "evidence": "Inspection of the animate() loop in the code shows it only updates camera controls, focus distance, and renders static meshes, with no environmental motion running."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 frames the French toast stack close up and centered on the plate from slightly above, matching the general camera angle and framing of the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show three thick slices stacked and rotated at slight offsets relative to one another."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show banana slices placed between the toast layers, on top of the stack, and on the plate to the left and front of the stack."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show a cluster of blueberries on top of the stack and several more arranged around the base on the plate."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the stack resting on a dark round plate set atop a grey-brown cloth surface."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show white sugar particles distributed in arcs across the dark plate and lightly speckling the top toast slice and berries."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "In Screenshots 1–5, the toast slices have uniform scalloped, wavy perimeters and smooth plastic-like surfaces that resemble molded biscuits rather than thick cut bread with natural crusts."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "In Screenshots 1 and 4, the visible banana slices are round discs displaying a faint brownish three-pointed seeded pattern at their centers."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show round blueberries of slightly varying sizes with recessed five-pointed crowns visible at their poles."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In Screenshot 2, a blueberry under the middle toast slice hangs partially clipped in mid-air above the plate, and multiple fruit pieces intersect deeply rather than resting naturally on surfaces."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 5 prominently expose the straight outer edge of the tablecloth against a black void, and Screenshots 1–4 show harsh circular crease lines on the plate and cutout-like intersections on the toast."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In the code, keyLight is placed in front of the stack at (-5.2, 8.4, 5.4) casting shadows backward in Screenshot 5 rather than coming from behind and left, and the syrup lacks bright warm highlights in Screenshot 1."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "In Screenshot 1, despite BokehPass being enabled, the back rim of the plate and the far edge of the cloth remain nearly sharp instead of softly blurred as in the reference photo."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 4, the far-left banana slice and the blueberries on top of the stack lack soft contact shadows where they meet the plate and toast."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "Screenshot 1 has a solid pitch-black empty background strip across the top of the frame above the cloth horizon, and the outer shadow areas of the plate fall to near-complete black."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 3, and 5, the syrup drips on the crust and puddles on the plate look like dark, dull brown plastic ridges and opaque rust-colored patches rather than glossy translucent amber."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show smooth, evenly shaded yellow-and-orange surfaces on the toast with regular vertical grooves and no porous bread crumb texture."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the blueberries display high-contrast, blotchy marbled blue-and-black patterns with glossy clearcoat reflections instead of a soft, dusty matte bloom."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 3, and 4, the banana slices look flat, opaque, and greyish-white with dark Rim shading artifacts, showing neither moistness nor slight translucency."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "In Screenshots 1–5, the tablecloth reads as a blurry grey-beige plaster or sand plane with no visible woven fabric structure, and the plate displays an artificial concentric ring artifact."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show both the plate and the tablecloth surface sitting horizontally level with no unintended tilt."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "In the HTML source, the syrup rivulets and puddles are static TubeGeometry and CylinderGeometry meshes with no animation in animate()."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Neither the screenshots nor the HTML code contain any steam or warm haze particle effect."
+    },
+    "26": {
+     "pass": false,
+     "evidence": "There is no environmental motion implemented anywhere in the scene's render loop."
+    },
+    "27": {
+     "pass": true,
+     "evidence": "Each blueberry and banana slice in the code is generated with a distinct procedural deformation seed, radius, and 3D rotation, avoiding identical adjacent copies in Screenshots 1–4."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show severe clipping throughout the stack, with banana slices and blueberries sinking halfway into the toast meshes and intersecting the plate."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the sugar on the black plate appears as large, discrete white pellets and coarse dots rather than fine dusted powder."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 is immediately recognizable as stylized 3D graphics due to its scalloped plastic-like toast, blotchy berries, severe mesh clipping, coarse white dots, visible table edge, and UI overlay."
+    }
+   }
+  },
+  "2": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1 through 5 show the 3D French toast scene fully rendered in Chrome with no blank screen or console errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 demonstrate orbiting and zooming around the stack, and OrbitControls in the code restricts maxPolarAngle to Math.PI * 0.465 and maxDistance to 15.5, keeping the camera above the cloth (radius 17) and inside the scene."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Scene geometry is modest (~30k triangles plus one InstancedMesh and one Points cloud), with two directional shadow maps (2048 and 1024) and lightweight post-processing (UnrealBloomPass and BokehPass), though MeshPhysicalMaterial transmission adds an extra scene render pass; it should still sustain ~30 fps or more on a typical modern laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display a persistent bottom UI bar with text ('Drag to orbit · Scroll to zoom') and interactive buttons ('Macro DoF: ON', 'Hero Angle')."
+    },
+    "2": {
+     "pass": false,
+     "evidence": "In the animate() loop in the source code, only camera reset lerping, controls.update(), DoF focus distance, and composer.render() run; there is no environmental animation or motion in the scene."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference photo's close-up, slightly elevated angle with the French toast stack centered on the dark plate, though the top of the frame shows a black background strip behind the cloth edge."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 show three thick slices of French toast stacked and rotationally offset from one another, similar to the reference photo."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show banana slices tucked between the toast layers, on top, and resting on the plate to the left and front, though the two front-leaning slices are heavily buried/clipped into the bottom slice and syrup."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show blueberries clustered on top of the stack, wedged between layers, and scattered along the front-left of the plate."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show a dark round ceramic plate resting on a light beige/grey-brown textured cloth, though Screenshot 5 reveals a stark black void above the flat cloth horizon."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show white specks representing powdered sugar scattered in a ring on the dark plate and lightly on the top toast slice and berries."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "In Screenshots 1–5, the toast slices have uniform, repetitive vertical ridges all the way around like giant scalloped biscuits or crackers rather than bread slices with rounded crust and soft cut edges."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show round banana discs with a faint brownish three-pointed seeded pattern in the center."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show round blueberries of slightly varying radii with sculpted 5-pointed star crowns visible on top."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In Screenshot 2, blueberries on the right side stick out mid-air or clip awkwardly, and in Screenshot 1 tiny white sugar specks float in empty air off the upper-right edge of the top toast slice."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "When orbited in Screenshots 2, 3, and 5, the cloth plane's sharp straight back edge is prominently visible in every side view against a pure black void, and translucent syrup/banana surfaces exhibit harsh circular cutout/refraction artifacts (Screenshot 4)."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 5, the key light (`keyLight.position.set(-5.2, 8.4, 5.4)`) comes from the front-left rather than behind-left, casting shadows backward-right instead of matching the photo's soft rear-left window light."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Despite BokehPass being enabled in code, Screenshot 1 shows virtually no perceptible shallow depth of field—the back plate rim, distant sugar dots, and rear cloth edge remain nearly as sharp as the front of the stack."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 4, the flat banana slice on the left of the plate and several berries lack convincing soft contact shadows, appearing pasted onto the dark surface."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 2, 3, and 5, the entire top strip above the tablecloth horizon is pure unlit black (`0x161412` darkened to near black)."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 3, the syrup rivulets down the toast crust look like dark, semi-opaque brown plastic tubes with dull highlights rather than bright, glossy translucent amber."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show smooth, airbrushed pale-yellow centers and uniform plastic-like fluted brown sides with no porous bread crumb or realistic uneven caramelised sear."
+    },
+    "20": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show blueberries with a mottled indigo-grey matte bloom and soft sheen, though slightly blotchy in texture."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 2, and 4, the banana slices look flat, chalky grey-beige, and opaque, with dark grey shading rims and sharp circular transparency/glaze artifacts rather than moist, slightly translucent fruit."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 5, the plate has a dark satin/glossy sheen (though marred by a bright circular ring artifact around the food), while the tablecloth reads as a blurry, low-detail grey-beige plane rather than crisp woven linen fabric."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show the plate and table surface sitting level horizontally with no unintended tilt."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "The syrup rivulets created in `addCrustSyrupRivulets` are static `TubeGeometry` meshes with no animation in `animate()`."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Neither the screenshots nor the HTML source code contain any steam or warm haze particle system or shader."
+    },
+    "26": {
+     "pass": false,
+     "evidence": "Because there is no environmental motion implemented in the scene (`animate()` only updates camera controls and DoF focus), no motion runs or loops."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "In Screenshot 1 and 4, adjacent blueberries share very similar blotchy texture patterns, though rotated and seeded slightly differently; however, several berries next to each other on top look nearly identical in surface mottling."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 4 clearly show banana slices and blueberries intersecting and clipping straight through the toast slices and into one another (e.g., top banana slice half-buried inside the top toast in Screenshot 2 and 3, berries embedded in crust in Screenshot 2)."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "In Screenshots 1–5, the powdered sugar on the plate appears as large, discrete, uniform white polka-dot pellets rather than fine, soft powdered sugar."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks unmistakably like stylized 3D computer graphics—with cracker-edged plastic toast, polka-dot sugar, clipping fruit, a black sky bar, and an on-screen UI bar—and could not pass for the reference photo."
+    }
+   }
+  },
+  "3": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D scene rendered cleanly in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 demonstrate orbiting and zooming, and `OrbitControls` restricts `maxPolarAngle = Math.PI * 0.465` and `maxDistance = 15.5`, keeping the camera above the cloth (`PlaneGeometry(34, 34)`). However, at max distance with shallow polar angles (screenshot 5), the back edge of the cloth is visible against a black void."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Scene geometry is modest (~30k triangles, one `InstancedMesh`, one `Points` cloud), with two shadow maps (2048 and 1024) and `BokehPass` + `UnrealBloomPass` + transmission pass; on a standard laptop with integrated graphics, `BokehPass` + `MeshPhysicalMaterial` transmission at up to 2x DPR can dip near 30 fps, though overall draw call count (~45) is light enough to stay around 30+ fps."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "All screenshots (1–5) display a bottom UI bar (`#ui`) containing text ('Drag to orbit · Scroll to zoom') and two interactive buttons ('Macro DoF: ON' and 'Hero Angle')."
+    },
+    "2": {
+     "pass": false,
+     "evidence": "In the `animate()` loop in the HTML source, only `controls.update()`, camera reset lerping, and `bokehPass` focus distance updates occur; there is no environmental motion running on load."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a close-up, slightly elevated angle with the French toast stack centered on the dark plate, closely matching the framing of the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show three thick slices of French toast stacked and slightly offset/rotated relative to each other, matching the arrangement in the photo."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show banana slices placed between the toast layers, on top, and around the base on the plate, though several slices in screenshot 1 clip heavily into the toast and plate."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show blueberries clustered on top of the stack, tucked between slices, and scattered at the front base on the plate."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show the stack resting on a dark round plate set upon a grey-beige cloth surface."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show white sugar particles scattered across the dark plate and lightly dusted on the top toast slice and berries."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "In screenshots 1–4, the toast slices look like corrugated plastic crackers or wavy tart shells with uniform vertical fluting all around the perimeter and smooth, bright yellow flat centers, rather than thick slices of bread with a rounded loaf crust and soft cut faces as in the photo."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show round banana discs with a faint dark 3-part seeded pattern in the center, though translucent syrup artifacts overlap parts of them."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show round blueberries of slightly varying sizes (`r: 0.250` to `0.315` in `berryPlacements`) with sculpted 5-pointed star crowns visible at their tops."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In screenshot 2, a blueberry under the middle slice (`[-1.18, 1.44, 0.56]`) and overhanging banana slices visibly float or protrude awkwardly without proper support, and in screenshot 1 syrup drips hang in mid-air."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "When orbited in screenshots 2, 3, and 4, the toast, plate, and cloth are closed meshes, though in screenshots 1–4 there is a harsh circular rendering artifact ring on the plate and severe transmission sorting holes/cutouts through the bananas and toast."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In the reference photo, soft window light comes from behind and to the left (back-left), whereas in the code `keyLight.position.set(-5.2, 8.4, 5.4)` places the main key light in front and to the left (`+z` is toward the camera at `z = 8.15`), lighting the front crust flatly instead of backlighting it."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "In screenshot 1, despite `BokehPass` being enabled (`maxblur: 0.0065`), the back plate rim and the horizon edge of the cloth against the black background remain quite sharp and clearly defined rather than softly blurred as in the reference photo."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 show very little soft contact shadowing grounding the blueberries, bananas, and toast layers against each other or the dark plate, leaving items looking pasted on."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "In screenshots 1, 2, 3, and 5, the entire upper background strip above the tablecloth (`scene.background = new THREE.Color(0x161412)` / black void) renders as a solid near-black band across the top of the frame."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In screenshots 1–3, the syrup rivulets on the crust look like dark brown opaque/plastic worms with dull highlights, and the syrup puddles on the plate look like flat reddish-brown shapes or cause weird grey circular refraction glitches on the bananas."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "In screenshots 1–4, the toast has uniform, smooth, cartoon-like yellow centers and repetitive striped brown edges with no visible porous bread crumb texture."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "In screenshots 1–4, the blueberries have harsh, high-contrast blotchy white-grey and black marbling that looks like polished granite or camouflage rather than a soft, dusty matte wax bloom."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In screenshots 1–4, the banana slices look flat, chalky grey-white, and suffer from sharp dark/grey circular clipping or transmission artifacts rather than looking moist and slightly translucent."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "In screenshots 1–5, the plate has a distracting bright thin circular ring artifact on its floor, and the cloth reads as a blurry grey-beige ground plane rather than clearly woven linen fabric."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show the plate and tablecloth sitting level and horizontal with no unintended tilt."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "Checking `addCrustSyrupRivulets` and `animate()` in the code confirms the syrup rivulets are static `TubeGeometry` meshes with no dripping or running animation."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "There is no steam or warm haze particle system or shader anywhere in the HTML source or visible in screenshots 1–5."
+    },
+    "26": {
+     "pass": false,
+     "evidence": "There is no continuous environmental motion in `animate()` at all."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "Although vertex seeds vary slightly, `berryMat` shares a single `berryTex` UV texture across all berries, making identical blotchy texture patterns appear on adjacent berries in screenshots 1 and 4."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "In screenshots 1–4, multiple banana slices and blueberries visibly clip/intersect straight into the toast crusts and into the plate floor (e.g., the upright front bananas and top bananas)."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "In screenshots 1–5, the sugar on the plate appears as large, coarse, isolated bright white dots/pellets rather than fine, soft powdered sugar."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks distinctly stylized and synthetic—with corrugated plastic-looking toast, blotchy granite-like berries, coarse white dots, clipping artifacts, a black sky bar, and an on-screen UI bar—and could not pass for the reference photo at first glance."
+    }
+   }
+  },
+  "4": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D scene rendered properly in Chrome with no blank screen or visual errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 show orbiting and zooming; OrbitControls in the code sets maxPolarAngle = Math.PI * 0.465 (keeping camera above y=0) and maxDistance = 15.5 (inside the 34x34 tablecloth)."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses moderate procedural geometry (~40 meshes plus one InstancedMesh and one Points object), two shadow maps (2048 and 1024), and EffectComposer with BokehPass and UnrealBloomPass, which should run at 30+ fps on a typical laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "All five screenshots show an on-screen UI bar at the bottom ('Drag to orbit · Scroll to zoom', 'Macro DoF: ON', 'Hero Angle')."
+    },
+    "2": {
+     "pass": false,
+     "evidence": "In the `animate()` function in the HTML source, only camera reset lerping, `controls.update()`, DoF focus distance, and `composer.render()` run; there is zero environmental motion."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a close-up, slightly elevated angle with the French toast stack centered on the plate, matching the framing of the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 clearly show three thick slices of French toast stacked and rotationally offset."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show banana slices tucked between the toast layers, on top, and resting on the plate to the left and front."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show blueberries clustered on top of the stack and scattered around the base of the toast on the plate."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show the stack resting on a dark round plate set on a grey-brown linen surface, though in Screenshot 5 the cloth stops at a stark black void horizon."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show white powdered sugar specks dusted across the dark plate and lightly on the top toast slice and berries."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the toast slices look like wavy-edged crackers or plastic molds with uniform vertical ridges rather than thick bread slices with a natural rounded loaf crust and soft cut edges."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show round banana discs with a faint brownish three-pointed seed pattern in the center, though several slices have dark metallic-looking bevel rims."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show round blueberries of slightly varying sizes with sculpted 5-pointed star crowns visible on top."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the right corner of the middle toast slice hovers unsupported, and in Screenshot 2 a blueberry near the center-right hangs mid-air underneath the middle slice."
+    },
+    "13": {
+     "pass": false,
+     "evidence": "In Screenshot 5 (zoomed out) and Screenshots 1–3, the tablecloth plane ends abruptly in the background revealing a solid black void edge across the top of the frame, and banana slices clip visibly through the toast geometry in Screenshot 2."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In the code (`keyLight.position.set(-5.2, 8.4, 5.4)`) and Screenshot 1, the main key light comes from the front-left rather than behind-left, and the syrup rivulets appear dark brown rather than catching bright warm window highlights."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "In Screenshot 1, despite `BokehPass` being active (`maxblur: 0.0065`), the back rim of the plate and the horizon edge of the cloth remain nearly sharp rather than softly blurred like the reference photo."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshot 1 and 4, several blueberries on top of the toast and the banana slice on the left of the plate lack convincing soft contact shadows grounding them."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "At the very top of Screenshot 1 (and prominently in Screenshot 5), the background above the tablecloth is a completely flat, near-black void (`0x161412`) with zero detail."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 5, the syrup rivulets on the toast crust look like dark, opaque brown worms and the puddles on the plate look like flat reddish-brown shapes without bright specular highlights or amber translucency."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the toast has smooth, plastic-like airbrushed vertex colors with pale yellow centers and uniform brown edges, lacking any porous bread crumb or realistic uneven caramelisation."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the blueberries have high-contrast blotchy white/blue noise textures that read like marbled stone rather than a subtle, dusty matte wax bloom."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the banana slices look opaque and chalky white/grey with unnatural dark grey metallic shading around their curved bevel edges rather than moist, slightly translucent fruit."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 5, the plate shows a dark satin/glossy ceramic sheen (though interrupted by a circular artifact ring from the transmission pass), while the cloth looks like a blurry grey noise plane rather than clearly woven linen fabric."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show the plate and table surface sitting completely level with no unintended tilt."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "The syrup meshes built in `addCrustSyrupRivulets` are static `TubeGeometry` meshes and are never animated in `animate()`."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Neither the screenshots nor the HTML source contain any steam or warm haze particle system or shader."
+    },
+    "26": {
+     "pass": false,
+     "evidence": "There is no environmental motion in the scene (`animate()` only updates camera controls and renders)."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "All blueberries share the exact same UV-mapped `berryTex` texture, and in Screenshot 1 and 4 adjacent berries on top and at the front show noticeably similar blotchy patterns, though rotated."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 4 show severe clipping: banana slices on top and between layers intersect directly through the toast surfaces, and syrup/banana geometry clips at the base."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the sugar on the plate consists of large, distinct, uniform white dots (`IcosahedronGeometry(0.015)`) that look like coarse salt or styrofoam beads rather than fine powdered sugar."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks distinctly like stylized 3D computer graphics—with plastic wavy-edged toast, blotchy berries, clipping bananas, coarse white dots, and a UI bar—and could not pass for the reference photo."
+    }
+   }
+  },
+  "5": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the 3D French toast scene fully rendered in Chrome without errors or a blank screen."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–4 confirm orbiting works, and `OrbitControls` restricts `maxPolarAngle = Math.PI * 0.465` and `maxDistance = 15.5`, keeping the camera above the cloth (`y=0`) and inside the 34x34 plane."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Geometry (~50k triangles total) and draw calls (~45) are modest, though `MeshPhysicalMaterial` with `transmission: 0.84` plus `BokehPass` and `UnrealBloomPass` add moderate GPU load that should still maintain ~30+ fps on a typical modern laptop after initial canvas generation."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 show a visible pill-shaped UI bar at the bottom with text ('Drag to orbit · Scroll to zoom') and two interactive buttons ('Macro DoF: ON' and 'Hero Angle')."
+    },
+    "2": {
+     "pass": false,
+     "evidence": "In the `animate()` loop, only `controls.update()`, `bokehPass` focus distance, and optional camera reset run; there is no environmental motion in the scene."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a close-up view from slightly above with the French toast stack centered on the dark plate, closely matching the framing and angle of the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show three slices of French toast stacked and slightly offset rotationally, matching the arrangement in the photo."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "In Screenshot 1, banana slices are tucked between the toast layers, placed on top, and resting around the base on the plate, though several severely clip into the toast."
+    },
+    "6": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show blueberries clustered on top of the stack and scattered around the base of the stack on the plate."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show the stack resting on a dark round plate placed on a grey-taupe textured cloth, though Screenshot 5 also reveals a pitch-black void above the cloth's horizon."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 4 show white specks representing powdered sugar scattered across the dark plate and lightly on the toast and berries."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the toast slices have uniform sinusoidal wave-fluted edges all the way around, making them look like giant wavy biscuits or crackers rather than cut slices of bread."
+    },
+    "10": {
+     "pass": true,
+     "evidence": "Screenshots 1, 3, and 4 show round banana discs with a faint three-part brownish seeded pattern in the center."
+    },
+    "11": {
+     "pass": true,
+     "evidence": "In Screenshots 1–4, the blueberries are round, vary slightly in size (`r: 0.250` to `0.315`), and display a recessed star-shaped calyx crown."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "Instead of resting naturally on surfaces, multiple banana slices and berries are deeply embedded inside the toast geometry (Screenshots 1–4), and several syrup drips hang rigidly in mid-air."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "When orbited in Screenshots 2–4, the stack, plate, and cloth are closed meshes without missing faces, though zoom-out Screenshot 5 exposes the abrupt back edge of the tablecloth against a black void."
+    },
+    "14": {
+     "pass": false,
+     "evidence": "In the code, `keyLight` is positioned at `(-5.2, 8.4, 5.4)` (in front and to the left, not behind and to the left), resulting in flat front-lit toast faces in Screenshot 1 lacking the photo's strong back-left window rim lighting."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the `BokehPass` blur (`maxblur: 0.0065`) is barely perceptible, leaving the back plate rim and background tablecloth nearly sharp compared to the pronounced creamy bokeh in the reference photo."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 4, contact shadows under the blueberries and banana slices on top of the toast and on the dark plate are weak or missing, making the fruit look ungrounded."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "At the very top of Screenshot 1, a horizontal strip above the tablecloth edge is pitch black (`#161412` background with no lighting)."
+    },
+    "18": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 3, the syrup rivulets on the front of the toast look like dark brown opaque-looking tubes with muted highlights rather than bright, wet, translucent amber glaze, and transmissive puddles on the plate cause dark sorting/refraction artifacts on overlapping fruit."
+    },
+    "19": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the toast has smooth, plastic-like airbrushed vertex colors (pale yellow center fading uniformly to orange-brown scalloped edges) with no visible porous bread crumb."
+    },
+    "20": {
+     "pass": false,
+     "evidence": "In Screenshots 1–4, the blueberries have a high-contrast blotchy blue-and-black noise pattern with glossy clearcoat highlights rather than a soft, dusty matte wax bloom."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 3, and 4, the banana slices look greyish-white, opaque, and dry, with dark grey shading rims where they intersect the toast."
+    },
+    "22": {
+     "pass": false,
+     "evidence": "The plate reads as dark ceramic (though with a sharp concentric ring artifact visible in Screenshots 1–4), while the tablecloth in Screenshots 1–3 and 5 looks like blurry mottled grey concrete or plaster rather than woven linen."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show the plate and tablecloth resting level on the horizontal plane without unintended tilt."
+    },
+    "24": {
+     "pass": false,
+     "evidence": "Inspection of `addCrustSyrupRivulets` and `animate()` shows the syrup meshes are completely static with no dripping or running animation."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Neither the screenshots nor the HTML source contain any steam or warm haze particle system or shader."
+    },
+    "26": {
+     "pass": false,
+     "evidence": "There is no environmental motion implemented in the `animate()` loop."
+    },
+    "27": {
+     "pass": false,
+     "evidence": "All blueberries share the exact same `berryTex` UV texture and all banana slices share one of two textures, so adjacent top blueberries in Screenshot 4 display identical blotchy texture patterns."
+    },
+    "28": {
+     "pass": false,
+     "evidence": "Screenshots 1–4 show severe geometry clipping everywhere: top banana slices sink halfway into the top toast slice, middle bananas and berries intersect deeply with the toast crusts, and front leaning bananas clip into the bottom toast and plate."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "In Screenshots 1–5, the sugar on the plate consists of large, discrete, uniform white dots (`IcosahedronGeometry(0.015)`) that look like coarse salt or styrofoam beads rather than fine powdered sugar."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Screenshot 1 looks unmistakably like stylized, low-detail 3D CGI due to the cracker-edged plastic toast, severely clipping fruit, coarse white dot sugar, and on-screen UI."
+    }
+   }
+  }
+ },
+ "flamingo": {
+  "1": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 5 show the 3D scene rendering properly in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2 to 5 confirm camera orbiting and zooming, while OrbitControls in the code sets maxPolarAngle = Math.PI * 0.492 and maxDistance = 26 to keep the camera above the water and inside the 180-unit sky dome."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses lightweight procedural geometry, a single 2048x2048 shadow map, and one 1024x1024 planar water reflection with no post-processing passes, easily sustaining 30+ fps on a standard laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1 to 5 display an on-screen text pill ('Drag to Orbit 3D • Scroll to Zoom • Right-Drag to Pan') from the #ui element, and right-drag panning is enabled in addition to orbiting."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, water.material.uniforms['time'].value updates continuously from page load without requiring user input."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 frames the flamingo from a side view at the bird's height, centered in the viewport and filling most of the vertical frame."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a single flamingo standing in calm water in the same stride pose as the reference photo, with one vertical support leg and the other leg bent backward."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference palette with a coral-orange neck and body, pink legs, black flight feathers, and a pale upper beak ending in a black tip."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 5 show a sharp, high-contrast horizon line separating a dark blue sky from much paler blue water, unlike the seamless, even blue background in the reference photo."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshot 1 and sunLight.position.set(7.5, 6.5, 5.5) place bright directional sunlight at the front right, illuminating the chest, right side of the neck, and upper body."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows the neck curving in a clear S shape with the head bent over and the hooked beak pointing straight down."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "Although the legs are long and backward-bending, webbed feet are not modelled; Screenshot 1 and createLeg() show each foot as a single small ConeGeometry, with the left cone poking upward out of the water."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 3, the wings sit embedded against the sides of the torso with thin black cones protruding from the rear rather than a partly raised wing revealing layered black flight feathers underneath."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "In Screenshot 1, only the left leg has a flat RingGeometry around it while the right leg enters the water with no ripple ring at all, and the left foot cone protrudes awkwardly above the surface."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "While the water has no visible outer edge when orbited in Screenshots 2 to 5, Screenshot 1 reveals an uncapped, detached cylindrical neck base hanging below the shifted torso (bodyMesh.position.y = 0.31)."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 3 show smooth directional shading across the rounded body and neck, transitioning from a bright sunlit front-right side to a softer shaded side."
+    },
+    "14": {
+     "pass": true,
+     "evidence": "In Screenshot 1, ACES filmic tone mapping and hemisphere fill light prevent any region from clipping to pure white or solid unshaded black."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 5 display a crisp, hard horizon edge between the sky dome and water plane rather than a soft, out-of-focus background gradient."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 4, the body, neck, and wings read as smooth plastic tubes and cones rather than soft, layered plumage."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "While the legs have darker joints in Screenshot 1, the entire neck and beak share a single plumageMat (roughness: 0.58 with featherBump), making the black beak tip matte rather than glossy."
+    },
+    "18": {
+     "pass": true,
+     "evidence": "Comparing Screenshot 4 (from above) with Screenshots 1 and 5 (low grazing angles) shows a smooth water surface whose Fresnel reflection strengthens noticeably at grazing angles."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows the pink legs reflecting in the water, and Screenshot 5 shows the full body and neck reflected on the water surface."
+    },
+    "20": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 show the water plane and horizon completely horizontal with no unintended tilt."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In the code, footRipple is a single flat RingGeometry on one foot that only pulses its scale by 6% and does not spread outward or distort the Water shader's reflection."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "In animate(), subtle sine-wave oscillations on flamingo.position.y and neckMesh.rotation.z provide gentle continuous breathing and neck motion."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "In animate(), advancing water.material.uniforms['time'].value at 0.22x elapsed time moves small wavelets continuously across the water surface."
+    },
+    "24": {
+     "pass": true,
+     "evidence": "All motions in animate() are driven by low-frequency sine waves and a wrapping normal map scrolling linearly with elapsed time, running at calm real-world speeds without jumps."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 5 show visible repeating horizontal bands from the tiled water normal map, and footRipple is a single sharp-edged ring on one foot rather than concentric rings fading with distance."
+    },
+    "26": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the upper leg tuft cones intersect directly into the bottom of the torso, and the left foot cone slices upward through the water surface."
+    },
+    "27": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 4 show smooth vertex-color gradients and subtle procedural bump mapping across the bird with no visible UV seams or repeating texture patterns."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 5 show clean, anti-aliased 3D geometry silhouettes against the sky and water with no jagged cut-out edges or halos."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 clearly looks like a stylized 3D primitive model with smooth tubes, a detached neck base, a sharp two-tone horizon, and an UI banner, so it could not pass for the reference photo at first glance."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "Because the wing covert is embedded into the side of the torso (wingGroup z = 0.25 inside bodyMesh half-width 0.336), Screenshot 1 shows a thin, jagged intersection sliver beneath the wing rather than a soft cast shadow."
+    }
+   }
+  },
+  "2": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 5 show the 3D scene rendering properly in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2 to 5 confirm camera orbiting and zooming around the flamingo, and OrbitControls sets maxPolarAngle to Math.PI * 0.492 and maxDistance to 26 inside a 180-unit sky dome and 300x300 water plane."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses lightweight procedural primitives, a single 2048x2048 shadow map, and one 1024x1024 planar water reflection pass with no post-processing, easily running above 30 fps on a standard laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1 to 5 display an on-screen text banner at the bottom ('Drag to Orbit 3D • Scroll to Zoom • Right-Drag to Pan'), and panning is also active alongside orbiting."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, water.material.uniforms['time'].value advances continuously from load without requiring any user input."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 frames the flamingo from a side view at the bird's height, centered and spanning most of the vertical frame as in the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a single flamingo standing in calm water in the same mid-stride pose as the photo, with one vertical supporting leg and the other leg bent backward."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a coral-orange neck and body, pink legs with darker joints, black flight feathers, and a pale beak base tapering through orange to a black tip."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "In Screenshots 1, 2, 3, and 5, the sky renders as a dark cobalt blue against a much paler blue water plane with a sharp, high-contrast horizon line, unlike the soft, even blue seamless background in the photo."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Sunlight positioned at (7.5, 6.5, 5.5) illuminates the front-right of the flamingo brightly in Screenshots 1 and 3 while leaving the back-left side in softer shade in Screenshot 2."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "In Screenshot 1, the neck traces a clear S-curve with the head angled downward and the hooked beak pointing straight down."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "Although the legs are long and thin with backward-bending joints, the feet are modeled as tiny single cones (new THREE.ConeGeometry(0.065, 0.18, 12)) that look like a small red spike in Screenshot 1 rather than webbed feet."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 4, the coral wings sit pressed against the body with spiky black cones protruding behind the tail rather than a partly raised wing revealing layered black flight feathers underneath as in the photo."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "In Screenshot 1, only the bent left leg has a flat blue RingGeometry decal while the right leg enters the water with no ripple ring at all, and the left leg cylinder terminates slightly above the water at y = 0.02 with its cone foot sticking upward."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the base of the neck tube hangs disconnected below the chest with an uncapped open TubeGeometry end, creating an obvious gap and unclosed geometry."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, and 3 show smooth form shading across the curved neck and body, transitioning from a bright sunlit front-right side to a softer shaded back-left side."
+    },
+    "14": {
+     "pass": true,
+     "evidence": "In Screenshot 1, the darkest areas (beak tip and flight feathers) retain dark charcoal tone and the brightest pale head/beak areas remain unclipped with no pure black or blown-out white regions."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshots 1 and 5 show a crisp, hard-edged horizon split between dark blue sky and light blue water rather than the soft, out-of-focus smooth gradient seen in the photo."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 4, the body, neck, and wings read as smooth plastic-like tubes and cones rather than soft, layered plumage."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "While the legs have darker joints in Screenshot 1, the beak tip shares plumageMat (roughness: 0.58 with pink sheen and feather bump) and reads as flat matte black rather than glossy black."
+    },
+    "18": {
+     "pass": true,
+     "evidence": "Comparing the top-down view in Screenshot 4 with the lower grazing angles in Screenshots 1 and 5 shows the glossy water surface reflecting much more strongly toward the horizon."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "The legs reflect in the water in Screenshot 1, and zooming out in Screenshot 5 reveals the full reflection of the bird's body, neck, and legs across the water surface."
+    },
+    "20": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 show a completely horizontal and level water surface with no unintended tilt."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In animate(), footRipple only pulses a single flat RingGeometry mesh's scale by 6% in place without spreading outward across the water or distorting the planar Water reflection."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "In animate(), sinusoidal updates to neckMesh.rotation.z and flamingo.position.y provide a gentle, continuous breathing and neck sway motion."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "The procedural normal map on the Water object scrolls slowly via water.material.uniforms['time'].value = elapsed * 0.22, moving small wavelets across the water."
+    },
+    "24": {
+     "pass": true,
+     "evidence": "All motions in animate() use low-frequency sine waves of elapsed time and linear scrolling on a period-matched RepeatWrapping normal map, running at calm real-world speed with no loop jumps."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Instead of concentric ripple rings fading with distance, Screenshot 1 has one uniform-opacity flat ring on a single leg, and Screenshots 2, 3, and 5 show visible repeating wavelet bands tiling across the water."
+    },
+    "26": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the diagonal left leg cylinder clips right through the side of its vertical white upper-thigh cone tuft, leaving the sharp tip of the cone hanging out in mid-air beside the leg."
+    },
+    "27": {
+     "pass": true,
+     "evidence": "Across Screenshots 1 to 4, the coral plumage surfaces show no visible UV texture seams or tiling repeats."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "In Screenshots 1 to 5, the anti-aliased 3D geometry gives the flamingo a clean silhouette against the sky and water with no jagged cut-out edges or halos."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 clearly looks like a stylized low-detail 3D model with primitive cones, a disconnected neck base, a stark dark-blue sky split, and a UI overlay, so it could not pass for the reference photo at first glance."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "In Screenshot 1 the flat-pressed wing leaves only a thin dark crease rather than a soft under-wing shadow as in the photo, and wing meshes omit receiveShadow = true so the body fails to cast shadows properly onto the shaded wing in Screenshot 2."
+    }
+   }
+  },
+  "3": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 5 show the 3D scene rendering cleanly in Chrome with no blank screen or visual errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2 to 5 confirm camera orbiting and zooming around the flamingo, while OrbitControls in the code restricts maxPolarAngle to Math.PI * 0.492 and maxDistance to 26 inside a 180-radius sky dome and 300x300 water plane."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses simple procedural tube and cone geometries, a single 2048x2048 shadow map, and one 1024x1024 planar Water reflection with no post-processing passes, easily sustaining over 30 fps on integrated laptop graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1 to 5 display an on-screen text pill at the bottom ('Drag to Orbit 3D • Scroll to Zoom • Right-Drag to Pan') from the #ui element, and OrbitControls leaves right-drag panning enabled."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, water.material.uniforms['time'] updates continuously from load without requiring any user input."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 frames the flamingo in a centered side profile at the bird's height, filling most of the vertical frame just like the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshot 1 depicts a single flamingo standing in calm water facing right in a mid-stride pose with one straight vertical leg and one backward-bent trailing leg matching the reference photo."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows the coral-orange neck and body, pink legs with darker joints, black primary flight feathers, and a pale upper beak transitioning to orange and a black tip."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Unlike the soft, seamless blue backdrop of the reference photo, Screenshots 1, 2, 3, and 5 show a sharp, high-contrast horizon line separating a dark blue sky from a much lighter blue water surface."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows bright illumination on the front-right surfaces of the neck, chest, and wing, driven by sunLight positioned at (7.5, 6.5, 5.5)."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshot 1 clearly shows the neck curving in an S shape with the head bent over and the hooked beak pointing straight downward."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "While the legs are long and thin with backward-bending joints in Screenshot 1, the feet are modeled as single simple cones (ConeGeometry) rather than webbed feet, with one sticking upward like a spike."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 3, the coral wing sits flush against the side of the body with small black cones protruding from the rear rather than being partly raised off the torso as in the reference photo."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "In Screenshots 1 to 3, only the bent left leg has a flat static ring mesh while the straight right leg enters the water with no ripple ring at all, and the left cone foot pokes awkwardly through the surface."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the base of the neck tube is offset below the shifted torso (bodyMesh.position.y = 0.31) and left uncapped by TubeGeometry, exposing a blunt disconnected cylinder edge and open geometry gap, while Screenshot 4 shows protruding spherical eyes."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 3 show smooth directional shading across the rounded forms of the neck and torso, transitioning from a bright sunlit side to a softer hemisphere-lit shadow side."
+    },
+    "14": {
+     "pass": true,
+     "evidence": "In Screenshot 1, ACES filmic tone mapping and hemisphere fill lighting keep dark areas like the black feathers and bright areas like the pale facial patch within range without pure black clipping or white blowout."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 5 show a crisp, hard edge along the horizon rather than a soft, out-of-focus smooth gradient as seen in the reference photo."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "Across Screenshots 1 to 4, the body, neck, and wings look like smooth plastic tubes and rigid geometric cones rather than soft, layered plumage."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "Although the legs have darker red-pink joints in Screenshot 1, the beak is part of neckMesh and shares the rough feather-bumped plumageMat (roughness 0.58) rather than having a glossy black tip."
+    },
+    "18": {
+     "pass": true,
+     "evidence": "Comparing the overhead view in Screenshot 4 with the lower angles in Screenshots 1 and 5 shows a smooth, glossy water plane whose Fresnel reflectivity increases noticeably at grazing angles."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows the pink legs reflecting downward in the water just as in the reference photo, and Screenshot 5 shows the full reflection of the bird across the water plane."
+    },
+    "20": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 show the water surface completely level across the frame with no unintended tilt."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In the code, footRipple is a single MeshBasicMaterial RingGeometry around only one leg that merely pulses its scale by 6% in place without spreading outward or distorting the Water shader reflection."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "In animate(), flamingo.position.y and neckMesh.rotation.z oscillate with gentle sine waves to create subtle breathing and slight neck movement."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "In animate(), water.material.uniforms['time'].value advances at elapsed * 0.22, moving small normal-mapped wavelets steadily across the water surface."
+    },
+    "24": {
+     "pass": true,
+     "evidence": "All motions in animate() are driven by continuous sine waves and linear time on a RepeatWrapping normal map at calm speeds, looping smoothly with no jumps or resets."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Screenshots 1 to 3 show only a single hard-edged oval ring mesh on one foot instead of concentric fading ripples, and Screenshots 2, 3, and 5 reveal a repeating horizontal banding pattern tiled across the water."
+    },
+    "26": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the cone mesh for the left foot intersects and clips halfway through the opaque water plane, leaving a sharp triangular spike sticking above the surface."
+    },
+    "27": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 4 show smooth vertex-colored surfaces on the body, neck, and wings with no visible 2D texture seams or tiling artifacts."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "Screenshots 1 to 5 show clean, antialiased 3D geometry silhouettes against the sky and water with no jagged cut-out edges or halos."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 immediately reads as a simplified 3D geometric model with a disconnected cylindrical neck base, spiky cone feathers, a sharp horizon split, and an on-screen UI bar, so it could not pass for the reference photo."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "In Screenshot 1, because the wing sits flush against the torso rather than lifting away from it, there is no soft cast shadow falling under the wing across the flank or along the neck as seen in the reference photo."
+    }
+   }
+  },
+  "4": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1 through 5 show the 3D scene rendering properly in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 confirm camera orbiting and zooming around the flamingo, while OrbitControls in the code sets maxPolarAngle to Math.PI * 0.492 and maxDistance to 26 to keep the camera above the water and inside the 180-unit sky dome."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses lightweight procedural geometry, a single 2048 shadow map, and one 1024x1024 planar Water reflection with no heavy post-processing, which easily runs above 30 fps on a standard laptop."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display a persistent text pill overlay at the bottom reading 'Drag to Orbit 3D • Scroll to Zoom • Right-Drag to Pan', and right-drag panning is enabled in addition to orbiting."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, the water normal map time uniform, foot ripple scale, and subtle flamingo motion run automatically from load via clock.getElapsedTime() without user input."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 frames the flamingo in profile from roughly the bird's height, centred and spanning most of the vertical frame as in the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a single flamingo standing in calm water in the same mid-stride pose as the reference photo, with one straight supporting leg forward and the other bent backward behind it."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the reference palette with a coral-orange neck and upper wings, paler pinkish-coral torso, pink legs with redder joints, black flight feathers, and a pale upper beak ending in a black tip."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Instead of a soft, even blue blending water and sky, Screenshots 1, 2, 3, and 5 show a stark, sharp horizon line separating a dark cobalt-blue sky from much paler ice-blue water."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 3 show bright directional sunlight coming from the front-right (sunLight at (7.5, 6.5, 5.5)), illuminating the chest, front of the neck, and front of the legs as in the photo."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "In Screenshot 1, the neck forms a clear S-curve with the head curved over at the top and the hooked beak pointing downward."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "While the bird has long thin legs with backward-bending joints and a compact body, the feet are modelled as simple single cones (ConeGeometry) that look like a sharp red spike in Screenshot 1 rather than webbed feet."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, the wings hug tightly against the flanks rather than being partly raised away from the body, with spiky black cones protruding from the rear and hanging straight down below the belly in Screenshots 2 and 3."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "In Screenshot 1, only the left leg has a flat dark ring while the right leg enters the water with no ripple ring at all, and the left foot sticks up out of the water like an angled red cone."
+    },
+    "12": {
+     "pass": false,
+     "evidence": "In Screenshots 1 and 4, shifting bodyMesh upward by 0.31 leaves the base of the neck TubeGeometry (created with closed = false, leaving open uncapped ends) visibly disconnected and jutting out below the chest."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show smooth directional shading across the curved torso, neck, and wings, with a brightly lit front-right side and a softer hemisphere-lit shaded side."
+    },
+    "14": {
+     "pass": true,
+     "evidence": "Screenshot 1 uses ACES filmic tone mapping and hemisphere fill light so that the pale beak base is not blown out to pure white and dark feathers retain subtle shading rather than clipping to pure black."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshot 1 has a crisp, high-contrast horizon edge cutting across the middle of the background rather than a smooth, soft, out-of-focus gradient as in the photo."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "Across Screenshots 1–4, the neck, body, and wing coverts read as smooth plastic-like geometric tubes and cones rather than soft, layered plumage."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "Although the pink legs have darker reddish joints, the black beak tip shares plumageMat (roughness 0.58 with feather bump) and looks flat and matte in Screenshot 1 rather than glossy black."
+    },
+    "18": {
+     "pass": true,
+     "evidence": "Comparing Screenshot 4 (from above, showing weak reflection) with Screenshots 1 and 5 (grazing angles, showing bright sky and bird reflections) confirms a smooth, glossy Fresnel water surface."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows the flamingo's legs reflecting in the water as in the photo, and Screenshot 5 reveals the full bird and leg reflection at a wider framing."
+    },
+    "20": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 show the water surface completely horizontal and level with no unintended tilt."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In the code, footRipple is just a single flat MeshBasicMaterial ring on the left foot pulsing slightly in place (1 + Math.sin(elapsed * 2.2) * 0.06), so ripples neither spread outward from the legs nor distort the planar water reflection."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "In animate(), flamingo.position.y and neckMesh.rotation.z oscillate gently via sine waves to give subtle breathing and neck movement."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "Advancing water.material.uniforms['time'] in animate() moves small procedural wind wavelets continuously across the water surface."
+    },
+    "24": {
+     "pass": true,
+     "evidence": "All motions in animate() use continuous low-frequency sine functions and seamless wrapped water normals driven by elapsed time, running at calm real-world speed with no loop jumps."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 show only a single hard-edged translucent oval around one foot rather than concentric ripple rings fading with distance, and horizontal banding from the tiled water normal map is visible in Screenshots 1 and 5."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the leg shafts and hip tufts attaching cleanly to the underside of the torso and entering the water plane without poking through the upper body."
+    },
+    "27": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show smooth vertex-colored surfaces on the bird with no visible UV texture seams or repeating patterns on the plumage."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "In Screenshots 1–5, WebGL antialiasing produces clean, smooth silhouettes around the bird against both the sky and water with no jagged cut-out edges or halos."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 immediately reads as a simple stylized 3D primitive model—with a disconnected tube neck, spiky cone feathers, a stark two-tone horizon, and an on-screen UI bar—and could not pass for the reference photo at first glance."
+    },
+    "30": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a soft shadow cast immediately beneath the wing covert onto the flank and smooth directional shading along the underside of the S-curved neck matching the front-right sun."
+    }
+   }
+  },
+  "5": {
+   "provider": "Google AI Studio",
+   "results": {
+    "G1": {
+     "pass": true,
+     "evidence": "Screenshots 1–5 show the scene rendering cleanly in Chrome with no blank screen or errors."
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 demonstrate camera orbiting and zooming, and OrbitControls in the code restricts maxPolarAngle to Math.PI * 0.492 and maxDistance to 26 so the camera stays above the water and inside the sky dome."
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "The scene uses lightweight procedural tubes, cones, spheres, one 2048x2048 shadow map, and a single 1024x1024 planar Water reflection with no post-processing, easily maintaining 30+ fps on integrated graphics."
+    },
+    "1": {
+     "pass": false,
+     "evidence": "Screenshots 1–5 display an on-screen UI banner ('Drag to Orbit 3D • Scroll to Zoom • Right-Drag to Pan'), and OrbitControls leaves panning enabled in addition to orbiting."
+    },
+    "2": {
+     "pass": true,
+     "evidence": "In the animate() loop, water normal scrolling (water.material.uniforms['time']), subtle flamingo breathing, neck rotation, and footRipple scaling run automatically on load."
+    },
+    "3": {
+     "pass": true,
+     "evidence": "Screenshot 1 frames the flamingo from a side angle near the bird's height, centered and filling most of the vertical frame as in the reference photo."
+    },
+    "4": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows a single flamingo standing in calm water in the same mid-stride pose as the reference photo, with one straight supporting leg and one bent trailing leg."
+    },
+    "5": {
+     "pass": true,
+     "evidence": "Screenshot 1 matches the key colour regions of the photo: coral-orange neck, wings, and upper body, pink legs with darker joints, black flight feathers, and a pale-based beak with an orange middle and black tip."
+    },
+    "6": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 5 show a dark royal-blue sky meeting a much paler blue water surface along a crisp, high-contrast horizon line rather than the soft, even, seamless blue of the photo."
+    },
+    "7": {
+     "pass": true,
+     "evidence": "In Screenshot 1 and sunLight.position.set(7.5, 6.5, 5.5), bright directional sunlight illuminates the bird from the front right while leaving the rear/left side (Screenshot 2) in shade."
+    },
+    "8": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows the neck curving in a clear S shape with the head bent over and the hooked beak pointing straight down."
+    },
+    "9": {
+     "pass": false,
+     "evidence": "While the legs are long and thin with backward-bending joints, Screenshot 1 and createLeg() show each foot is modeled as a single small cone with no webbed toes, and in Screenshot 4 the eyes protrude like stalks."
+    },
+    "10": {
+     "pass": false,
+     "evidence": "In Screenshots 1–3, the wings sit flat against the sides of the body with thin black cones poking straight out the back rather than a partly raised wing revealing layered flight feathers underneath."
+    },
+    "11": {
+     "pass": false,
+     "evidence": "Screenshots 1–3 show a flat, dark translucent RingGeometry disc around only the left foot while the right leg enters the water with no ripple ring at all."
+    },
+    "12": {
+     "pass": true,
+     "evidence": "Screenshots 2–5 show closed 3D geometry all the way around the flamingo with no holes or missing faces, and the 300x300 water plane extends to the horizon with no visible outer boundary."
+    },
+    "13": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show smooth directional shading wrapping around the curved body and neck, with a bright front-right lit side and a softer blue-filled shadow side."
+    },
+    "14": {
+     "pass": true,
+     "evidence": "In Screenshot 1, ACES filmic tone mapping and hemisphere fill light keep highlights from blowing out to pure white and dark areas from crushing to solid black."
+    },
+    "15": {
+     "pass": false,
+     "evidence": "Screenshots 1, 2, 3, and 5 have a razor-sharp horizon line separating a dark blue sky from light blue water instead of a soft, out-of-focus smooth gradient."
+    },
+    "16": {
+     "pass": false,
+     "evidence": "Across Screenshots 1–4, the body, neck, and wings read as smooth plastic tubes and cones with abrupt geometric intersections rather than soft, layered plumage."
+    },
+    "17": {
+     "pass": false,
+     "evidence": "Although the legs have darker reddish joints, the beak tip is part of neckMesh using plumageMat (roughness 0.58 with feather bump) and appears matte in Screenshot 1 rather than glossy black."
+    },
+    "18": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 show a smooth, glossy water surface using Three.js Water that reflects the sky more strongly toward grazing horizon angles."
+    },
+    "19": {
+     "pass": true,
+     "evidence": "Screenshots 1 and 5 clearly show planar reflections of the flamingo's legs and body on the water surface."
+    },
+    "20": {
+     "pass": true,
+     "evidence": "Screenshots 1, 2, 3, and 5 show the water surface is completely horizontal and level."
+    },
+    "21": {
+     "pass": false,
+     "evidence": "In the code, footRipple is a static-positioned MeshBasicMaterial RingGeometry pulsing by 6% on only one leg, so ripples neither spread outward across the water nor distort the Water reflection."
+    },
+    "22": {
+     "pass": true,
+     "evidence": "In animate(), flamingo.position.y and neckMesh.rotation.z apply a gentle sinusoidal breathing and neck motion continuously."
+    },
+    "23": {
+     "pass": true,
+     "evidence": "In animate(), water.material.uniforms['time'].value advances continuously at elapsed * 0.22, moving small wavelets across the water surface."
+    },
+    "24": {
+     "pass": true,
+     "evidence": "All animations in animate() use smooth sine waves and linear time offsets on wrapped normal textures at gentle speeds, running without jumps or loop resets."
+    },
+    "25": {
+     "pass": false,
+     "evidence": "Instead of concentric ripple rings fading with distance, Screenshot 1 shows a single hard-edged translucent ring on one foot and visible horizontal repeating wave bands across the water."
+    },
+    "26": {
+     "pass": true,
+     "evidence": "Screenshots 1–3 show the legs connecting cleanly to the underside of the body via femoral tufts and entering the water without unnatural clipping."
+    },
+    "27": {
+     "pass": true,
+     "evidence": "Screenshots 1–4 show smooth vertex-colored surfaces with a very subtle bump map and no visible UV texture seams or repeating tile patterns on the plumage."
+    },
+    "28": {
+     "pass": true,
+     "evidence": "Screenshot 1 shows clean, antialiased 3D silhouette edges on the bird against the blue sky with no jagged cutouts or halos."
+    },
+    "29": {
+     "pass": false,
+     "evidence": "Screenshot 1 immediately reads as a simplified geometric 3D model with tubular body parts, spiky cone feathers, a stark horizon seam, and an on-screen UI pill, so it could not pass for the reference photo."
+    },
+    "30": {
+     "pass": false,
+     "evidence": "In Screenshot 1, the flat side-mounted wing fails to cast the broad soft shadow onto the flank seen in the photo, showing only a thin dark crack along the wing's lower edge."
+    }
+   }
+  }
+ }
+}

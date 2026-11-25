@@ -170,7 +170,7 @@ function renderOverview() {
   const all = SAMPLES.flatMap(s => s.rows).filter(r => r.k);
   const unanAll = all.filter(r => r.v === 0 || r.v === r.k).length;
   const runsLabel = STATS.runs.length === 1 ? `${STATS.runs[0]} runs` : 'runs';
-  page.className = 'doc';
+  page.className = 'doc wide';
   page.innerHTML = `
     <h1 class="home">Rubrics</h1>
     <p class="lead">Five photos, each turned into a 3D scene by ${esc(MODEL)} from one prompt, then scored against its rubric by a human review and by ${esc(MODEL)} as a judge, ${runsLabel} per scene.</p>
@@ -217,7 +217,16 @@ function renderSample(s) {
     ${s.note ? `<p class="gen-note">${esc(s.note)}</p>` : ''}
     ${s.caps.length ? `<details class="sec"><summary><h2>Captures</h2><span class="label">${s.caps.length} views &middot; what both reviews saw</span></summary><div class="caps">${s.caps.map(c => `<a href="${esc(c)}" target="_blank" rel="noopener"><img src="${esc(c)}" alt="${esc(capName(c))}" loading="lazy"><span class="label">${esc(capName(c))}</span></a>`).join('')}</div></details>` : ''}
     <details class="sec" open><summary><h2>Rubrics</h2><span class="label">${agreeText(s.rows)} agree with human</span></summary>${rubricTable(s.rows)}</details>`;
-  page.querySelectorAll('.only-dis-box').forEach(b => b.addEventListener('change', () => page.querySelector('.judge-wrap').classList.toggle('only-dis', b.checked)));
+  page.querySelectorAll('.only-dis-box').forEach(b => b.addEventListener('change', () => {
+    const wrap = page.querySelector('.judge-wrap');
+    wrap.classList.toggle('only-dis', b.checked);
+    // hide category headers whose rows are all filtered out
+    wrap.querySelectorAll('tr.grp').forEach(g => {
+      let shown = false;
+      for (let r = g.nextElementSibling; r && !r.classList.contains('grp'); r = r.nextElementSibling) if (getComputedStyle(r).display !== 'none') shown = true;
+      g.hidden = b.checked && !shown;
+    });
+  }));
   page.querySelectorAll('.frame iframe[data-src]').forEach(f => {
     const cover = f.parentElement.querySelector('.loading');
     f.addEventListener('load', () => { if (f.src && f.src !== 'about:blank') setTimeout(() => cover.classList.add('done'), 600); });
